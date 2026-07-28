@@ -1,0 +1,467 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.9in]{geometry}
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{algorithm, algpseudocode}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\definecolor{linkblue}{RGB}{0, 70, 140}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true, urlcolor=linkblue, linkcolor=linkblue, citecolor=linkblue]{hyperref}
+\usepackage[nameinlink,capitalize,noabbrev]{cleveref}
+
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
+\pagestyle{plain}
+
+% math shorthands, matching methodology.tex
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\bbH}{\mathbb{H}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\Lhat}{\hat{L}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\begin{document}
+
+% ======================================================================
+%  ByteBoost 2026 - Project Description
+% ======================================================================
+
+\begin{center}
+ {\Large\bfseries ByteBoost Workshop: Project Description}\\[6pt]
+    {\large\bfseries Shape-Constrained Boosted Symbolic Regression\\
+    for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation}
+\end{center}
+
+\hrule
+\vspace{6pt}
+
+\section{Field of science}\label{sec:field}
+Computer Science: Machine Learning and Artificial Intelligence, specifically the foundations of large language models (neural scaling laws) and interpretable machine learning via symbolic regression. Secondary field: High-Performance Computing and computer architecture (cross-platform performance characterization).
+
+\section{Abstract / summary}\label{sec:abstract}
+
+Training a modern AI language model can cost millions of dollars in computing time, so researchers rarely train blindly. Instead they rely on \emph{scaling laws}: compact formulas that predict how much error a model will make before it is built, from how large it is and how much text it reads. These formulas guide how money and hardware are spent across the AI industry. Yet they are essentially educated guesses: a human picks the \emph{shape} of the equation by hand, then fits a few numbers to measured data.
+
+Our project asks a computer to discover the equation itself, using \emph{symbolic regression}: a search over enormous numbers of candidate formulas that returns a readable equation rather than an opaque black box. Left unconstrained, such a search is unreliable. It finds formulas that match the measurements we already have, then predicts nonsense at larger scale, such as negative error, or error that \emph{rises} when you add training data. We therefore require every formula to obey common-sense rules: more data and bigger models never hurt; each further increase helps less than the last; error stays positive; and improvement stops at an irreducible floor no model can beat.
+These rules are formalized as the admissibility axioms in \cref{sec:axioms}; we \emph{mathematically prove} they hold over the full certification domain, not just at the points we happened to measure (\cref{sec:guarantee,sec:stage-admiss}).
+
+We build the formula in stages, starting from a simple textbook law and adding one correction at a time (\cref{sec:boosting,sec:stage-admiss}).
+The guarantees hold after \emph{every} stage, not only at the end, and we prove the corrections sharpen the fit without changing the two numbers researchers care about most: the irreducible floor, and how fast error falls as models and data grow.
+We develop two variants (\cref{sec:boosting,sec:soft}): one discards any correction that breaks a rule; the other scores how badly rules are bent and drives those scores to zero, searching more freely while still bounding any shortfall.
+
+We need ByteBoost's testbeds because the project has two very different bottlenecks (\cref{sec:testbeds,sec:baselines}).
+Training large models is limited by raw computing speed; Neocortex's Cerebras systems put an entire model on one giant chip, which avoids the slowdown of splitting a model across many ordinary GPUs.
+We will compare those training runs with runs we have already finished on NVIDIA GPUs (\cref{sec:baselines}).
+Finding the formula is a separate problem: a large search that mainly uses ordinary processors, and whose most expensive step is the mathematical check that each candidate obeys the rules (\cref{sec:certificates}).
+Ookami's A64FX machines are a strong fit for that search, and would also let us carefully measure how this kind of formula search performs on that hardware.
+
+By the end of the program we will deliver a scaling-law formula that obeys the rules above, fit on our collected training data; an open-source library for finding such formulas; and a short write-up of the method (\cref{sec:deliverables}).
+An initial batch of trained models is already public (\cref{sec:datasets}), so we do not start from scratch.
+
+\section{Key requirements}\label{sec:requirements}
+
+\subsection{Testbed hardware (requested)}\label{sec:testbeds}
+\begin{itemize}[nosep, leftmargin=1.4em]
+ \item \textbf{Neocortex (PSC):} Cerebras wafer-scale systems for the model-pretraining grid described in \cref{sec:models,sec:datasets}, where dataflow execution and wafer-scale memory should cut training wall-clock time for the larger models without the overhead of distributed training.
+ \item \textbf{Ookami (Stony Brook):} Fujitsu A64FX nodes (ARM ISA, 512-bit SVE vector units, HBM2) for the CPU-bound, highly parallel symbolic-regression search of \cref{sec:boosting}, and in particular the certification inner loop of \cref{sec:certificates}.
+\end{itemize}
+
+\subsection{Baseline hardware (already available to us)}\label{sec:baselines}
+200 NVIDIA GH200 superchips on DeltaAI at NCSA, a local four-GH200 cluster, and three 256-core AMD EPYC machines, used as our existing GPU/x86 baselines.
+
+\subsection{Software and tools}\label{sec:software}
+PyTorch 2.x with FlashAttention for pretraining; \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}; \texttt{gplearn} for the hard-constrained symbolic-regression path of \cref{sec:boosting,sec:stage-admiss} with custom admissibility predicates~\citep{stephens2015gplearn}; Deep Symbolic Optimization (DSO) with a transformer-based controller for the soft-constrained path of \cref{sec:soft}; JAX with custom JVP rules and a Python interval-arithmetic backend for the automatic-differentiation-plus-interval-arithmetic proof step of \cref{sec:certificates}.
+
+\subsection{Models}\label{sec:models}
+Decoder-only transformer language models in the LLaMA architecture~\citep{touvron2023llama}, spanning roughly 10M--1.4B parameters, across several tokens-per-parameter ratios ($M = D/N$), following the Step Law protocol~\citep{li2025steplaw} and the overtraining regime of Gadre et al.~\citep{gadre2024overtraining}, with $\mu$P~/~$\mu$Transfer~\citep{yang2022mup} to decouple optimization from scale.
+
+\subsection{Datasets}\label{sec:datasets}
+Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and FineWeb-Edu~\citep{penedo2024finewebedu} pretraining corpora; an already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} (trained checkpoints and loss curves from an initial DeltaAI grid).
+
+\section{Method summary (technical)}\label{sec:method}
+
+\subsection{Setup}\label{sec:setup}
+Let $N$ be the parameter count, $D$ the training-token count, and
+$\calH = \{h_1, \ldots, h_m\}$ a finite set of remaining hyperparameters.
+For each coordinate $h \in \{N, D\} \cup \calH$, let $H_h$ be its finite set of
+admissible values and $\phi_h \colon H_h \to \bbR_{>0}$ a strictly monotone
+preprocessing map; write $\phi_i \coloneqq \phi_{h_i}$ for brevity.
+The configuration space is the product
+$\bbH \coloneqq \prod_{h \in \{N,D\}\cup\calH} H_h$,
+with typical element $\mathbf{h} \in \bbH$ (so $N, D, h_i$ denote the corresponding
+coordinates of~$\mathbf{h}$).
+Let $L \colon \bbH \to \bbR$ be validation loss; we seek $\Lhat \approx L$.
+We are given a labeled dataset
+$\calD = \{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n} \subset \bbH \times \bbR$.
+For each scale variable $x \in \{N, D\}$ set
+$x_{\min} \coloneqq \min H_x > 0$ and
+$x_{\max} \coloneqq \max H_x$,
+treat $x$ as continuous on
+$[x_{\min}, \infty)$, and take all derivatives with the other coordinates held fixed.
+
+\subsection{Admissibility axioms}\label{sec:axioms}
+$\Lhat$ is \emph{admissible} ($\Lhat \in \calS$) if it satisfies~(A1)--(A6) below.
+Where an axiom mentions a scale variable $x$, it is imposed for each
+$x \in \{N, D\}$ with the other coordinates held fixed.
+
+\begin{enumerate}[nosep, leftmargin=2.2em, label=\textup{(A\arabic*)}]
+    \item \textbf{Monotone decrease.}
+    $\dfrac{\partial \Lhat}{\partial x} \leq 0$ for all $x \geq x_{\min}$.
+    \item \textbf{Diminishing returns.}
+    $\dfrac{\partial^2 \Lhat}{\partial x^2} \geq 0$ for all $x \geq x_{\min}$.
+    \item \textbf{Irreducible loss.}
+    There is a positive \emph{joint floor} $L_\infty$ and, along each axis, a
+    \emph{marginal floor} $L^{\infty}_{x}$:
+    \begin{enumerate}[nosep, leftmargin=1.4em, label=\textup{(\roman*)}]
+        \item \emph{Joint floor.}
+        There exists $L_\infty > 0$ such that
+        $\Lhat(\mathbf{h}) > L_\infty$ for every $\mathbf{h} \in \bbH$.
+        \item \emph{Marginal floor.}
+        For each $x \in \{N,D\}$ and every fixed choice of the other
+        coordinates, the single-axis limit
+        \begin{equation}\label{eq:margfloor-bb}
+            L^{\infty}_{x}
+            \;\coloneqq\;
+            \lim_{t \to \infty}
+            \Lhat(\mathbf{h})\big|_{x = t}
+        \end{equation}
+        exists and is finite, and satisfies
+        $L^{\infty}_{x} \geq L_\infty$.
+    \end{enumerate}
+    Equality $L^{\infty}_{x} = L_\infty$ holds only in the joint limit
+    (all scale variables $\to \infty$ together); along a single axis the
+    marginal floor is in general strictly larger.
+    \item \textbf{Asymptotic power-law decay.}
+    Relative to the marginal floor~\eqref{eq:margfloor-bb},
+    \begin{equation}\label{eq:powerlaw-bb}
+        \lim_{t\to\infty}
+        \frac{\log\bigl(\Lhat(\mathbf{h})\big|_{x=t}
+            - L^{\infty}_{x}\bigr)}{\log t}
+        \;=\; c_x
+        \qquad\text{for some } c_x < 0.
+    \end{equation}
+    \item \textbf{Positivity.}
+    $\Lhat(\mathbf{h}) > 0$ for all $\mathbf{h} \in \bbH$.
+    \item \textbf{Graceful saturation.}
+    $\Lhat$ is continuous and differentiable ($C^1$) in $x$ on $[x_{\min}, \infty)$, with
+    $\Lhat(x_{\min}, \cdot)$ finite and $> L_\infty$.
+\end{enumerate}
+
+These encode physical priors on loss surfaces that unconstrained symbolic regression routinely violates.
+In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a single axis the excess over the joint floor need not vanish, so a power-law rate would not be identifiable against $L_\infty$.
+
+\subsection{Boosted construction}\label{sec:boosting}
+The ensemble is built stagewise,
+$\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$, under an \emph{admissibility invariant}:
+$\Lhat^{(j)} \in \calS$ for every $j = 0, \ldots, K$ (\cref{sec:axioms}).
+Throughout, $\Lhat_j$ (subscript) is the stage-$j$ correction and
+$\Lhat^{(j)}$ (superscript) is the cumulative ensemble through stage~$j$,
+so in particular $\Lhat^{(0)} = \Lhat_0$.
+Stage~$0$ is a generalized Chinchilla law, fit in closed form and admissible by
+construction with joint floor $L_\infty = E$ and stage-0 asymptotic exponents
+$c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ (the rates $c_x$ in~(A4) of \cref{sec:axioms} along $N$ and~$D$):
+\begin{equation}\label{eq:chinchilla-bb}
+    \Lhat^{(0)} \;=\; \Lhat_0 \;=\;
+    \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}}
+    + \sum_{i=1}^{m} \frac{C_i}{\phi_i(h_i)^{\gamma_i}} + E,
+    \qquad A, B, C_i, E, \alpha, \beta, \gamma_i > 0 .
+\end{equation}
+Each later stage $j \geq 1$ fits Huber pseudo-residuals of the current ensemble,
+with clipping threshold
+\begin{equation}\label{eq:delta-bb}
+    \delta_j
+    \;\coloneqq\;
+    \mathrm{median}_{\ell=1,\ldots,n}
+    \bigl|L(\mathbf{h}_\ell) - \Lhat^{(j-1)}(\mathbf{h}_\ell)\bigr|
+\end{equation}
+so that outlier runs cannot dominate:
+\begin{equation}\label{eq:pseudoresid-bb}
+    \tilde{r}_j^{(\ell)}
+    \;\coloneqq\;
+    \begin{cases}
+        L(\mathbf{h}_\ell) - \Lhat^{(j-1)}(\mathbf{h}_\ell)
+            & \text{if }
+              \bigl|L(\mathbf{h}_\ell) - \Lhat^{(j-1)}(\mathbf{h}_\ell)\bigr|
+              \leq \delta_j, \\[3pt]
+        \delta_j \cdot
+          \mathrm{sign}\bigl(L(\mathbf{h}_\ell)
+                        - \Lhat^{(j-1)}(\mathbf{h}_\ell)\bigr)
+            & \text{otherwise}.
+    \end{cases}
+\end{equation}
+Corrections are sought by genetic-programming search over expression trees with
+operators $\{+, \times, \div\} \cup \{\mathrm{pow}_p : p \in \calP\}$
+for a finite set $\calP \subset \bbR \setminus \{0\}$
+(where $\mathrm{pow}_p(z) = |z|^p$ for $z > 0$) and bounded depth.
+
+\subsection{Stagewise admissibility}\label{sec:stage-admiss}\label{sec:certificates}
+Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axioms} is a continuum statement over $\bbH$. Admissibility of the update is nonetheless equivalent to local conditions on the \emph{increment}: given $\Lhat^{(j-1)} \in \calS$ with joint floor $L_\infty$, $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$ is admissible \emph{if and only if} $\Lhat_j$ satisfies, for each $x \in \{N,D\}$,
+\begin{equation}\label{eq:stage-admiss-bb}
+\begin{gathered}
+\text{(i) } \frac{\partial \Lhat_j}{\partial x}
+   \leq -\frac{\partial \Lhat^{(j-1)}}{\partial x}
+   \quad\text{for all } x \geq x_{\min},
+\\[2pt]
+\text{(ii) } \frac{\partial^2 \Lhat_j}{\partial x^2}
+   \geq -\frac{\partial^2 \Lhat^{(j-1)}}{\partial x^2}
+   \quad\text{for all } x \geq x_{\min},
+\\[2pt]
+\text{(iii) } \Lhat_j(\mathbf{h}) > -\Lhat^{(j-1)}(\mathbf{h})
+   \quad\text{for all } \mathbf{h} \in \bbH,
+\\[2pt]
+\text{(iv) } \Lhat^{(j-1)}(\mathbf{h}) + \Lhat_j(\mathbf{h}) > L_\infty
+   \quad\text{for all } \mathbf{h} \in \bbH,
+\\[2pt]
+\text{(v) } \Lhat_j(\mathbf{h})\big|_{x=t} = O\bigl(t^{c_{x,j}}\bigr)
+   \text{ as } t \to \infty
+   \text{ for some } c_{x,j} < c_x^{(0)},
+\\[2pt]
+\text{(vi) } \Lhat_j \in C^\infty
+   \text{ on } [x_{\min}, x_{\max}]
+   \text{ with }
+   \bigl|\Lhat_j(x_{\min}, \cdot)\bigr| < \infty.
+\end{gathered}
+\end{equation}
+Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\bbH$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
+They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificates decide whether~$g$ preserves~\eqref{eq:stage-admiss-bb}: interval checks establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
+
+\smallskip\noindent
+\emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on~$\calI_x$).
+Over the compact box $\calI_x \coloneqq [x_{\min}, x_{\max}]$ (other coordinates ranging over their finite $H_h$), forward-mode automatic differentiation composed with interval arithmetic~\citep{moore2009interval,kronberger2022shape} evaluates~$g$ bottom-up on interval operands and returns guaranteed enclosures
+$\underline{f} \leq f \leq \overline{f}$ on~$\calI_x$ for $f \in \{F,\, \partial F/\partial x,\, \partial^2 F/\partial x^2\}$, in time linear in the tree size.
+A candidate is accepted when, for each $x \in \{N,D\}$,
+\begin{equation}\label{eq:interval-bb}
+    \overline{\partial F / \partial x} \leq 0,
+    \quad
+    \underline{\partial^2 F / \partial x^2} \geq 0,
+    \quad
+    \underline{F} > L_\infty ,
+    \quad
+    \overline{F} < \infty .
+\end{equation}
+Because the enclosures are sound, \eqref{eq:interval-bb} is a \emph{sufficient} certificate that the corresponding continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points:
+$\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ on~$\calI_x$ (hence~(i) on the box), and likewise for~(ii);
+$\underline{F} > L_\infty > 0$ forces both~(iii) and~(iv) on the configurations covered by the product of boxes;
+$\overline{F} < \infty$ forces the finiteness half of~(vi) (smoothness of~$g$ on~$\calI_x$ follows from the operator set).
+The test is conservative: a failure of~\eqref{eq:interval-bb} does \emph{not} prove that~$g$ fails~\eqref{eq:stage-admiss-bb} (interval over-approximation can reject a truly admissible update), but every accepted~$g$ is guaranteed to preserve admissibility on~$\calI_x$.
+That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the A64FX performance work.
+
+\smallskip\noindent
+\emph{(b) Exact structural checks} (condition~(v), and prerequisites for it).
+Define the asymptotic exponent $\mathrm{ord}(g,x)$ recursively on the tree: constants and leaves other than~$x$ contribute~$0$; $\mathrm{pow}_p(x)$ contributes~$p$; products add exponents; quotients subtract; sums take the maximum.
+Then~(v) holds with $c_{x,j} = \mathrm{ord}(g,x)$ precisely when $\mathrm{ord}(g,x) < c_x^{(0)}$ for each $x \in \{N,D\}$.
+We additionally require that each scale variable $x \in \{N,D\}$ appears as a leaf of~$g$ (otherwise the exponent in~$x$ is undefined or vacuously~$0$).
+Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\bbH$.
+
+Algorithm~\ref{alg:boosting-bb} enforces~\eqref{eq:stage-admiss-bb} via certificates~(a)--(b) at every stage.
+\begin{algorithm}[H]
+\caption{Shape-constrained boosted symbolic regression}
+\label{alg:boosting-bb}
+\begin{algorithmic}[1]
+\Require Dataset $\calD = \{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n}$,
+         stages $K$
+\Ensure Admissible ensemble $\Lhat^{(K)} \in \calS$
+\State Fit $\Lhat_0$ via~\eqref{eq:chinchilla-bb} on $\calD$;
+       set $\Lhat^{(0)} \gets \Lhat_0$
+\For{$j = 1, \ldots, K$}
+    \State Compute $\delta_j$ via~\eqref{eq:delta-bb}
+    \State Compute $\tilde{r}_j^{(\ell)}$ for all $\ell=1,\ldots,n$
+           via~\eqref{eq:pseudoresid-bb}
+    \State Find
+           $\Lhat_j \in \argmin_{g}
+           \dfrac{1}{n}\sum_{\ell=1}^{n}\bigl(\tilde{r}_j^{(\ell)} - g(\mathbf{h}_\ell)\bigr)^2$
+           subject to certificates~(a)--(b) for~\eqref{eq:stage-admiss-bb}
+    \State $\Lhat^{(j)} \gets \Lhat^{(j-1)} + \Lhat_j$
+\EndFor
+\State \Return $\Lhat^{(K)}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Guarantee}\label{sec:guarantee}
+If $\Lhat_0 \in \calS$ and every $\Lhat_j$ is accepted by certificates~(a)--(b) of \cref{sec:stage-admiss}, then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
+\begin{equation}\label{eq:guarantee-bb}
+    \lim_{t \to \infty}
+    \frac{\log\bigl(\Lhat^{(j)}(\mathbf{h})\big|_{x=t}
+        - L^{\infty}_{x}\bigr)}{\log t}
+    \;=\; c_x^{(0)},
+\end{equation}
+where $L^{\infty}_{x}$ is the marginal floor of $\Lhat^{(j)}$ along~$x$ (equal to that of~$\Lhat_0$). Boosting therefore improves fit \emph{without} corrupting the interpretable constants researchers actually quote.
+
+\subsection{Soft-constrained variant}\label{sec:soft}
+A second path replaces the hard admissibility filter of Algorithm~\ref{alg:boosting-bb} and \cref{sec:stage-admiss} with per-axiom violation scores on the same candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$.
+Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural quantities of~(b), define
+\begin{equation}\label{eq:violations-bb}
+\begin{aligned}
+    v_{\mathrm{mono}}(g)
+      &= \max_{x\in\{N,D\}}
+         \max\Bigl(0,\; \overline{\partial F/\partial x}\Bigr),
+    &\quad&\text{(monotonicity gap)},
+    \\
+    v_{\mathrm{conv}}(g)
+      &= \max_{x\in\{N,D\}}
+         \max\Bigl(0,\; -\underline{\partial^2 F/\partial x^2}\Bigr),
+    &\quad&\text{(convexity gap)},
+    \\
+    v_{\mathrm{irred}}(g)
+      &= \max\bigl(0,\; L_\infty - \underline{F}\bigr),
+    &\quad&\text{(floor gap)},
+    \\
+    v_{\mathrm{decay}}(g)
+      &= \max_{x\in\{N,D\}}
+         \max\bigl(0,\;
+           \mathrm{ord}(g,x) - c_x^{(0)}
+           + \varepsilon_{\mathrm{decay}}\bigr),
+    &\quad&\text{(power-law gap)},
+    \\
+    v_{\mathrm{leaf}}(g)
+      &= \bigl|\{x\in\{N,D\}
+           : x \notin \mathrm{leaves}(g)\}\bigr|,
+    &\quad&\text{(missing scale leaves)}.
+\end{aligned}
+\end{equation}
+Here $\varepsilon_{\mathrm{decay}} > 0$ is a fixed margin so that $v_{\mathrm{decay}}(g)=0$ forces the strict inequality $\mathrm{ord}(g,x) \leq c_x^{(0)}-\varepsilon_{\mathrm{decay}} < c_x^{(0)}$ required by~\eqref{eq:stage-admiss-bb}(v); $\mathrm{leaves}(g)$ is the set of variable leaves of the expression tree~$g$.
+Every score is nonnegative, and $v_{\mathrm{mono}}=v_{\mathrm{conv}}=v_{\mathrm{irred}}=v_{\mathrm{leaf}}=0$ iff the corresponding hard certificate passes (for $v_{\mathrm{decay}}$, zero is sufficient but slightly stronger than~(v) because of the margin).
+Writing $a$ for an axiom index ranging over $\{\mathrm{mono},\mathrm{conv},\mathrm{irred},\mathrm{decay},\mathrm{leaf}\}$ and $\lambda_a > 0$ for its penalty weight, the aggregate violation is $V(g)=\sum_a v_a(g)$.
+Stage~$j$ then minimizes the penalized fitness
+\begin{equation}\label{eq:penalized-bb}
+    F_j(g) \;=\;
+    \underbrace{\frac{1}{n} \sum_{\ell=1}^{n}
+      \bigl(\tilde{r}_j^{(\ell)} - g(\mathbf{h}_\ell)\bigr)^2}_{\text{data fit}}
+    \;+\;
+    \underbrace{\sum_a \lambda_a \, v_a(g)^2}_{\text{axiom penalty}} ,
+\end{equation}
+where $F_j$ is a scalar fitness (distinct from the ensemble map~$F$ above), the first term is mean squared error of~$g$ against the Huber pseudo-residuals~\eqref{eq:pseudoresid-bb}, and the second term penalizes axiom gaps (squared so the penalty gradient vanishes at zero violation).
+Candidates that already satisfy~\eqref{eq:stage-admiss-bb} therefore incur no penalty pressure.
+This path carries its own guarantee: $V = 0$ at every stage recovers the hard result exactly; the interval-based scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-bound the corresponding true pointwise violations (while $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact), yielding a \emph{measured} admissibility gap rather than silent failure; and for a sufficiently small decay margin every correction that passes the hard admissibility certificates has zero penalty, so the soft search provably contains the hard one of \cref{sec:stage-admiss}.
+Comparing the two paths (certified-but-restricted versus free-but-scored) is one of the empirical questions the project settles.
+
+\section{Additional information}\label{sec:additional}
+
+\subsection{Collaborators welcome}\label{sec:collaborators}
+The project splits into two fairly independent tracks, so a teammate could own either one.
+The \emph{modeling} track ports and benchmarks transformer pretraining on Cerebras (\cref{sec:testbeds}) and profiles it against our GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras SDK).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to A64FX (\cref{sec:testbeds}) and tunes the certification inner loop of \cref{sec:certificates} for the ARM/SVE architecture (useful background: C/C++ or Python performance work, or an interest in ARM/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
+No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
+
+\subsection{Deliverables}\label{sec:deliverables}
+(1) An admissible boosted scaling law (\cref{sec:axioms,sec:guarantee}) fit on the collected training grid (\cref{sec:datasets}); (2) a public release of the shape-constrained symbolic-regression library with the interval-arithmetic-certified admissibility checking of \cref{sec:certificates}; and (3) a short paper on the method of \cref{sec:method}.
+
+\clearpage
+\renewcommand{\refname}{References}
+\renewcommand{\bibsection}{\section{\refname}}
+\bibliographystyle{unsrtnat}
+\bibliography{byteboost_refs}
+
+\clearpage
+\section{Notation}\label{sec:notation}
+\begin{longtable}{@{}>{$}l<{$}p{0.72\textwidth}@{}}
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Symbol} & \textbf{Meaning} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+N, D
+  & Parameter count and training-token count (scale variables). \\
+M
+  & Tokens-per-parameter ratio $M = D/N$ (\cref{sec:models}). \\
+\calH = \{h_1,\ldots,h_m\}
+  & Remaining hyperparameters; $m = |\calH|$. \\
+i
+  & Hyperparameter index, $i=1,\ldots,m$ (distinct from
+    data-point index~$\ell$). \\
+H_h
+  & Finite set of admissible values for coordinate $h \in \{N,D\}\cup\calH$. \\
+\phi_h,\; \phi_i
+  & Strictly monotone preprocessing $\phi_h \colon H_h \to \bbR_{>0}$;
+    $\phi_i \coloneqq \phi_{h_i}$. \\
+\bbH
+  & Configuration space $\prod_{h} H_h$. \\
+\mathbf{h}
+  & Typical element of $\bbH$ (coordinates $N,D,h_i$). \\
+L,\; \Lhat
+  & True validation loss and its approximation. \\
+\calD,\; n,\; \ell
+  & Labeled dataset
+    $\{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n}$;
+    $n = |\calD|$; data-point index~$\ell$. \\
+x
+  & Generic scale variable, $x \in \{N,D\}$. \\
+t
+  & Dummy limit variable along a scale axis
+    (e.g.\ $\Lhat(\mathbf{h})|_{x=t}$). \\
+x_{\min},\; x_{\max}
+  & $\min H_x$ and $\max H_x$. \\
+\calS
+  & Set of admissible scaling laws (\cref{sec:axioms}). \\
+L_\infty,\; L_\infty^{(j)}
+  & Joint irreducible-loss floor; joint floor of~$\Lhat^{(j)}$
+    ($L_\infty^{(j)}=E$ under the hard path). \\
+L^{\infty}_{x}
+  & Marginal floor along axis~$x$~\eqref{eq:margfloor-bb}. \\
+c_x,\; c_x^{(0)}
+  & Asymptotic power-law exponent along~$x$~(A4);
+    stage-0 value $c_N^{(0)}=-\alpha$, $c_D^{(0)}=-\beta$. \\
+j,\; K
+  & Boosting stage index; number of correction stages after
+    stage~$0$ (Algorithm~\ref{alg:boosting-bb}). \\
+\Lhat_j,\; \Lhat^{(j)}
+  & Stage-$j$ correction (subscript) and cumulative ensemble through
+    stage~$j$ (superscript); $\Lhat^{(0)}=\Lhat_0$. \\
+A,B,C_i,E,\alpha,\beta,\gamma_i
+  & Positive coefficients/exponents of the stage-0 Chinchilla
+    law~\eqref{eq:chinchilla-bb}; joint floor $L_\infty=E$. \\
+\delta_j
+  & Huber clipping threshold at stage~$j$~\eqref{eq:delta-bb}. \\
+\tilde{r}_j^{(\ell)}
+  & Huber pseudo-residual for data point~$\ell$ at
+    stage~$j$~\eqref{eq:pseudoresid-bb}. \\
+\calP,\; p
+  & Finite set of admissible powers
+    $\calP\subset\bbR\setminus\{0\}$; generic element~$p$. \\
+\mathrm{pow}_p
+  & Power primitive $\mathrm{pow}_p(z)=|z|^p$ for $z>0$. \\
+g,\; F
+  & Candidate expression tree; ensemble-plus-candidate
+    $F=\Lhat^{(j-1)}+g$. \\
+c_{x,j},\; \mathrm{ord}(g,x)
+  & Asymptotic exponent of correction/candidate~$g$ along~$x$;
+    $c_{x,j}=\mathrm{ord}(g,x)$ in~\eqref{eq:stage-admiss-bb}(v). \\
+\calI_x
+  & Compact certification box $[x_{\min},x_{\max}]$
+    (\cref{sec:stage-admiss}). \\
+\underline{f},\; \overline{f}
+  & Interval-arithmetic lower/upper enclosures of~$f$ on~$\calI_x$
+    (global over that box for fixed~$x$; soft scores take
+    $\max_{x\in\{N,D\}}$ of the per-axis gaps). \\
+a,\; v_a(g),\; V(g)
+  & Soft-path axiom index $a\in\{\mathrm{mono},\mathrm{conv},\mathrm{irred},
+    \mathrm{decay},\mathrm{leaf}\}$; per-axiom violation score;
+    aggregate $V=\sum_a v_a$~\eqref{eq:violations-bb}. \\
+\varepsilon_{\mathrm{decay}}
+  & Positive margin in $v_{\mathrm{decay}}$ so zero score implies
+    strict power-law decay~\eqref{eq:violations-bb}. \\
+\mathrm{leaves}(g)
+  & Set of variable leaves of expression tree~$g$. \\
+\lambda_a
+  & Positive penalty weight for axiom~$a$. \\
+F_j(g)
+  & Soft-path penalized fitness at stage~$j$~\eqref{eq:penalized-bb}
+    (distinct from~$F$). \\
+\end{longtable}
+
+\end{document}
