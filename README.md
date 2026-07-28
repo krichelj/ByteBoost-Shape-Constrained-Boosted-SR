@@ -2,7 +2,7 @@
 
 **Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation**
 
-Workshop project description for [ByteBoost 2026](https://byteboost.dev/) (ACCESS cyberinfrastructure testbeds). Discover neural scaling-law formulas with symbolic regression, while certifying physical priors (monotonicity, diminishing returns, positivity, irreducible floor, power-law decay) via interval-arithmetic forward-mode AD—across Cerebras (Neocortex) pretraining and A64FX (Ookami) search.
+Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoost.php) (ACCESS cyberinfrastructure testbeds). Discover neural scaling-law formulas with symbolic regression, while certifying physical priors (monotonicity, diminishing returns, positivity, irreducible floor, power-law decay) via interval-arithmetic forward-mode AD—across Cerebras (Neocortex) pretraining and A64FX (Ookami) search.
 
 ## Documents
 
