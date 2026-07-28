@@ -1,0 +1,33 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{microtype}
+\usepackage{xcolor}
+\definecolor{linkblue}{RGB}{0, 70, 140}
+\usepackage[colorlinks=true, urlcolor=linkblue, linkcolor=linkblue, citecolor=linkblue]{hyperref}
+
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+    {\large\bfseries Shape-Constrained Boosted Symbolic Regression \\
+    for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation} \\[4pt]
+    {\normalsize \href{https://krichelj.github.io/}{Joshua Shay Kricheli}, PhD Candidate, Syracuse University \\
+    Advisor: Prof.\ \href{https://ecs.syracuse.edu/faculty-staff/paulo-shakarian}{Paulo Shakarian}}
+\end{center}
+
+Neural scaling laws relate language-model validation loss to parameter count $N$, training tokens $D$, and architectural hyperparameters, and they determine how compute is allocated in essentially every modern pretraining run. The laws in common use (\href{https://arxiv.org/abs/2203.15556}{Chinchilla}, \href{https://arxiv.org/abs/2001.08361}{Kaplan}, \href{https://arxiv.org/abs/2403.08540}{Gadre et al.}) assume a hand-specified additive power-law form rather than discovering one from data. Symbolic regression offers an automatic route to functional-form discovery, but unconstrained search routinely returns expressions that fit the training grid and then fail to extrapolate: non-monotone in $N$ or $D$, negative-valued, or divergent as scale grows. Our project develops a shape-constrained boosted symbolic regression procedure that discovers scaling-law expressions while guaranteeing, by construction, asymptotic power-law decay, monotonicity, convexity, and a positive irreducible-loss floor.
+
+The procedure begins with a generalized Chinchilla initialization, $\hat{L}_0 = A/N^{\alpha} + B/D^{\beta} + \sum_i C_i/\phi_i(h_i)^{\gamma_i} + E$, fit in closed form on an initial grid. At each subsequent boosting stage it adds a Huber pseudo-residual correction discovered by genetic programming over a restricted grammar of arithmetic operators and fractional-power primitives, and admits the correction only if the cumulative ensemble satisfies six axioms derived from physical priors on loss surfaces. Verification uses forward-mode automatic differentiation composed with interval arithmetic in the style of \href{https://doi.org/10.1162/evco_a_00294}{Kronberger et al.\ (2022)}, which provides guaranteed certificates over the full hyperparameter domain rather than empirical grid checks.
+
+The regression dataset is a controlled scaling grid of decoder-only transformers pretrained on \href{https://huggingface.co/datasets/togethercomputer/RedPajama-Data-1T}{RedPajama} and \href{https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu}{FineWeb-Edu}, with $N$ spanning roughly 10M to 1.4B parameters and $D$ spanning several token-per-parameter ratios $M = D/N$ following the \href{https://arxiv.org/abs/2503.04715}{Step Law} protocol of Li et al.\ and the \href{https://arxiv.org/abs/2403.08540}{overtraining regime} of Gadre et al.; \href{https://arxiv.org/abs/2203.03466}{$\mu$P/$\mu$Transfer} decouples optimization from scale, and a secondary sweep covers learning rate and batch size. An initial portion of this grid has already been trained on our DeltaAI allocation and is publicly available as the \href{https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models}{\texttt{colinear\_scaling\_models}} collection on HuggingFace. Training runs on PyTorch 2.x with FlashAttention, managed under \texttt{uv} and logged via Weights \& Biases. The symbolic regression stack combines \texttt{gplearn} for the hard-constrained path, with custom feasibility predicates calling a Python interval-arithmetic backend, and Deep Symbolic Optimization (DSO) with a transformer-based controller for the soft-constrained path; JAX with custom JVP rules supplies derivative enclosures.
+
+Two computational bottlenecks motivate ByteBoost participation, and each maps cleanly onto a different testbed. Pretraining the scaling grid is throughput-bound across hundreds of short runs; Neocortex's Cerebras CS-2 systems are the natural match for the larger models in our $N$ range, where dataflow execution and wafer-scale memory should reduce wall-clock training time relative to GPU baselines without the overhead of distributed training. Comparing the resulting loss curves against our existing baselines (an allocation of 200 NVIDIA GH200 superchips on DeltaAI at NCSA, plus a local four-GH200 cluster) would directly test whether scaling exponents $\alpha, \beta$ are hardware-invariant, an open empirical question whose answer would directly inform platform-selection choices for any group running a similar pretraining program. The symbolic regression search is a separate, CPU-bound bottleneck, embarrassingly parallel across genetic-programming populations; here Ookami's A64FX nodes contribute the architectural diversity our existing three 256-core AMD EPYC machines cannot supply (ARM ISA, 512-bit SVE, HBM2), and characterizing \texttt{gplearn}'s tree-evaluation loop on this stack would be a concrete BYOS capstone deliverable and, to our knowledge, the first systematic A64FX characterization of GP-based SR workloads.
+
+By the Fall 2026 presentation we will deliver an admissible boosted scaling law fit jointly across these hardware families, a public release of the shape-constrained SR library with IA-certified admissibility checking, and a short paper quantifying hardware-dependence (or invariance) of scaling exponents with target venues NeurIPS 2026 and AAAI 2027. The project is based in Prof.\ \href{https://ecs.syracuse.edu/faculty-staff/paulo-shakarian}{Paulo Shakarian}'s \href{https://leibniz.syracuse.edu/}{Leibniz Lab} at Syracuse University and is led by a third-year PhD candidate; recent group output includes a paper \href{https://arxiv.org/abs/2505.19361}{accepted to AAAI 2026 on consistency-based abductive reasoning} and active infrastructure work on HPC clusters including DeltaAI (NCSA) and ACES (TAMU).
+
+\end{document}

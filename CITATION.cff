@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation"
+message: If you use this project description or method, please cite it.
+type: software
+authors:
+  - family-names: Kricheli
+    given-names: Joshua Shay
+repository-code: https://github.com/krichelj/ByteBoost2026
+url: https://github.com/krichelj/ByteBoost2026
+abstract: >-
+  ByteBoost 2026 workshop project on discovering neural scaling laws via
+  shape-constrained boosted symbolic regression, with interval-arithmetic
+  certificates, evaluated across Cerebras (Neocortex) and A64FX (Ookami).
+keywords:
+  - neural scaling laws
+  - symbolic regression
+  - shape constraints
+  - interval arithmetic
+  - large language models
+  - high-performance computing
+  - ByteBoost
+license: MIT
+version: 0.1.0
+date-released: "2026-07-28"
