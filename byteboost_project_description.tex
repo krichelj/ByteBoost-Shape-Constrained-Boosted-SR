@@ -63,7 +63,7 @@ We need ByteBoost's testbeds because the project has two very different bottlene
 Training large models is limited by raw computing speed; Neocortex's Cerebras systems put an entire model on one giant chip, which avoids the slowdown of splitting a model across many ordinary GPUs.
 We will compare those training runs with runs we have already finished on NVIDIA GPUs (\cref{sec:baselines}).
 Finding the formula is a separate problem: a large search that mainly uses ordinary processors, and whose most expensive step is the mathematical check that each candidate obeys the rules (\cref{sec:certificates}).
-Ookami's A64FX machines are a strong fit for that search, and would also let us carefully measure how this kind of formula search performs on that hardware.
+Stony Brook's AMA27 AmpereOne cluster is a strong fit for that search: many high-core-count Arm nodes for highly parallel genetic-programming populations, on an architecture designed for scalar and imperfectly vectorized academic codes like ours, and distinct from our existing x86 CPU baselines.
 
 By the end of the program we will deliver a scaling-law formula that obeys the rules above, fit on our collected training data; an open-source library for finding such formulas; and a short write-up of the method (\cref{sec:deliverables}).
 An initial batch of trained models is already public (\cref{sec:datasets}), so we do not start from scratch.
@@ -73,7 +73,7 @@ An initial batch of trained models is already public (\cref{sec:datasets}), so w
 \subsection{Testbed hardware (requested)}\label{sec:testbeds}
 \begin{itemize}[nosep, leftmargin=1.4em]
  \item \textbf{Neocortex (PSC):} Cerebras wafer-scale systems for the model-pretraining grid described in \cref{sec:models,sec:datasets}, where dataflow execution and wafer-scale memory should cut training wall-clock time for the larger models without the overhead of distributed training.
- \item \textbf{Ookami (Stony Brook):} Fujitsu A64FX nodes (ARM ISA, 512-bit SVE vector units, HBM2) for the CPU-bound, highly parallel symbolic-regression search of \cref{sec:boosting}, and in particular the certification inner loop of \cref{sec:certificates}.
+ \item \textbf{AMA27 (Stony Brook):} AmpereOne A192-32M nodes (Arm ISA, 192 cores and 384\,GB DDR5 per node) for the CPU-bound, highly parallel symbolic-regression search of \cref{sec:boosting}, and in particular the certification inner loop of \cref{sec:certificates}. AMA27 is the Arm testbed featured in ByteBoost~2.0; relative to our x86 EPYC baselines it supplies architectural diversity and dense core counts well matched to population-parallel genetic programming and interval-arithmetic checking (a largely scalar / imperfectly vectorized Python+JAX workload).
 \end{itemize}
 
 \subsection{Baseline hardware (already available to us)}\label{sec:baselines}
@@ -254,7 +254,7 @@ $\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ 
 $\underline{F} > L_\infty > 0$ forces both~(iii) and~(iv) on the configurations covered by the product of boxes;
 $\overline{F} < \infty$ forces the finiteness half of~(vi) (smoothness of~$g$ on~$\calI_x$ follows from the operator set).
 The test is conservative: a failure of~\eqref{eq:interval-bb} does \emph{not} prove that~$g$ fails~\eqref{eq:stage-admiss-bb} (interval over-approximation can reject a truly admissible update), but every accepted~$g$ is guaranteed to preserve admissibility on~$\calI_x$.
-That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the A64FX performance work.
+That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
 
 \smallskip\noindent
 \emph{(b) Exact structural checks} (condition~(v), and prerequisites for it).
@@ -350,7 +350,7 @@ Comparing the two paths (certified-but-restricted versus free-but-scored) is one
 \subsection{Collaborators welcome}\label{sec:collaborators}
 The project splits into two fairly independent tracks, so a teammate could own either one.
 The \emph{modeling} track ports and benchmarks transformer pretraining on Cerebras (\cref{sec:testbeds}) and profiles it against our GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras SDK).
-The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to A64FX (\cref{sec:testbeds}) and tunes the certification inner loop of \cref{sec:certificates} for the ARM/SVE architecture (useful background: C/C++ or Python performance work, or an interest in ARM/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to AMA27 (\cref{sec:testbeds}) and profiles the certification inner loop of \cref{sec:certificates} on AmpereOne relative to our x86 EPYC baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 
 \subsection{Deliverables}\label{sec:deliverables}
