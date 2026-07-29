@@ -60,10 +60,11 @@ The guarantees hold after \emph{every} stage, not only at the end, and we prove 
 We develop two variants (\cref{sec:boosting,sec:soft}): one discards any correction that breaks a rule; the other scores how badly rules are bent and drives those scores to zero, searching more freely while still bounding any shortfall.
 
 We need ByteBoost's testbeds because the project has two very different bottlenecks (\cref{sec:testbeds,sec:baselines}).
-Training large models is limited by raw computing speed; Neocortex's Cerebras systems put an entire model on one giant chip, which avoids the slowdown of splitting a model across many ordinary GPUs.
+Training large models is limited by raw computing speed; Neocortex at PSC provides Cerebras CS-3 wafer-scale systems that can hold an entire model on one chip, avoiding the slowdown of splitting a model across many ordinary GPUs.
 We will compare those training runs with runs we have already finished on NVIDIA GPUs (\cref{sec:baselines}).
-Finding the formula is a separate problem: a large search that mainly uses ordinary processors, and whose most expensive step is the mathematical check that each candidate obeys the rules (\cref{sec:certificates}).
-Stony Brook's AMA27 AmpereOne cluster is a strong fit for that search: many high-core-count Arm nodes for highly parallel genetic-programming populations, on an architecture designed for scalar and imperfectly vectorized academic codes like ours, and distinct from our existing x86 CPU baselines.
+Finding the formula is a separate problem: a large, CPU-bound search whose hottest step is the interval-arithmetic check that each candidate obeys the rules (\cref{sec:certificates}).
+That search is highly parallel across genetic-programming populations and is mostly scalar / imperfectly vectorized Python and JAX code, so it does \emph{not} need wide SVE vectors or HBM.
+Stony Brook's AMA27 AmpereOne cluster fits it well: hundreds of high-core-count Arm nodes, distinct from our existing AMD EPYC (x86) CPU baselines, and featured as the Stony Brook Arm platform in ByteBoost~2.0.
 
 By the end of the program we will deliver a scaling-law formula that obeys the rules above, fit on our collected training data; an open-source library for finding such formulas; and a short write-up of the method (\cref{sec:deliverables}).
 An initial batch of trained models is already public (\cref{sec:datasets}), so we do not start from scratch.
@@ -72,12 +73,19 @@ An initial batch of trained models is already public (\cref{sec:datasets}), so w
 
 \subsection{Testbed hardware (requested)}\label{sec:testbeds}
 \begin{itemize}[nosep, leftmargin=1.4em]
- \item \textbf{Neocortex (PSC):} Cerebras wafer-scale systems for the model-pretraining grid described in \cref{sec:models,sec:datasets}, where dataflow execution and wafer-scale memory should cut training wall-clock time for the larger models without the overhead of distributed training.
- \item \textbf{AMA27 (Stony Brook):} AmpereOne A192-32M nodes (Arm ISA, 192 cores and 384\,GB DDR5 per node) for the CPU-bound, highly parallel symbolic-regression search of \cref{sec:boosting}, and in particular the certification inner loop of \cref{sec:certificates}. AMA27 is the Arm testbed featured in ByteBoost~2.0; relative to our x86 EPYC baselines it supplies architectural diversity and dense core counts well matched to population-parallel genetic programming and interval-arithmetic checking (a largely scalar / imperfectly vectorized Python+JAX workload).
+ \item \textbf{Neocortex (PSC):} Cerebras CS-3 wafer-scale systems for the model-pretraining grid in \cref{sec:models,sec:datasets}
+ (\url{https://www.psc.edu/resources/neocortex/}).
+ Each CS-3 is built around a Wafer Scale Engine~3 (WSE-3) with on-chip SRAM and extreme memory bandwidth, so a model in our~$N$ range can stay on a single wafer without multi-GPU model parallelism.
+ We use Neocortex only for pretraining; loss curves are compared to our existing NVIDIA GPU runs (\cref{sec:baselines}).
+ \item \textbf{AMA27 (Stony Brook Supercomputing Center / ACCESS):} Arm-based AmpereOne A192-32M cluster for the CPU-bound symbolic-regression search of \cref{sec:boosting} and the certification inner loop of \cref{sec:certificates}.
+ Per the ACCESS resource description, phase~1 deploys 312 single-socket compute nodes, each with a 192-core AmpereOne A192-32M CPU and 384\,GB DDR5, linked by 200\,Gbps NDR InfiniBand, with a 5\,PB GPFS filesystem (\url{https://support.access-ci.org/affinity-groups/ama27}).
+ AMA27 is the Stony Brook Arm testbed featured in ByteBoost~2.0 (in place of the retired Ookami A64FX system).
+ We do \emph{not} rely on A64FX-style 512-bit SVE or HBM: the GP/IA workload is population-parallel and largely scalar, so the useful AMA27 properties are Arm ISA diversity versus our AMD EPYC (x86) baselines, high core counts per node, and dense node count for concurrent candidate evaluation.
 \end{itemize}
 
 \subsection{Baseline hardware (already available to us)}\label{sec:baselines}
-200 NVIDIA GH200 superchips on DeltaAI at NCSA, a local four-GH200 cluster, and three 256-core AMD EPYC machines, used as our existing GPU/x86 baselines.
+\textbf{GPU baselines (pretraining comparisons):} 200 NVIDIA GH200 superchips on DeltaAI at NCSA, plus a local four-GH200 cluster.
+\textbf{CPU baselines (search/certification comparisons):} three 256-core AMD EPYC (x86) machines, against which we will profile the AMA27 AmpereOne port.
 
 \subsection{Software and tools}\label{sec:software}
 PyTorch 2.x with FlashAttention for pretraining; \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}; \texttt{gplearn} for the hard-constrained symbolic-regression path of \cref{sec:boosting,sec:stage-admiss} with custom admissibility predicates~\citep{stephens2015gplearn}; Deep Symbolic Optimization (DSO) with a transformer-based controller for the soft-constrained path of \cref{sec:soft}; JAX with custom JVP rules and a Python interval-arithmetic backend for the automatic-differentiation-plus-interval-arithmetic proof step of \cref{sec:certificates}.
@@ -349,8 +357,8 @@ Comparing the two paths (certified-but-restricted versus free-but-scored) is one
 
 \subsection{Collaborators welcome}\label{sec:collaborators}
 The project splits into two fairly independent tracks, so a teammate could own either one.
-The \emph{modeling} track ports and benchmarks transformer pretraining on Cerebras (\cref{sec:testbeds}) and profiles it against our GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras SDK).
-The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to AMA27 (\cref{sec:testbeds}) and profiles the certification inner loop of \cref{sec:certificates} on AmpereOne relative to our x86 EPYC baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
+The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and profiles it against our NVIDIA GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras software stack).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to AMA27 (\cref{sec:testbeds}) and profiles the certification inner loop of \cref{sec:certificates} on AmpereOne against our AMD EPYC (x86) CPU baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 
 \subsection{Deliverables}\label{sec:deliverables}
