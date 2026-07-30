@@ -11,7 +11,7 @@ Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ook
 | [`byteboost_project_description.pdf`](byteboost_project_description.pdf) | Full project description (compiled) |
 | [`byteboost_project_description.tex`](byteboost_project_description.tex) | LaTeX source |
 | [`byteboost_refs.bib`](byteboost_refs.bib) | Bibliography |
-| [`byteboost_abstract.tex`](byteboost_abstract.tex) | Short abstract draft |
+| [`ABSTRACT.md`](ABSTRACT.md) / [`byteboost_abstract.tex`](byteboost_abstract.tex) | Shared participant abstract (Dave Carlson's condensed version) |
 
 ## Build
 

@@ -1,26 +1,13 @@
-\documentclass[10pt]{article}
+# Shared abstract (ByteBoost 2.0 participants)
 
-\usepackage[margin=1in]{geometry}
-\usepackage{microtype}
-\usepackage{xcolor}
-\definecolor{linkblue}{RGB}{0, 70, 140}
-\usepackage[colorlinks=true, urlcolor=linkblue, linkcolor=linkblue, citecolor=linkblue]{hyperref}
+Condensed abstract circulated by Dave Carlson (Stony Brook) for sharing with workshop participants. Matches the posted project blurb.
 
-\setlength{\parskip}{6pt}
-\setlength{\parindent}{0pt}
-\pagestyle{empty}
+**Project:** Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation
 
-\begin{document}
+**Project Lead:** Joshua Shay Kricheli (PhD Candidate in Electrical Engineering and Computer Science, Syracuse University)
 
-\begin{center}
- {\large\bfseries Shape-Constrained Boosted Symbolic Regression\\
-    for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation}\\[6pt]
-    {\normalsize Project Lead: \href{https://krichelj.github.io/}{Joshua Shay Kricheli}\\
-    PhD Candidate in Electrical Engineering and Computer Science, Syracuse University}
-\end{center}
+## Abstract / Summary
 
-\smallskip
-\noindent\textbf{Abstract / Summary.}
 Training a modern AI language model can cost millions of dollars, so researchers use scaling laws to predict performance from model size and training data before committing resources. These equations guide major hardware and budget decisions, but their mathematical form is usually chosen manually and then fitted to measured results.
 
 Our project uses symbolic regression to discover the scaling-law equation directly from data. Symbolic regression searches many candidate formulas and returns an interpretable equation rather than a black-box model. Unconstrained searches, however, often produce formulas that fit existing measurements but extrapolate unrealistically, predicting negative error or worse performance with more data.
@@ -33,12 +20,10 @@ The project has two computational bottlenecks. Model training will use Cerebras 
 
 Deliverables will include a certified scaling-law formula fitted to our training data, an open-source discovery library, and a concise methods report. An initial set of trained models is already public.
 
-\medskip
-\noindent\textbf{Target System:} Neocortex and AMA27\\
-\textbf{Field of science:} Machine Learning and Artificial Intelligence, specifically the foundations of large language models (neural scaling laws) and interpretable machine learning via symbolic regression.\\
-\textbf{Key Requirements:} Cerebras wafer-scale systems and Arm CPUs
+## Metadata
 
-\vspace{8pt}
-{\footnotesize Condensed abstract circulated to ByteBoost~2.0 participants (Dave Carlson, Stony Brook).}
-
-\end{document}
+| Field | Value |
+|-------|-------|
+| Target System | Neocortex and AMA27 |
+| Field of science | Machine Learning and Artificial Intelligence, specifically the foundations of large language models (neural scaling laws) and interpretable machine learning via symbolic regression. |
+| Key Requirements | Cerebras wafer-scale systems and Arm CPUs |
