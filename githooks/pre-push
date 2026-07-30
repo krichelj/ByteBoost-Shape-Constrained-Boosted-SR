@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#
+# pre-push hook: run the same from-scratch LaTeX guard that CI runs, so a
+# build with errors or warnings is rejected before it reaches the remote.
+#
+# Enable it (once, per clone):
+#     git config core.hooksPath githooks
+#
+# Bypass in an emergency with:  git push --no-verify
+#
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+"$REPO_ROOT/scripts/check-latex.sh"
+rc=$?
+
+if [ "$rc" -eq 2 ]; then
+  # Toolchain missing locally — don't block the push; CI will still enforce.
+  echo "pre-push: TeX Live not found locally; skipping the build guard." >&2
+  echo "pre-push: CI (latex-guard) will run the check on the server." >&2
+  exit 0
+fi
+
+if [ "$rc" -ne 0 ]; then
+  echo "pre-push: rejected — the document does not compile cleanly." >&2
+  echo "pre-push: fix the errors/warnings above, or bypass with 'git push --no-verify'." >&2
+  exit 1
+fi
+
+exit 0

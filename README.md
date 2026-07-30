@@ -26,6 +26,10 @@ Or: `make`.
 
 Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the packages listed in the preamble).
 
+## Build guard
+
+`main` is protected: a from-scratch recompile must produce **no errors and no warnings**, or the change is rejected. CI runs `scripts/check-latex.sh` on every push and PR; enable the same check locally with `git config core.hooksPath githooks`. See [`scripts/README.md`](scripts/README.md).
+
 ## Related
 
 - Scaling-grid checkpoints: [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models)
