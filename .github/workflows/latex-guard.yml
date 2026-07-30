@@ -1,0 +1,30 @@
+name: latex-guard
+
+# Rejects any change to main whose from-scratch compile of
+# byteboost_project_description produces errors or warnings. The check never
+# looks at the committed PDF — scripts/check-latex.sh rebuilds from source.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# One in-flight run per ref; newer pushes cancel older runs.
+concurrency:
+  group: latex-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile-check:
+    name: compile-check
+    runs-on: ubuntu-latest
+    # Official TeX Live image: full pdflatex + bibtex + latexmk, matching a
+    # standard local TeX Live install.
+    container: texlive/texlive:latest
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Recompile from scratch and reject on any error or warning
+        run: bash scripts/check-latex.sh
