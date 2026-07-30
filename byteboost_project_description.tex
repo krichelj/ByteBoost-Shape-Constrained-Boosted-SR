@@ -50,24 +50,17 @@ Computer Science: Machine Learning and Artificial Intelligence, specifically the
 
 \section{Abstract / summary}\label{sec:abstract}
 
-Training a modern AI language model can cost millions of dollars in computing time, so researchers rarely train blindly. Instead they rely on \emph{scaling laws}: compact formulas that predict how much error a model will make before it is built, from how large it is and how much text it reads. These formulas guide how money and hardware are spent across the AI industry. Yet they are essentially educated guesses: a human picks the \emph{shape} of the equation by hand, then fits a few numbers to measured data.
+Training a modern AI language model can cost millions of dollars, so researchers use scaling laws to predict performance from model size and training data before committing resources. These equations guide major hardware and budget decisions, but their mathematical form is usually chosen manually and then fitted to measured results.
 
-Our project asks a computer to discover the equation itself, using \emph{symbolic regression}: a search over enormous numbers of candidate formulas that returns a readable equation rather than an opaque black box. Left unconstrained, such a search is unreliable. It finds formulas that match the measurements we already have, then predicts nonsense at larger scale, such as negative error, or error that \emph{rises} when you add training data. We therefore require every formula to obey common-sense rules: more data and bigger models never hurt; each further increase helps less than the last; error stays positive; and improvement stops at an irreducible floor no model can beat.
-These rules are formalized as the admissibility axioms in \cref{sec:axioms}; we \emph{mathematically prove} they hold over the full certification domain, not just at the points we happened to measure (\cref{sec:guarantee,sec:stage-admiss}).
+Our project uses symbolic regression to discover the scaling-law equation directly from data. Symbolic regression searches many candidate formulas and returns an interpretable equation rather than a black-box model. Unconstrained searches, however, often produce formulas that fit existing measurements but extrapolate unrealistically, predicting negative error or worse performance with more data.
 
-We build the formula in stages, starting from a simple textbook law and adding one correction at a time (\cref{sec:boosting,sec:stage-admiss}).
-The guarantees hold after \emph{every} stage, not only at the end, and we prove the corrections sharpen the fit without changing the two numbers researchers care about most: the irreducible floor, and how fast error falls as models and data grow.
-We develop two variants (\cref{sec:boosting,sec:soft}): one discards any correction that breaks a rule; the other scores how badly rules are bent and drives those scores to zero, searching more freely while still bounding any shortfall.
+We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive; and performance must approach an irreducible floor. We mathematically certify these properties across the full domain of interest, not only at measured points (\cref{sec:axioms,sec:guarantee,sec:stage-admiss}).
 
-We need ByteBoost's testbeds because the project has two very different bottlenecks (\cref{sec:testbeds,sec:baselines}).
-Training large models is limited by raw computing speed; Neocortex at PSC provides Cerebras CS-3 wafer-scale systems that can hold an entire model on one chip, avoiding the slowdown of splitting a model across many ordinary GPUs.
-We will compare those training runs with runs we have already finished on NVIDIA GPUs (\cref{sec:baselines}).
-Finding the formula is a separate problem: a large, CPU-bound search whose hottest step is the interval-arithmetic check that each candidate obeys the rules (\cref{sec:certificates}).
-That search is highly parallel across genetic-programming populations and is mostly scalar / imperfectly vectorized Python and JAX code, so it does \emph{not} need wide SVE vectors or HBM.
-Stony Brook's AMA27 AmpereOne cluster fits it well: hundreds of high-core-count Arm nodes, distinct from our existing AMD EPYC (x86) CPU baselines, and featured as the Stony Brook Arm platform in ByteBoost~2.0.
+The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{sec:boosting,sec:stage-admiss}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement. One search method rejects inadmissible corrections; another penalizes violations and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft}).
 
-By the end of the program we will deliver a scaling-law formula that obeys the rules above, fit on our collected training data; an open-source library for finding such formulas; and a short write-up of the method (\cref{sec:deliverables}).
-An initial batch of trained models is already public (\cref{sec:datasets}), so we do not start from scratch.
+The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform and will be compared with completed NVIDIA GPU runs (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python and JAX code, Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
+
+Deliverables will include a certified scaling-law formula fitted to our training data, an open-source discovery library, and a concise methods report (\cref{sec:deliverables}). An initial set of trained models is already public (\cref{sec:datasets}).
 
 \section{Key requirements}\label{sec:requirements}
 
