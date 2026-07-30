@@ -10,7 +10,7 @@ url: https://github.com/krichelj/ByteBoost2026
 abstract: >-
   ByteBoost 2026 workshop project on discovering neural scaling laws via
   shape-constrained boosted symbolic regression, with interval-arithmetic
-  certificates, evaluated across Cerebras (Neocortex) and A64FX (Ookami).
+  certificates, evaluated across Cerebras CS-3 (Neocortex) and AmpereOne (AMA27).
 keywords:
   - neural scaling laws
   - symbolic regression
