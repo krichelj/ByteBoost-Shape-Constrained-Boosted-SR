@@ -11,9 +11,9 @@ Algorithm
 1. Fit ``L̂_0`` via eq. chinchilla; set ``L̂^{(0)} ← L̂_0``.
 2. For ``j = 1, …, K``:
    a. Compute ``δ_j`` and Huber pseudo-residuals ``r̃_j^{(ℓ)}``.
-   b. Find ``L̂_j ∈ argmin_g (1/n) Σ_ℓ (r̃_j^{(ℓ)} − g(h_ℓ))²``
-      subject to certificates (a)–(b) of ``sec:stage-admiss``
-      (hard path) — or the soft penalized objective of ``sec:soft``.
+   b. Find ``L̂_j`` via the soft penalized objective of ``sec:soft``
+      (primary), or via hard certificates (a)–(b) of ``sec:stage-admiss``
+      (workshop extension).
    c. ``L̂^{(j)} ← L̂^{(j−1)} + L̂_j``.
 3. Return ``L̂^{(K)} ∈ S``.
 """
@@ -48,7 +48,8 @@ class BoostingAlgorithm(ABC):
         baseline:
             Stage-0 ``BaselineFit`` (``src.search.baselines``).
         search_backend:
-            Hard or soft stage search (``src.search.hard_path`` / ``src.search.soft_path``).
+            Soft stage search by default (``src.search.soft_path``);
+            optional hard reject filter (``src.search.hard_path``).
         """
         self.K = num_stages
         self.baseline = baseline

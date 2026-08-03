@@ -1,7 +1,8 @@
 """
 Stage-0 generalized Chinchilla law (``sec:boosting``, eq. chinchilla).
 
-Stage 0 fits, in closed form / nonlinear least squares, an admissible baseline
+Stage 0 fits by nonlinear least squares (positive parameter constraints) an
+admissible baseline. The canonical power-law form is
 
     L̂^{(0)} = L̂_0
             = A / N^α + B / D^β + Σ_{i=1}^m C_i / φ_i(h_i)^{γ_i} + E,
@@ -10,8 +11,9 @@ with all coefficients/exponents positive. By construction:
 * joint floor ``L_∞ = E``;
 * stage-0 asymptotic exponents ``c_N^{(0)} = −α``, ``c_D^{(0)} = −β``.
 
-Hyperparameter terms (``m``, ``φ_i``, …) depend on the chosen grid
-(2D vs 4D, etc.) — choose a concrete parameterization in subclasses.
+Concrete grids: 2D ``(N, D)`` and 4D ``(N, D, WD, lr)``. For 4D, hyperparameter
+terms may instead be quadratic penalties in ``log lr`` / ``log WD`` (U-shaped
+loss); shape axioms still act only on ``N`` and ``D``.
 """
 
 from __future__ import annotations
@@ -65,7 +67,7 @@ class GeneralizedChinchilla(BaselineFit):
     """Concrete stage-0 law — implement 2D and/or 4D specializations."""
 
     def fit(self, X: Any, y: Any) -> None:
-        raise NotImplementedError("TODO: fit eq. chinchilla with positive params")
+        raise NotImplementedError("TODO: NLS fit of eq. chinchilla with positive params")
 
     def predict(self, X: Any) -> Any:
         raise NotImplementedError("TODO: evaluate L̂_0")

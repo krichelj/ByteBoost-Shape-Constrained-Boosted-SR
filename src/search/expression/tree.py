@@ -2,7 +2,7 @@
 Expression-tree abstraction for a candidate correction ``g``.
 
 The project description treats ``g`` as a finite expression tree. Concrete
-encodings (gplearn prefix lists, sympy, DSO token sequences, …) are left to
+encodings (gplearn prefix lists, sympy, PySR expressions, …) are left to
 students; this protocol captures the operations certificates need.
 """
 

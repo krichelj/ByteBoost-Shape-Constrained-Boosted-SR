@@ -10,7 +10,10 @@ Using IA enclosures of ``F = L̂^{(j−1)} + g`` and structural quantities:
     v_leaf(g)  = |{x ∈ {N,D} : x ∉ leaves(g)}|
 
 Every score is nonnegative. Aggregate ``V(g) = Σ_a v_a(g)``.
-``V = 0`` at every stage recovers the hard-path result.
+Soft fitness uses ``Σ_a λ_a v_a(g)²`` (typically with positive ``λ``); ``λ = 0``
+is the unconstrained ablation. ``V = 0`` at every stage recovers hard
+admissibility. A5/A6 may be folded into ``v_decay`` / ``v_leaf`` rather than
+scored as separate soft terms — match ``AXIOM_INDICES`` / your λ schedule.
 """
 
 from __future__ import annotations

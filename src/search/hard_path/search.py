@@ -1,17 +1,15 @@
 """
 Hard-constrained search path (``sec:boosting``, ``sec:stage-admiss``).
 
-One search method **rejects** inadmissible corrections: only candidates ``g``
-that pass certificates (a)–(b) of ``sec:stage-admiss`` are eligible for the
-stage argmin
+Workshop extension: reject inadmissible corrections during search so that only
+candidates ``g`` that pass certificates (a)–(b) enter the stage argmin
 
     L̂_j ∈ argmin_g (1/n) Σ_ℓ (r̃_j^{(ℓ)} − g(h_ℓ))²
           subject to certificates (a)–(b).
 
-Project software note (``sec:software``): ``gplearn`` with custom admissibility
-predicates is the intended hard-path engine. Implementing a true reject filter
-during search (only survivors of certificates (a)–(b) enter the stage argmin)
-is a primary ByteBoost exercise.
+The primary shipped method is the soft-penalty gplearn path
+(``src.search.soft_path``). Implement this hard filter on top of the same
+DualInterval certificate helpers.
 """
 
 from __future__ import annotations
@@ -39,11 +37,11 @@ class HardSearchBackend(ABC):
         Parameters
         ----------
         X, pseudo_residuals:
-            Features and Huber targets ``r̃_j`` for stage ``j``.
+            Features (typically log-features) and Huber targets ``r̃_j``.
         ensemble_state:
             ``L̂^{(j−1)}`` context (floors, exponents, prior programs, domains).
         certificate:
-            Object implementing the sufficient IA + structural checks
+            Object implementing sufficient IA + structural checks
             (``src.constraints.certificates``, ``src.constraints.axioms.stage_conditions``).
         """
 
