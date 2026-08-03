@@ -12,6 +12,6 @@ abstract:
 clean:
 	bash scripts/compile.sh clean
 
-# From-scratch quality gate (errors + warnings). Used by CI and pre-push.
+# From-scratch quality gate (errors + warnings).
 check:
 	bash scripts/check-latex.sh

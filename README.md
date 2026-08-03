@@ -30,14 +30,6 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the pac
 make check
 ```
 
-Optionally run the same gate before every push:
-
-```bash
-git config core.hooksPath githooks
-```
-
-If TeX Live is missing locally, the pre-push hook skips.
-
 ## Related
 
 - Scaling-grid checkpoints: [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models)
