@@ -4,18 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-LaTeX sources and a student implementation skeleton for a ByteBoost 2026 workshop
-project (ACCESS cyberinfrastructure testbeds): "Shape-Constrained Boosted
-Symbolic Regression for Interpretable Neural Scaling Laws." Compiled PDFs are
-committed deliverables alongside the ``.tex`` sources.
+ByteBoost 2026 workshop materials for **Shape-Constrained Boosted Symbolic Regression
+for Interpretable Neural Scaling Laws**:
+
+- LaTeX project description / abstract (committed PDFs are deliverables)
+- Student implementation skeleton under ``src/`` (formal stubs; students fill in)
+
+There is no private reference implementation in this repository. Students work from
+the project description and the ``src/`` stubs only.
 
 ## Layout
 
 ```
 documents/
-  abstract/       # one-page participant abstract
+  abstract/       # one-page participant abstract (.tex, .pdf, ABSTRACT.md)
   description/    # full project description + bibliography
-src/              # student implementation skeleton (see src/README.md)
+src/              # student skeleton (see src/README.md)
+scripts/
+  compile.sh      # build PDFs
+  check-latex.sh  # optional from-scratch warning-strict check
+Makefile          # wraps scripts/compile.sh (+ make check)
 ```
 
 ## Build commands
@@ -46,6 +54,10 @@ Two documents, one bibliography:
 3. The `\section{Abstract / summary}` of `documents/description/byteboost_project_description.tex` — identical prose, except it adds `\cref{...}` cross-references to later sections
 
 If you edit the abstract wording anywhere, propagate the change to all three (keeping the `\cref` additions only in the project description).
+
+## Student skeleton
+
+See `src/README.md` for the description ↔ package map and suggested implementation order. Keep stub comments aligned with project-description notation (`sec:*`, eq. labels, A1–A6, Algorithm 1). Prefer extending stubs over inventing a parallel layout.
 
 ## Domain consistency
 

@@ -12,6 +12,17 @@ Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoos
 
 Implement the method in [`src/`](src/). Each subpackage maps to a section of the project description (setup, axioms, certificates, boosting, hard/soft paths, modeling track, …). Stubs use the description’s notation and raise `NotImplementedError` — see [`src/README.md`](src/README.md) for the full map and suggested order.
 
+Run Python from the repository root so imports like `from src.setup…` resolve.
+
+## Repository layout
+
+```
+documents/   # LaTeX sources + committed PDFs
+src/         # student implementation skeleton
+scripts/     # compile.sh, optional check-latex.sh
+Makefile     # make / make description / make abstract / make clean / make check
+```
+
 ## Build (LaTeX)
 
 ```bash

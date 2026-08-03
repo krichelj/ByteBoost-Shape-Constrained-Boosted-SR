@@ -1,1 +1,1 @@
-"""Package markers — import concrete symbols from submodules explicitly."""
+"""Setup: configuration space ℍ, preprocessing φ, and dataset 𝒟."""
