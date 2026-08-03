@@ -16,10 +16,10 @@ Work from the repository root so package imports resolve, e.g.
 | Package | Role | Subpackages |
 |---------|------|-------------|
 | `scaling/` | Problem setup and data (`sec:setup`, `sec:datasets`) | `setup/`, `data/` |
-| `constraints/` | Admissibility and certificates (`sec:axioms`, `sec:stage-admiss`, `sec:guarantee`) | `axioms/`, `certificates/`, `guarantee/` |
+| `constraints/` | Admissibility and certificates (`sec:axioms`, `sec:stage-admiss`, `sec:certificates`, `sec:guarantee`) | `axioms/`, `certificates/`, `guarantee/` |
 | `search/` | Boosted SR (`sec:boosting`, `sec:algorithm`, `sec:soft`) | `baselines/`, `residuals/`, `expression/`, `soft_path/`, `hard_path/`, `boosting/` |
 | `modeling/` | Pretraining track (`sec:models`, Neocortex in `sec:testbeds`) | `models/`, `training/` |
-| `systems/` | HPC profiling and deliverables (`sec:testbeds` AMA27, `sec:deliverables`) | `hpc/`, `pipeline/` |
+| `systems/` | HPC profiling and deliverables (`sec:testbeds` AMA27, `sec:baselines`, `sec:deliverables`) | `hpc/`, `pipeline/` |
 
 ## Description ↔ skeleton
 
@@ -29,14 +29,14 @@ calls into the search backends.
 
 | Project description | Skeleton path |
 |---------------------|---------------|
-| §Setup (`sec:setup`) | `scaling/setup/` |
+| §Setup (`sec:setup`) | `scaling/setup/` (`ℍ`, continuum `ℍ̃`) |
 | §Datasets (`sec:datasets`) | `scaling/data/` |
 | §Admissibility axioms A1–A6 (`sec:axioms`) | `constraints/axioms/admissibility.py` |
 | Stage-0 Chinchilla / NLS (`sec:boosting`, Prop. 1) | `search/baselines/` |
 | Huber \(\delta_j\), \(\tilde r_j\) (`sec:boosting`) | `search/residuals/` |
 | Expression trees / \(\mathrm{pow}_p\) (`sec:boosting`) | `search/expression/` |
 | Stagewise conditions (i)–(vi) (`sec:stage-admiss`, Prop. 2) | `constraints/axioms/stage_conditions.py` |
-| DualInterval certificates (`sec:certificates`) | `constraints/certificates/` (`interval.py`, `ia_eval.py`, `hard_certificates.py`) |
+| DualInterval certificates on \(I_x\subset\widetilde{\mathbb{H}}\) (`sec:certificates`) | `constraints/certificates/` (`interval.py`, `ia_eval.py`, `hard_certificates.py`) |
 | Optional JAX+JVP certificate (`sec:software`) | `constraints/certificates/jax_backend.py` |
 | Soft path \(v_a\), \(F_j\), gplearn (`sec:soft`, Prop. 3) | `search/soft_path/` |
 | Soft search backends (gplearn / optional PySR) | `search/soft_path/backends.py` |
@@ -54,21 +54,21 @@ calls into the search backends.
 Dependency order (soft search is primary; hard filter is optional workshop
 extension). This is *not* the same as §4 section order in the PDF.
 
-1. `scaling/` — \(\mathbb{H}\) and \(\mathcal{D}\)
-2. `constraints/certificates/interval.py` — `Interval`, `DualInterval`
-3. `constraints/axioms/admissibility.py` — A1–A6
+1. `scaling/` — discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
+2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2)
+3. `constraints/axioms/admissibility.py` — A1–A6 on \(\widetilde{\mathbb{H}}\)
 4. `search/baselines/` — NLS admissible \(\widehat L_0\)
 5. `search/residuals/` — Huber stage targets
 6. `search/expression/` + `constraints/certificates/ia_eval.py` — trees, \(\mathrm{ord}\), log→raw
-7. `constraints/axioms/stage_conditions.py` + certificate enclosures
-8. `search/soft_path/` — primary gplearn + IA penalties
+7. `constraints/axioms/stage_conditions.py` + certificate enclosures on \(I_x\subset\widetilde{\mathbb{H}}\)
+8. `search/soft_path/` — primary gplearn + IA penalties (A5 via `v_irred`; A6 via finiteness)
 9. `search/hard_path/` — optional reject filter (workshop extension)
 10. `search/boosting/` — Algorithm 1 (`sec:algorithm`)
-11. `constraints/guarantee/` — floor / exponent checks
+11. `constraints/guarantee/` — floor / exponent checks on \(\widetilde{\mathbb{H}}\)
 12. Modeling / systems tracks as assigned: `modeling/`, `systems/hpc/`
 
 ## Notation
 
 Symbols match Appendix A of the project description (`N`, `D`, \(\mathcal{H}\),
-\(\widehat L\), \(\mathcal{S}\), \(L_\infty\), \(c_x^{(0)}\), …). Prefer those
-names in identifiers and comments.
+\(\mathbb{H}\), \(\widetilde{\mathbb{H}}\), \(\widehat L\), \(\mathcal{S}\),
+\(L_\infty\), \(c_x^{(0)}\), …). Prefer those names in identifiers and comments.

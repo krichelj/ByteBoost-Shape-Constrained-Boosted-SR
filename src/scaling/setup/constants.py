@@ -1,6 +1,11 @@
 """
 Global symbols aligned with project-description §Notation / ``sec:setup``.
 
+Includes scale names, soft-path axiom indices, and illustrative ``λ_a`` /
+``ε_decay``. Continuum domain ``ℍ̃`` and certification boxes ``I_x`` are
+constructed from the configuration space (``configuration.py``), not stored
+as globals here.
+
 Students may extend this module with experiment-specific constants
 (e.g. concrete grids ``H_N``, ``H_D``) without changing the formal meaning
 of the symbols below.
@@ -18,9 +23,11 @@ SCALE_VARS: Final[tuple[str, str]] = ("N", "D")
 # M_GRID: Sequence[float] = ...
 
 # Soft-path axiom indices a ∈ {mono, conv, irred, decay, leaf}
-# (``sec:soft``, eq. violations-bb). Positivity (A5) and graceful saturation (A6)
-# are certified via the irreducible-floor / finiteness IA checks rather than
-# separate soft scores (see project description).
+# (``sec:soft``, eq. violations-bb). Positivity (A5) is implied by the joint
+# floor when L_∞ > 0 and is folded into v_irred; graceful saturation (A6) is
+# certified via DualInterval finiteness / the C² (in practice C^∞) operator set
+# rather than a separate soft score — prop:soft requires V=0 *and* finite
+# enclosures (see project description ``sec:axioms``, ``sec:soft``).
 AXIOM_INDICES: Final[tuple[str, ...]] = (
     "mono",
     "conv",

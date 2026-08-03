@@ -2,9 +2,11 @@
 Optional JAX + custom JVP certificate path (``sec:software``).
 
 Primary certificates use pure-Python ``DualInterval``
-(``src.constraints.certificates.interval`` + ``ia_eval``).
-This module is an optional acceleration / alternate AD+IA backend behind the
-same ``HardIntervalCertificate`` interface — not required for the soft path.
+(``src.constraints.certificates.interval`` + ``ia_eval``) on compact slices of
+``ℍ̃``. This module is an optional acceleration / alternate AD+IA backend
+behind the same ``HardIntervalCertificate`` interface — not required for the
+soft path. Must still return sound enclosures for eq. interval-bb
+(including second derivatives for (A2) and floor tests for (A3)/(A5)).
 """
 
 from __future__ import annotations

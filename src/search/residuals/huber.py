@@ -1,7 +1,8 @@
 """
 Huber clipping and pseudo-residuals (``sec:boosting``, eq. delta-bb, eq. pseudoresid-bb).
 
-At boosting stage ``j ≥ 1``:
+At boosting stage ``j ≥ 1``, computed on the labeled grid ``ℍ`` (not the
+continuum domain ``ℍ̃`` used by A1–A6):
 
     δ_j := median_{ℓ=1…n} |L(h_ℓ) − L̂^{(j−1)}(h_ℓ)|
 
@@ -12,7 +13,8 @@ At boosting stage ``j ≥ 1``:
             otherwise.
 
 Corrections ``g`` are fit to these Huber pseudo-residuals so outlier runs
-cannot dominate the stage objective.
+cannot dominate the stage objective. Admissibility of ``g`` is checked
+separately via DualInterval certificates on ``I_x ⊂ ℍ̃``.
 """
 
 from __future__ import annotations

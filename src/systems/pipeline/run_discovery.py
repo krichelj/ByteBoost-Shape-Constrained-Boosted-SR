@@ -3,10 +3,10 @@ End-to-end discovery pipeline and deliverable hooks (``sec:deliverables``).
 
 Deliverables
 ------------
-(1) An admissible boosted scaling law (``sec:axioms``, ``sec:guarantee``) fit on
-    the collected training grid (``sec:datasets``).
+(1) An admissible boosted scaling law on ``ℍ̃`` (``sec:axioms``, ``sec:guarantee``)
+    fit on the collected training grid ``ℍ`` (``sec:datasets``).
 (2) Public release of the shape-constrained SR library with IA-certified
-    admissibility checking (``sec:certificates``).
+    admissibility checking on ``I_x ⊂ ℍ̃`` (``sec:certificates``).
 (3) A short paper / methods report on ``sec:method``.
 
 This module wires student implementations into a single runnable entry point.
@@ -50,8 +50,9 @@ def run_discovery(config: DiscoveryConfig, *args: Any, **kwargs: Any) -> Discove
 
     Typical soft-path wiring
     ------------------------
-    setup → stage-0 NLS baseline → for each stage: Huber residuals → soft
-    ``F_j`` search → ensemble update → guarantee / soft ``V`` report.
+    setup (``ℍ`` / ``ℍ̃`` / ``I_x``) → stage-0 NLS baseline → for each stage:
+    Huber residuals → soft ``F_j`` search (IA penalties on ``I_x ⊂ ℍ̃``) →
+    ensemble update → guarantee / soft ``V`` report.
     """
     raise NotImplementedError(
         "TODO: wire setup → baseline → soft (or hard) boosting → guarantee.check"

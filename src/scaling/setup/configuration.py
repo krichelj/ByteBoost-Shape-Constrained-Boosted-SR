@@ -8,7 +8,10 @@ Formal objects
 * For each coordinate ``h ∈ {N, D} ∪ H``, a finite admissible set ``H_h`` and a
   strictly monotone preprocessing map ``φ_h : H_h → R_{>0}``.
 * Configuration space ``ℍ = ∏_h H_h`` with typical element ``h ∈ ℍ``.
-* Validation loss ``L : ℍ → R``; approximation ``L̂ ≈ L``.
+* Continuum domain ``ℍ̃`` for admissibility (``sec:axioms``): each scale ranges
+  over ``[x_min, ∞)``, other coordinates over finite ``H_h``; ``ℍ ⊂ ℍ̃``.
+* Validation loss ``L : ℍ → R``; approximation ``L̂ ≈ L`` (extended along scales
+  to ``ℍ̃`` when stating A1–A6).
 * Labeled dataset ``D = {(h_ℓ, L(h_ℓ))}_{ℓ=1}^n ⊂ ℍ × R``.
 * For each scale ``x ∈ {N, D}``: ``x_min = min H_x > 0``, ``x_max = max H_x``;
   treat ``x`` as continuous on ``[x_min, ∞)``.
@@ -28,7 +31,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 
 
 # Type aliases — refine as needed (arrays, tensors, …).
-ConfigPoint = Any  # element h ∈ ℍ
+ConfigPoint = Any  # element h ∈ ℍ (or continuum point in ℍ̃ for axiom checks)
 LossValue = float
 PreprocessMap = Callable[[Any], float]  # φ_h
 
@@ -67,7 +70,12 @@ class CoordinateSpec:
 
 @dataclass
 class ConfigurationSpace:
-    """Product space ``ℍ = ∏_h H_h`` (``sec:setup``)."""
+    """Product space ``ℍ = ∏_h H_h`` (``sec:setup``).
+
+    Also defines the continuum domain ``ℍ̃`` used by A1–A6: scale coordinates
+    extend to ``[x_min, ∞)`` while non-scale coordinates stay on finite ``H_h``.
+    Certification boxes ``I_x = [x_min, x_max]`` are compact slices of ``ℍ̃``.
+    """
 
     coordinates: Mapping[str, CoordinateSpec] = field(default_factory=dict)
 
@@ -78,6 +86,14 @@ class ConfigurationSpace:
     def hyperparameter_coords(self) -> Iterable[CoordinateSpec]:
         """Yield coordinates in ``H = {h_1, …, h_m}``."""
         raise NotImplementedError("TODO: filter non-scale coordinates")
+
+    def certification_domains(self) -> dict[str, Any]:
+        """Return IA domains for each scale box ``I_x`` and frozen ``H_h`` ranges.
+
+        Used by DualInterval certificates (``sec:certificates``) as a compact
+        continuum slice of ``ℍ̃`` covering the observed grid.
+        """
+        raise NotImplementedError("TODO: build Interval domains for I_x and H_h")
 
     def preprocess(self, h: ConfigPoint) -> Any:
         """Apply ``φ`` coordinate-wise to a configuration ``h ∈ ℍ``.
