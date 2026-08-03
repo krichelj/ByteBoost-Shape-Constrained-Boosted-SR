@@ -75,7 +75,7 @@ We therefore require every candidate formula to satisfy admissibility axioms: la
 
 The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{prop:chinchilla-admiss,prop:stage-iff,thm:guarantee}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement (\cref{thm:guarantee}). The primary search path \emph{penalizes} axiom violations inside a genetic-programming fitness and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft,prop:soft}); a second path \emph{rejects} inadmissible corrections outright and is a workshop extension of the soft engine (\cref{sec:stage-admiss,sec:algorithm}).
 
-The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform and will be compared with completed NVIDIA GPU runs (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python (with optional JAX acceleration), Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
+The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform; new validation losses will be compared to already-published loss curves from an existing scaling grid on Hugging Face (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python (with optional JAX acceleration), Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
 
 Deliverables will include a certified scaling-law formula fitted to our training data, an open-source discovery library, and a concise methods report (\cref{sec:deliverables}). An initial set of trained models is already public (\cref{sec:datasets}).
 
@@ -87,17 +87,18 @@ Deliverables will include a certified scaling-law formula fitted to our training
  \item \textbf{Neocortex (PSC):} Cerebras CS-3 wafer-scale systems for the model-pretraining grid in \cref{sec:models,sec:datasets}
  (\url{https://www.psc.edu/resources/neocortex/}).
  Each CS-3 is built around a Wafer Scale Engine~3 (WSE-3) with on-chip SRAM and extreme memory bandwidth, so a model in our~$N$ range can stay on a single wafer without multi-GPU model parallelism.
- We use Neocortex only for pretraining; loss curves are compared to our existing NVIDIA GPU runs (\cref{sec:baselines}).
+ We use Neocortex only for pretraining; the resulting validation losses are compared to the already-published loss curves of \cref{sec:baselines} (not to re-running those models on student-accessible GPUs).
  \item \textbf{AMA27 (Stony Brook Supercomputing Center / ACCESS):} Arm-based AmpereOne A192-32M cluster for the CPU-bound symbolic-regression search of \cref{sec:boosting} and the certification inner loop of \cref{sec:certificates}.
  Per the ACCESS resource description, phase~1 deploys 312 single-socket compute nodes, each with a 192-core AmpereOne A192-32M CPU and 384\,GB DDR5, linked by 200\,Gbps NDR InfiniBand, with a 5\,PB GPFS filesystem (\url{https://support.access-ci.org/affinity-groups/ama27}).
  AMA27 is the Stony Brook Arm testbed featured in ByteBoost~2.0 (in place of the retired Ookami A64FX system).
- We do \emph{not} rely on A64FX-style 512-bit SVE or HBM: the GP/IA workload is population-parallel and largely scalar Python DualInterval evaluation, so the useful AMA27 properties are Arm ISA diversity versus our AMD EPYC (x86) baselines, high core counts per node, and dense node count for concurrent candidate evaluation.
+ We do \emph{not} rely on A64FX-style 512-bit SVE or HBM: the GP/IA workload is population-parallel and largely scalar Python DualInterval evaluation, so the useful AMA27 properties are Arm ISA diversity, high core counts per node, and dense node count for concurrent candidate evaluation.
 \end{itemize}
 
-\subsection{Baseline hardware (already available to us)}\label{sec:baselines}
-\codeRef{\pyFile{src/systems/hpc/profiling.py}, \pyFile{src/modeling/training/trainer.py}}
-\textbf{GPU baselines (pretraining comparisons):} 200 NVIDIA GH200 superchips on DeltaAI at NCSA, plus a local four-GH200 cluster.
-\textbf{CPU baselines (search/certification comparisons):} three 256-core AMD EPYC (x86) machines, against which we will profile the AMA27 AmpereOne port.
+\subsection{Existing scaling-law baselines (public artifacts)}\label{sec:baselines}
+\codeRef{\pyFile{src/scaling/data/scaling_dataset.py}, \pyFile{src/modeling/training/trainer.py}}
+An already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} provides trained LLM checkpoints and the associated validation-loss curves from a prior scaling grid.
+Those artifacts are the workshop baseline: students compare \emph{losses}~$L(\mathbf{h})$ (and the scaling laws fit to them), not the original training hardware, which is neither part of this project nor available to participants.
+New Neocortex pretraining runs should emit losses on a comparable protocol so they can be plotted and analyzed against that public loss inventory (\cref{sec:datasets,sec:models}).
 
 \subsection{Software and tools}\label{sec:software}
 \codeRef{\pyDir{src/modeling/training}, \pyDir{src/search}, \pyDir{src/constraints/certificates}}
@@ -114,7 +115,7 @@ Workshop ports may adopt LLaMA-style blocks~\citep{touvron2023llama}, FlashAtten
 \subsection{Datasets}\label{sec:datasets}
 \codeRef{\pyFile{src/scaling/data/scaling_dataset.py}, \pyFile{src/scaling/data/corpora.py}}
 Pretraining corpora used to generate new grid points include Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and related open text mixtures (optional FineWeb-Edu~\citep{penedo2024finewebedu} for workshop extensions).
-An already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} supplies trained checkpoints and loss curves from an initial DeltaAI grid for the symbolic-regression track.
+An already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} supplies trained checkpoints and loss curves for the symbolic-regression track and for loss-level comparison with new Neocortex runs (\cref{sec:baselines}); the original training hardware is out of scope.
 
 \section{Method summary (technical)}\label{sec:method}
 \codeRef{\pyDir{src/scaling}, \pyDir{src/constraints}, \pyDir{src/search}; map: \cref{sec:code-map}}
@@ -458,8 +459,8 @@ Comparing soft-penalty search ($\lambda_a>0$) against an unconstrained baseline 
 \subsection{Collaborators welcome}\label{sec:collaborators}
 \codeRef{\pyDir{src/modeling} (modeling); \pyDir{src/search}, \pyDir{src/systems/hpc} (search)}
 The project splits into two fairly independent tracks, so a teammate could own either one.
-The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and profiles it against our NVIDIA GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras software stack).
-The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting,sec:algorithm,sec:soft} to AMA27 (\cref{sec:testbeds}) and profiles the DualInterval certification inner loop of \cref{sec:certificates} on AmpereOne against our AMD EPYC (x86) CPU baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking soft-penalty search against $\lambda_a=0$ and against a hard reject filter (\cref{sec:stage-admiss}).
+The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and compares the resulting validation losses to the public Hugging Face loss curves of \cref{sec:baselines} (useful background: PyTorch, or curiosity about the Cerebras software stack).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting,sec:algorithm,sec:soft} to AMA27 (\cref{sec:testbeds}) and profiles the DualInterval certification inner loop of \cref{sec:certificates} on AmpereOne (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking soft-penalty search against $\lambda_a=0$ and against a hard reject filter (\cref{sec:stage-admiss}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 The student skeleton paths for each track are listed in \cref{sec:code-map}.
 
@@ -621,9 +622,10 @@ The stage-0 baseline used by the boosting stubs is \cref{prop:chinchilla-admiss}
 \cref{sec:guarantee} & \pyDir{src/constraints} & \pyFile{src/constraints/guarantee/invariants.py} \\
 \cref{sec:soft} & \pyDir{src/search} & \pyDir{src/search/soft_path} \\
 \cref{sec:software} (optional JAX) & \pyDir{src/constraints} & \pyFile{src/constraints/certificates/jax_backend.py} \\
+\cref{sec:baselines} & \pyDir{src/scaling} & \pyFile{src/scaling/data/scaling_dataset.py} \\
 \cref{sec:models} & \pyDir{src/modeling} & \pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/transformer.py} \\
 \cref{sec:testbeds} (Neocortex) & \pyDir{src/modeling} & \pyDir{src/modeling/training} \\
-\cref{sec:testbeds,sec:baselines} (AMA27/CPU) & \pyDir{src/systems} & \pyDir{src/systems/hpc} \\
+\cref{sec:testbeds} (AMA27/CPU) & \pyDir{src/systems} & \pyDir{src/systems/hpc} \\
 \cref{sec:deliverables} & \pyDir{src/systems} & \pyFile{src/systems/pipeline/run_discovery.py} \\
 \end{longtable}
 }

@@ -1,8 +1,10 @@
 """
 Pretraining loop stubs (modeling track; ``sec:testbeds``, ``sec:software``).
 
-Neocortex (PSC) Cerebras CS-3 systems are requested for the pretraining grid;
-compare loss curves to existing NVIDIA GH200 baselines (DeltaAI / local).
+Neocortex (PSC) Cerebras CS-3 systems are requested for the pretraining grid.
+Emit validation losses ``L(h)`` on a protocol comparable to the public Hugging
+Face scaling inventory (``sec:baselines``) so new curves can be compared at the
+loss level — not by re-running models on student GPUs.
 Environment: ``uv``, Weights & Biases logging.
 """
 
@@ -30,15 +32,17 @@ class PretrainTrainer(ABC):
         -------
         metrics :
             Must include validation loss ``L`` and identifiers for ``N``, ``D``, …
-            suitable for appending to ``D``.
+            suitable for appending to ``D`` and for loss-level comparison with
+            ``sec:baselines`` HF curves.
         """
 
 
 class TorchPretrainTrainer(PretrainTrainer):
-    """PyTorch DDP path (GPU baselines / portable prototype).
+    """Portable PyTorch DDP prototype (local / available GPUs if any).
 
     FlashAttention / μP / LLaMA-style blocks are optional ports — not required
-    for a consistent ``(N, D, L)`` measurement grid.
+    for a consistent ``(N, D, L)`` measurement grid. Not a workshop hardware
+    baseline; public loss baselines live on Hugging Face (``sec:baselines``).
     """
 
     def train(
@@ -62,5 +66,6 @@ class NeocortexPretrainTrainer(PretrainTrainer):
         **kwargs: Any,
     ) -> dict[str, Any]:
         raise NotImplementedError(
-            "TODO: port pretraining to Neocortex CS-3; emit comparable loss curves"
+            "TODO: port pretraining to Neocortex CS-3; emit losses comparable "
+            "to the public HF inventory (sec:baselines)"
         )

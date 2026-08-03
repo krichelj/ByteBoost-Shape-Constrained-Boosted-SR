@@ -1,13 +1,14 @@
 """
-HPC profiling hooks (``sec:testbeds``, ``sec:baselines``, ``sec:collaborators``).
+HPC profiling hooks (``sec:testbeds``, ``sec:collaborators``).
 
 Search track: port the GP + IA certification inner loop to AMA27
-(AmpereOne A192-32M) and compare against AMD EPYC (x86) CPU baselines.
-The workload is population-parallel and largely scalar — useful AMA27
-properties are Arm ISA diversity, high core counts, and dense node count.
+(AmpereOne A192-32M). The workload is population-parallel and largely scalar —
+useful AMA27 properties are Arm ISA diversity, high core counts, and dense
+node count for concurrent candidate evaluation.
 
-Modeling track: compare Cerebras CS-3 pretraining throughput / loss curves
-to NVIDIA GH200 baselines.
+Modeling track: profile Cerebras CS-3 / Neocortex pretraining throughput on the
+requested testbed. Loss-level comparison to existing public HF scaling curves
+belongs in ``src.scaling.data`` / ``sec:baselines`` (not a hardware baseline).
 """
 
 from __future__ import annotations
@@ -36,13 +37,10 @@ def profile_certification_inner_loop(*args: Any, **kwargs: Any) -> ProfileResult
 
 
 def profile_stage_search(*args: Any, **kwargs: Any) -> ProfileResult:
-    """Benchmark one boosting stage's SR search on the current host."""
-    raise NotImplementedError("TODO: end-to-end stage timing on AMA27 vs EPYC")
+    """Benchmark one boosting stage's SR search on the current host (e.g. AMA27)."""
+    raise NotImplementedError("TODO: end-to-end stage timing on AMA27")
 
 
-def compare_pretrain_platforms(
-    neocortex_metrics: dict[str, Any],
-    gpu_metrics: dict[str, Any],
-) -> dict[str, Any]:
-    """Summarize CS-3 vs GH200 pretraining comparisons for the methods report."""
-    raise NotImplementedError("TODO: normalize and compare loss / throughput")
+def summarize_neocortex_pretrain(metrics: dict[str, Any]) -> dict[str, Any]:
+    """Summarize Neocortex CS-3 pretraining throughput / run metadata for the report."""
+    raise NotImplementedError("TODO: normalize Neocortex throughput / wall-time metrics")

@@ -19,7 +19,7 @@ Work from the repository root so package imports resolve, e.g.
 | `constraints/` | Admissibility and certificates (`sec:axioms`, `sec:stage-admiss`, `sec:certificates`, `sec:guarantee`) | `axioms/`, `certificates/`, `guarantee/` |
 | `search/` | Boosted SR (`sec:boosting`, `sec:algorithm`, `sec:soft`) | `baselines/`, `residuals/`, `expression/`, `soft_path/`, `hard_path/`, `boosting/` |
 | `modeling/` | Pretraining track (`sec:models`, Neocortex in `sec:testbeds`) | `models/`, `training/` |
-| `systems/` | HPC profiling and deliverables (`sec:testbeds` AMA27, `sec:baselines`, `sec:deliverables`) | `hpc/`, `pipeline/` |
+| `systems/` | HPC profiling and deliverables (`sec:testbeds` AMA27, `sec:deliverables`) | `hpc/`, `pipeline/` |
 
 ## Description ↔ skeleton
 
@@ -43,9 +43,10 @@ calls into the search backends.
 | Hard path / reject filter (`sec:stage-admiss`, workshop) | `search/hard_path/` |
 | Algorithm 1 (`sec:algorithm`, `alg:boosting-bb`) | `search/boosting/` |
 | Guarantee (`sec:guarantee`, Thm. 1) | `constraints/guarantee/` |
+| Existing HF loss / checkpoint baselines (`sec:baselines`) | `scaling/data/scaling_dataset.py` |
 | Models (`sec:models`) | `modeling/models/config.py`, `modeling/models/transformer.py` |
 | Pretraining / Neocortex (`sec:testbeds`) | `modeling/training/` |
-| AMA27 / CPU profiling (`sec:testbeds`, `sec:baselines`) | `systems/hpc/` |
+| AMA27 / CPU profiling (`sec:testbeds`) | `systems/hpc/` |
 | End-to-end wire-up / deliverables (`sec:deliverables`) | `systems/pipeline/` |
 | Collaborator tracks (`sec:collaborators`) | `modeling/` vs `search/` + `systems/hpc/` |
 

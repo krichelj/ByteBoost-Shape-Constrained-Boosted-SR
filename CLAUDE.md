@@ -52,4 +52,4 @@ See `src/README.md` for the description ↔ package map and suggested implementa
 
 ## Domain consistency
 
-The requested testbeds are **Neocortex (PSC, Cerebras CS-3)** for pretraining and **AMA27 (Stony Brook, AmpereOne A192-32M Arm cluster)** for the CPU-bound symbolic-regression search. Earlier drafts referenced Ookami/A64FX and CS-2 — those systems were replaced; do not reintroduce them except in the historical note explaining AMA27 replaced the retired Ookami.
+The requested testbeds are **Neocortex (PSC, Cerebras CS-3)** for pretraining and **AMA27 (Stony Brook, AmpereOne A192-32M Arm cluster)** for the CPU-bound symbolic-regression search. Existing LLM *loss* baselines are the public Hugging Face `colinear_scaling_models` inventory (`sec:baselines`) — compare losses, not original training hardware (which is not available to students). Earlier drafts referenced Ookami/A64FX and CS-2 — those systems were replaced; do not reintroduce them except in the historical note explaining AMA27 replaced the retired Ookami. Do not reintroduce GH200/DeltaAI/EPYC as workshop-available baseline hardware.
