@@ -36,5 +36,5 @@ class FineWebEduCorpus(Corpus):
 
 
 def pretokenize(corpus: Corpus, *args: Any, **kwargs: Any) -> Any:
-    """Optional offline tokenization step (see reference ``scripts/data/``)."""
+    """Optional offline tokenization step for pretraining corpora."""
     raise NotImplementedError("TODO: tokenize / pack sequences for training")

@@ -5,9 +5,6 @@ Sound enclosures ``f̲ ≤ f ≤ f̄`` on a compact box ``I_x = [x_min, x_max]``
 the substrate for continuum certificates of (A1)–(A4)/(A6) and stage
 conditions (i)–(iv), (vi). Composition with forward-mode AD yields enclosures
 of ``F``, ``∂F/∂x``, and ``∂²F/∂x²`` in time linear in the expression-tree size.
-
-Reference study path: ``reference/.../src/core/interval.py``.
-Implement your own; do not import the reference package from student code.
 """
 
 from __future__ import annotations

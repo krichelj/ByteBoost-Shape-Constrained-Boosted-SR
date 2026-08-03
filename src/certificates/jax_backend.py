@@ -2,9 +2,9 @@
 Optional JAX + custom JVP certificate path (``sec:software``).
 
 The project description lists JAX with custom JVP rules and a Python
-interval-arithmetic backend for the AD+IA proof step. The reference submodule
-uses pure-Python ``DualInterval`` instead. Students may implement either (or
-both) behind the same ``HardIntervalCertificate`` interface.
+interval-arithmetic backend for the AD+IA proof step. Students may implement
+that stack, or a pure-Python DualInterval evaluator, behind the same
+``HardIntervalCertificate`` interface.
 """
 
 from __future__ import annotations
