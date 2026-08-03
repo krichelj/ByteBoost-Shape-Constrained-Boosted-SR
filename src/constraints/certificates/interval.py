@@ -5,6 +5,10 @@ Sound enclosures ``f̲ ≤ f ≤ f̄`` on a compact box ``I_x = [x_min, x_max]``
 the substrate for continuum certificates of (A1)–(A4)/(A6) and stage
 conditions (i)–(iv), (vi). Composition with forward-mode AD yields enclosures
 of ``F``, ``∂F/∂x``, and ``∂²F/∂x²`` in time linear in the expression-tree size.
+
+Both search paths use these primitives:
+* soft path (``sec:soft``) — convert enclosures into continuous ``v_a`` scores;
+* hard path (workshop extension) — accept/reject via certificate (a).
 """
 
 from __future__ import annotations
@@ -30,14 +34,29 @@ class Interval:
     def __add__(self, other: Interval | Scalar) -> Interval:
         raise NotImplementedError("TODO: interval addition")
 
+    def __radd__(self, other: Interval | Scalar) -> Interval:
+        raise NotImplementedError("TODO: reverse interval addition")
+
     def __sub__(self, other: Interval | Scalar) -> Interval:
         raise NotImplementedError("TODO: interval subtraction")
+
+    def __rsub__(self, other: Interval | Scalar) -> Interval:
+        raise NotImplementedError("TODO: reverse interval subtraction")
 
     def __mul__(self, other: Interval | Scalar) -> Interval:
         raise NotImplementedError("TODO: interval multiplication")
 
+    def __rmul__(self, other: Interval | Scalar) -> Interval:
+        raise NotImplementedError("TODO: reverse interval multiplication")
+
     def __truediv__(self, other: Interval | Scalar) -> Interval:
         raise NotImplementedError("TODO: interval division (handle 0 ∈ divisor)")
+
+    def __rtruediv__(self, other: Interval | Scalar) -> Interval:
+        raise NotImplementedError("TODO: reverse interval division")
+
+    def __neg__(self) -> Interval:
+        raise NotImplementedError("TODO: interval negation")
 
     @staticmethod
     def power(base: Interval, exp: float) -> Interval:
@@ -49,8 +68,13 @@ class Interval:
 class DualInterval:
     """Forward-mode AD value: ``(val, d1, d2)`` as intervals.
 
-    For the differentiated coordinate ``x``, use ``variable(domain)``;
+    Carries the value and the first two derivatives w.r.t. one differentiated
+    scale coordinate ``x``. For that coordinate use ``variable(domain)``;
     for other coordinates held fixed, use ``parameter(domain)``.
+
+    Arithmetic must propagate derivative rules (product, quotient, chain rule
+    for ``pow_p``) so tree evaluation yields sound enclosures of
+    ``F``, ``∂F/∂x``, ``∂²F/∂x²`` on ``I_x`` (eq. interval-bb).
     """
 
     val: Interval
@@ -59,6 +83,7 @@ class DualInterval:
 
     @staticmethod
     def constant(c: float) -> DualInterval:
+        """Constant leaf: value ``[c,c]``, derivatives zero."""
         raise NotImplementedError("TODO: DualInterval with zero derivatives")
 
     @staticmethod
@@ -70,3 +95,37 @@ class DualInterval:
     def parameter(domain: Interval) -> DualInterval:
         """Frozen coordinate (derivatives zero)."""
         raise NotImplementedError("TODO: DualInterval.parameter")
+
+    # --- DualInterval arithmetic (same operator set as Interval / trees) ---
+
+    def __add__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: dual addition (val, d1, d2)")
+
+    def __radd__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: reverse dual addition")
+
+    def __sub__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: dual subtraction")
+
+    def __rsub__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: reverse dual subtraction")
+
+    def __mul__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: dual product rule")
+
+    def __rmul__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: reverse dual product")
+
+    def __truediv__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: dual quotient rule (0 ∉ divisor)")
+
+    def __rtruediv__(self, other: DualInterval | Scalar) -> DualInterval:
+        raise NotImplementedError("TODO: reverse dual quotient")
+
+    def __neg__(self) -> DualInterval:
+        raise NotImplementedError("TODO: dual negation")
+
+    @staticmethod
+    def power(base: DualInterval, exp: float) -> DualInterval:
+        """Dual enclosure of ``pow_p(z) = |z|^p`` (chain rule on val/d1/d2)."""
+        raise NotImplementedError("TODO: dual power for pow_p")

@@ -18,7 +18,7 @@ SCALE_VARS: Final[tuple[str, str]] = ("N", "D")
 # M_GRID: Sequence[float] = ...
 
 # Soft-path axiom indices a ∈ {mono, conv, irred, decay, leaf}
-# (``sec:soft``, eq. violations). Positivity (A5) and graceful saturation (A6)
+# (``sec:soft``, eq. violations-bb). Positivity (A5) and graceful saturation (A6)
 # are certified via the irreducible-floor / finiteness IA checks rather than
 # separate soft scores (see project description).
 AXIOM_INDICES: Final[tuple[str, ...]] = (

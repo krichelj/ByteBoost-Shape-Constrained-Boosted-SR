@@ -1,8 +1,8 @@
 """
-Boosting guarantee (``sec:guarantee``, eq. guarantee).
+Boosting guarantee (``sec:guarantee``, Thm. 1 / ``thm:guarantee``, eq. guarantee-bb).
 
-If ``L̂_0 ∈ S`` and every ``L̂_j`` is accepted by certificates (a)–(b), then for
-all ``j``:
+Hard path: if ``L̂_0 ∈ S`` and every ``L̂_j`` is accepted by certificates (a)–(b),
+then for all ``j``:
 
 * ``L̂^{(j)} ∈ S``;
 * writing ``L_∞^{(j)}`` for the joint floor of ``L̂^{(j)}``, one has
@@ -14,9 +14,10 @@ all ``j``:
   where ``L^∞_x`` is the marginal floor of ``L̂^{(j)}`` along ``x``
   (equal to that of ``L̂_0``).
 
-Boosting therefore improves fit *without* corrupting the interpretable
-constants researchers quote. Implement empirical checks / unit tests that
-probe these invariants on fitted ensembles.
+Soft path recovers the same conclusion when ``V = 0`` at every stage
+(``prop:soft``). Boosting therefore improves fit *without* corrupting the
+interpretable constants researchers quote. Implement empirical checks / unit
+tests that probe these invariants on fitted ensembles.
 """
 
 from __future__ import annotations

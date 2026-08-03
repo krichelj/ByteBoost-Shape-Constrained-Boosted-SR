@@ -20,8 +20,8 @@ documents/
   description/    # project description (.tex, .pdf) + bibliography
 src/              # student skeleton — five packages (see src/README.md)
   scaling/        # sec:setup, sec:datasets
-  constraints/    # sec:axioms, sec:certificates, sec:guarantee
-  search/         # sec:boosting, sec:soft (Algorithm 1)
+  constraints/    # sec:axioms, sec:stage-admiss, sec:guarantee
+  search/         # sec:boosting, sec:algorithm, sec:soft (+ hard_path extension)
   modeling/       # sec:models, Neocortex pretraining
   systems/        # AMA27/HPC profiling, deliverables pipeline
 scripts/

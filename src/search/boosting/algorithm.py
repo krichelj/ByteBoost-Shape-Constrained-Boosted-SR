@@ -1,21 +1,25 @@
 """
-Boosted ensemble construction (``sec:boosting``, Algorithm ``alg:boosting-bb``).
+Shape-constrained boosted symbolic regression (``sec:algorithm``, ``alg:boosting-bb``).
 
-Admissibility invariant: ``L̂^{(j)} ∈ S`` for every ``j = 0, …, K``.
+Builds on the stage-0 baseline and search operators of ``sec:boosting``.
+Target invariant: ``L̂^{(j)} ∈ S`` for every ``j = 0, …, K`` — exact under the
+hard filter; soft path recovers it when ``V = 0`` at every stage
+(``sec:soft``, ``sec:guarantee``).
 Notation: ``L̂_j`` (subscript) = stage-``j`` correction;
 ``L̂^{(j)}`` (superscript) = cumulative ensemble through stage ``j``,
 with ``L̂^{(0)} = L̂_0``.
 
-Algorithm
----------
-1. Fit ``L̂_0`` via eq. chinchilla; set ``L̂^{(0)} ← L̂_0``.
+Algorithm (matches ``alg:boosting-bb``)
+---------------------------------------
+1. Fit ``L̂_0`` via eq. chinchilla-bb; set ``L̂^{(0)} ← L̂_0``.
 2. For ``j = 1, …, K``:
-   a. Compute ``δ_j`` and Huber pseudo-residuals ``r̃_j^{(ℓ)}``.
-   b. Find ``L̂_j`` via the soft penalized objective of ``sec:soft``
-      (primary), or via hard certificates (a)–(b) of ``sec:stage-admiss``
-      (workshop extension).
-   c. ``L̂^{(j)} ← L̂^{(j−1)} + L̂_j``.
-3. Return ``L̂^{(K)} ∈ S``.
+   a. Compute ``δ_j`` via eq. delta-bb.
+   b. Compute Huber pseudo-residuals ``r̃_j^{(ℓ)}`` via eq. pseudoresid-bb.
+   c. Find ``L̂_j`` via soft search eq. penalized-bb (primary), **or** by
+      MSE argmin subject to certificates (a)–(b) for eq. stage-admiss-bb
+      (workshop hard-filter extension).
+   d. ``L̂^{(j)} ← L̂^{(j−1)} + L̂_j``.
+3. Return ``L̂^{(K)}`` (admissible under hard / soft with ``V = 0``).
 """
 
 from __future__ import annotations

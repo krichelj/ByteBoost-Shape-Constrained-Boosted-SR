@@ -1,13 +1,18 @@
 """
 Tree evaluation under DualInterval and structural asymptotic checks
-(``sec:certificates``, certificate (b)).
+(``sec:certificates``).
 
-Search features are typically ``log φ_h(h)``. Evaluate DualIntervals in that
-coordinate system, then map first/second derivatives to the raw scale axis via
-``chain_rule_log_to_raw`` before applying the interval tests of eq. interval.
+Helpers for both certificate (a) (IA enclosures of ``F``, ``∂F/∂x``, ``∂²F/∂x²``)
+and certificate (b) (structural ``ord`` / leaf checks). Soft scores (``sec:soft``)
+and the hard reject filter reuse the same routines.
 
-Structural checks
------------------
+Search features are typically ``log φ_h(h)`` for every coordinate
+``h ∈ {N, D} ∪ H``. Evaluate DualIntervals in that coordinate system, then map
+first/second derivatives to the raw scale axis via ``chain_rule_log_to_raw``
+before applying the interval tests of eq. interval-bb.
+
+Structural checks (certificate (b))
+-----------------------------------
 * ``ord(g, x)`` — asymptotic exponent of expression tree ``g`` along scale ``x``,
   defined recursively: non-``x`` leaves → 0; ``pow_p(x)`` → ``p``; products add;
   quotients subtract; sums take the maximum.
@@ -16,10 +21,14 @@ Structural checks
   ``ord(g, x) < c_x^{(0)}`` for each ``x ∈ {N, D}``.
 * Each scale leaf ``x ∈ {N, D}`` must appear in ``leaves(g)``.
 
-IA evaluation
--------------
-Walk the finite expression tree bottom-up on DualInterval operands
-(operators ``{+, ×, ÷} ∪ {pow_p : p ∈ P}``; optional neg/inv for ablations).
+IA evaluation (certificate (a) substrate)
+-----------------------------------------
+Walk the finite expression tree bottom-up on DualInterval operands with the
+same primary operator set as search (``sec:boosting``):
+
+    ``{+, −, ×, ÷} ∪ {pow_p : p ∈ P}``
+
+Optional unary helpers ``inv`` / ``log`` / ``sqrt`` may be enabled for ablations.
 """
 
 from __future__ import annotations

@@ -2,7 +2,7 @@
 
 **Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation**
 
-Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoost.php) (ACCESS cyberinfrastructure testbeds). Discover neural scaling-law formulas with symbolic regression, while certifying physical priors (monotonicity, diminishing returns, positivity, irreducible floor, power-law decay) via interval-arithmetic forward-mode AD, across Cerebras CS-3 (Neocortex) pretraining and AmpereOne (AMA27) search.
+Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoost.php) (ACCESS cyberinfrastructure testbeds; URL path is historical). Discover neural scaling-law formulas with symbolic regression, while certifying physical priors (A1–A6: monotonicity, diminishing returns, irreducible floor, power-law decay, positivity, graceful saturation) via interval-arithmetic forward-mode AD, across Cerebras CS-3 (Neocortex) pretraining and AmpereOne (AMA27) search.
 
 ## Documents
 
@@ -21,7 +21,7 @@ documents/description/   # LaTeX source, bibliography, committed PDF
 src/                     # student skeleton (5 packages — see src/README.md)
   scaling/               # setup + datasets
   constraints/           # axioms, certificates, guarantee
-  search/                # boosting / hard & soft SR paths
+  search/                # stage-0 / residuals / soft (+ hard) SR / Algorithm 1
   modeling/              # LM architecture + pretraining
   systems/               # HPC profiling + deliverables pipeline
 scripts/                 # compile.sh, optional check-latex.sh
@@ -41,7 +41,7 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make 
 ## Related
 
 - Scaling-grid checkpoints: [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models)
-- Method: shape-constrained boosted SR with hard (IA certificates) and soft (violation penalties) paths
+- Method: shape-constrained boosted SR with a primary soft path (IA violation penalties) and an optional hard path (IA reject certificates)
 
 ## License
 

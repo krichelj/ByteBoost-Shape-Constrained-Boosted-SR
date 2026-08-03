@@ -1,5 +1,5 @@
 """
-Huber clipping and pseudo-residuals (eq. delta, eq. pseudoresid).
+Huber clipping and pseudo-residuals (``sec:boosting``, eq. delta-bb, eq. pseudoresid-bb).
 
 At boosting stage ``j ≥ 1``:
 
@@ -26,5 +26,5 @@ def huber_delta(y_true: Any, y_pred: Any) -> float:
 
 
 def huber_pseudo_residuals(y_true: Any, y_pred: Any, delta: float) -> Any:
-    """Return the vector ``(r̃_j^{(ℓ)})_{ℓ=1}^n`` (eq. pseudoresid)."""
+    """Return the vector ``(r̃_j^{(ℓ)})_{ℓ=1}^n`` (eq. pseudoresid-bb)."""
     raise NotImplementedError("TODO: clip residuals at ±delta with sign")

@@ -31,5 +31,5 @@ class JaxIntervalCertificate(HardIntervalCertificate):
         **kwargs: Any,
     ) -> IntervalCertificate:
         raise NotImplementedError(
-            "TODO: optional JAX JVP + IA backend implementing eq. interval"
+            "TODO: optional JAX JVP + IA backend implementing eq. interval-bb"
         )

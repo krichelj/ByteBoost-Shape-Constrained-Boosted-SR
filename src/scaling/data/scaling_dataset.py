@@ -2,7 +2,8 @@
 Scaling-law datasets (``sec:datasets``, ``sec:setup``).
 
 Sources named in the project description:
-* Wikipedia, RedPajama, FineWeb-Edu — pretraining corpora (modeling track).
+* Wikipedia, RedPajama, and related open text mixtures — pretraining corpora
+  (modeling track). FineWeb-Edu is an *optional* workshop extension.
 * Public ``colinear_scaling_models`` on Hugging Face — trained checkpoints and
   loss curves from an initial DeltaAI grid (already available).
 
