@@ -1,8 +1,9 @@
 name: latex-guard
 
 # Rejects any change to main whose from-scratch compile of
-# byteboost_project_description produces errors or warnings. The check never
-# looks at the committed PDF — scripts/check-latex.sh rebuilds from source.
+# documents/description/byteboost_project_description produces errors or
+# warnings. The check never looks at the committed PDF —
+# scripts/check-latex.sh rebuilds from source.
 
 on:
   push:

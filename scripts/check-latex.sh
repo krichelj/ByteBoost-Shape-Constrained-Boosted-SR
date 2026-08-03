@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# check-latex.sh — recompile byteboost_project_description from source and
-# reject the build if it produces ANY LaTeX error, LaTeX/package/class/font
-# warning, over/underfull box, or BibTeX warning/error.
+# check-latex.sh — recompile documents/description/byteboost_project_description
+# from source and reject the build if it produces ANY LaTeX error,
+# LaTeX/package/class/font warning, over/underfull box, or BibTeX warning/error.
 #
 # It deliberately never inspects the committed *.pdf. It copies only the
 # source (*.tex/*.bib, plus any local *.bst/*.cls/*.sty) into a throwaway
@@ -13,6 +13,7 @@
 set -uo pipefail
 
 DOC="byteboost_project_description"
+SRC_DIR="documents/description"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -29,8 +30,9 @@ trap 'rm -rf "$WORK"' EXIT
 # from a clean slate is the whole point: the verdict must not depend on any
 # previously compiled artifact.
 shopt -s nullglob
-for f in "$REPO_ROOT"/*.tex "$REPO_ROOT"/*.bib "$REPO_ROOT"/*.bst \
-         "$REPO_ROOT"/*.cls "$REPO_ROOT"/*.sty; do
+for f in "$REPO_ROOT/$SRC_DIR"/*.tex "$REPO_ROOT/$SRC_DIR"/*.bib \
+         "$REPO_ROOT/$SRC_DIR"/*.bst "$REPO_ROOT/$SRC_DIR"/*.cls \
+         "$REPO_ROOT/$SRC_DIR"/*.sty; do
   cp "$f" "$WORK"/
 done
 shopt -u nullglob

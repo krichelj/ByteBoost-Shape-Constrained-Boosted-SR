@@ -1,14 +1,15 @@
 .PHONY: pdf clean
 
+DOC_DIR = documents/description
 MAIN = byteboost_project_description
 
-pdf: $(MAIN).pdf
+pdf: $(DOC_DIR)/$(MAIN).pdf
 
-$(MAIN).pdf: $(MAIN).tex byteboost_refs.bib
-	pdflatex -interaction=nonstopmode $(MAIN)
-	bibtex $(MAIN)
-	pdflatex -interaction=nonstopmode $(MAIN)
-	pdflatex -interaction=nonstopmode $(MAIN)
+$(DOC_DIR)/$(MAIN).pdf: $(DOC_DIR)/$(MAIN).tex $(DOC_DIR)/byteboost_refs.bib
+	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
+	cd $(DOC_DIR) && bibtex $(MAIN)
+	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
+	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
 
 clean:
-	rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out
+	cd $(DOC_DIR) && rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out

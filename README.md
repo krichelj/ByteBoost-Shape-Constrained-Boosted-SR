@@ -8,21 +8,22 @@ Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ook
 
 | File | Description |
 |------|-------------|
-| [`byteboost_project_description.pdf`](byteboost_project_description.pdf) | Full project description (compiled) |
-| [`byteboost_project_description.tex`](byteboost_project_description.tex) | LaTeX source |
-| [`byteboost_refs.bib`](byteboost_refs.bib) | Bibliography |
-| [`ABSTRACT.md`](ABSTRACT.md) / [`byteboost_abstract.tex`](byteboost_abstract.tex) | Shared participant abstract (Dave Carlson's condensed version) |
+| [`documents/description/byteboost_project_description.pdf`](documents/description/byteboost_project_description.pdf) | Full project description (compiled) |
+| [`documents/description/byteboost_project_description.tex`](documents/description/byteboost_project_description.tex) | LaTeX source |
+| [`documents/description/byteboost_refs.bib`](documents/description/byteboost_refs.bib) | Bibliography |
+| [`documents/abstract/ABSTRACT.md`](documents/abstract/ABSTRACT.md) / [`documents/abstract/byteboost_abstract.tex`](documents/abstract/byteboost_abstract.tex) | Shared participant abstract (Dave Carlson's condensed version) |
 
 ## Build
 
 ```bash
+cd documents/description
 pdflatex byteboost_project_description
 bibtex   byteboost_project_description
 pdflatex byteboost_project_description
 pdflatex byteboost_project_description
 ```
 
-Or: `make`.
+Or from the repo root: `make`.
 
 Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the packages listed in the preamble).
 

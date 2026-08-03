@@ -1,11 +1,12 @@
 # Build guard
 
-`check-latex.sh` recompiles `byteboost_project_description` **from source** and
-exits non-zero if the build produces any LaTeX error, LaTeX/font/package/class
-warning, over/underfull box, or BibTeX warning. It never inspects the committed
-PDF: it copies only the `.tex`/`.bib` (and any local `.bst`/`.cls`/`.sty`) into a
-temporary directory, builds to convergence with `latexmk`, and judges the final
-`.log` and the BibTeX `.blg`.
+`check-latex.sh` recompiles `documents/description/byteboost_project_description`
+**from source** and exits non-zero if the build produces any LaTeX error,
+LaTeX/font/package/class warning, over/underfull box, or BibTeX warning. It
+never inspects the committed PDF: it copies only the `.tex`/`.bib` (and any
+local `.bst`/`.cls`/`.sty`) from `documents/description/` into a temporary
+directory, builds to convergence with `latexmk`, and judges the final `.log`
+and the BibTeX `.blg`.
 
 ```bash
 bash scripts/check-latex.sh   # exit 0 = clean, 1 = errors/warnings, 2 = no TeX Live
