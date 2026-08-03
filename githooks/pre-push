@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# pre-push hook: run the same from-scratch LaTeX guard that CI runs, so a
+# pre-push hook: run `make check` (same from-scratch LaTeX guard as CI), so a
 # build with errors or warnings is rejected before it reaches the remote.
 #
 # Enable it (once, per clone):
@@ -11,17 +11,17 @@
 set -uo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-"$REPO_ROOT/scripts/check-latex.sh"
-rc=$?
+cd "$REPO_ROOT" || exit 1
 
-if [ "$rc" -eq 2 ]; then
-  # Toolchain missing locally — don't block the push; CI will still enforce.
+# Toolchain missing locally — don't block the push; CI will still enforce.
+# (Checked here because `make` maps any recipe failure to exit 2.)
+if ! command -v latexmk >/dev/null 2>&1; then
   echo "pre-push: TeX Live not found locally; skipping the build guard." >&2
   echo "pre-push: CI (latex-guard) will run the check on the server." >&2
   exit 0
 fi
 
-if [ "$rc" -ne 0 ]; then
+if ! make check; then
   echo "pre-push: rejected — the document does not compile cleanly." >&2
   echo "pre-push: fix the errors/warnings above, or bypass with 'git push --no-verify'." >&2
   exit 1
