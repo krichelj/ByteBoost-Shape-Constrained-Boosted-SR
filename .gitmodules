@@ -1,0 +1,3 @@
+[submodule "reference/axiomatic_neural_scaling_laws"]
+	path = reference/axiomatic_neural_scaling_laws
+	url = https://github.com/lab-v2/axiomatic_neural_scaling_laws.git
