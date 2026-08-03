@@ -19,7 +19,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.certificates.interval import DualInterval, Interval
+from src.constraints.certificates.interval import DualInterval, Interval
 
 
 class BaselineFit(ABC):

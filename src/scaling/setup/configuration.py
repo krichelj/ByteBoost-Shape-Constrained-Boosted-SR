@@ -112,4 +112,4 @@ class DatasetLoader(ABC):
 
     @abstractmethod
     def load(self, *args: Any, **kwargs: Any) -> LabeledDataset:
-        """Return a labeled scaling dataset (see also ``src.data``)."""
+        """Return a labeled scaling dataset (see also ``src.scaling.data``)."""

@@ -21,7 +21,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
 
-from src.certificates.interval import DualInterval, Interval
+from src.constraints.certificates.interval import DualInterval, Interval
 
 
 @dataclass(frozen=True)

@@ -11,8 +11,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.certificates.hard_certificates import HardIntervalCertificate, IntervalCertificate
-from src.certificates.interval import DualInterval, Interval
+from src.constraints.certificates.hard_certificates import (
+    HardIntervalCertificate,
+    IntervalCertificate,
+)
+from src.constraints.certificates.interval import DualInterval, Interval
 
 
 class JaxIntervalCertificate(HardIntervalCertificate):

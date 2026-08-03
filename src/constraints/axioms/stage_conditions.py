@@ -15,7 +15,7 @@ Given ``L̂^{(j−1)} ∈ S`` with joint floor ``L_∞``, the update
 
 Conditions (i)–(iv), (vi) on the compact box are handled by sound interval
 certificates; (v) by the structural exponent ``ord(g, x)``
-(see ``src.certificates``).
+(see ``src.constraints.certificates``).
 """
 
 from __future__ import annotations

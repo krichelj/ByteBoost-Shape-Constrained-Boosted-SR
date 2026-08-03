@@ -18,7 +18,12 @@ the project description and the ``src/`` stubs only.
 ```
 documents/
   description/    # project description (.tex, .pdf) + bibliography
-src/              # student skeleton (see src/README.md)
+src/              # student skeleton — five packages (see src/README.md)
+  scaling/        # sec:setup, sec:datasets
+  constraints/    # sec:axioms, sec:certificates, sec:guarantee
+  search/         # sec:boosting, sec:soft (Algorithm 1)
+  modeling/       # sec:models, Neocortex pretraining
+  systems/        # AMA27/HPC profiling, deliverables pipeline
 scripts/
   compile.sh      # build the description PDF
   check-latex.sh  # optional from-scratch warning-strict check
