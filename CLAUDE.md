@@ -29,7 +29,7 @@ bash scripts/compile.sh clean        # remove aux files; keeps PDFs
 
 Or: `make` / `make description` / `make abstract` / `make clean` / `make check`
 (wrappers around the scripts). `make check` is the from-scratch quality gate
-(no errors or warnings) used by CI and the optional pre-push hook.
+(no errors or warnings); the optional pre-push hook can run it locally.
 
 Requires a standard TeX Live / MacTeX install. After editing a `.tex` file, rebuild and commit the updated PDF alongside the source, since the PDFs are tracked deliverables.
 

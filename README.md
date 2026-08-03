@@ -30,13 +30,13 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the pac
 make check
 ```
 
-CI (`.github/workflows/latex-guard.yml`) runs `make check` on every push and PR to `main`; branch protection requires the `compile-check` status. Optionally run the same gate before every push:
+Optionally run the same gate before every push:
 
 ```bash
 git config core.hooksPath githooks
 ```
 
-If TeX Live is missing locally, the pre-push hook skips and lets CI enforce.
+If TeX Live is missing locally, the pre-push hook skips.
 
 ## Related
 
