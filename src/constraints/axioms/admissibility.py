@@ -23,7 +23,7 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
 (A6) **Graceful saturation.** ``L̂`` is ``C¹`` in ``x`` on ``[x_min, ∞)``,
     with ``L̂(x_min, ·)`` finite and ``> L_∞``.
 
-Continuum statements are decided by certificates in ``src.certificates``
+Continuum statements are decided by certificates in ``src.constraints.certificates``
 (sound IA on the compact box ``I_x``, structural checks for asymptotics).
 """
 

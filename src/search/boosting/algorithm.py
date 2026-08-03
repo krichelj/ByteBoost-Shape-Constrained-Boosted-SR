@@ -46,9 +46,9 @@ class BoostingAlgorithm(ABC):
         num_stages:
             ``K`` — number of correction stages after stage 0.
         baseline:
-            Stage-0 ``BaselineFit`` (``src.baselines``).
+            Stage-0 ``BaselineFit`` (``src.search.baselines``).
         search_backend:
-            Hard or soft stage search (``src.hard_path`` / ``src.soft_path``).
+            Hard or soft stage search (``src.search.hard_path`` / ``src.search.soft_path``).
         """
         self.K = num_stages
         self.baseline = baseline

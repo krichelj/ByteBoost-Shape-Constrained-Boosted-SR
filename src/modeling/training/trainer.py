@@ -11,7 +11,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.models.config import ModelConfig
+from src.modeling.models.config import ModelConfig
 
 
 class PretrainTrainer(ABC):

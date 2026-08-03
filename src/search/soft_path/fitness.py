@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from src.setup.constants import DEFAULT_LAMBDAS
+from src.scaling.setup.constants import DEFAULT_LAMBDAS
 
 
 def penalized_fitness(

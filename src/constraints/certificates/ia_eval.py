@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable, Sequence
 
-from src.certificates.interval import DualInterval
+from src.constraints.certificates.interval import DualInterval
 
 
 def evaluate_program(

@@ -7,7 +7,7 @@ Sources named in the project description:
   loss curves from an initial DeltaAI grid (already available).
 
 This module concerns the *labeled* pairs ``(h_ℓ, L(h_ℓ))`` that feed symbolic
-regression. Corpus download/tokenization lives under ``src.training`` /
+regression. Corpus download/tokenization lives under ``src.modeling.training`` /
 ``corpora.py``.
 """
 
@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.setup.configuration import DatasetLoader, LabeledDataset
+from src.scaling.setup.configuration import DatasetLoader, LabeledDataset
 
 
 class HuggingFaceScalingLoader(DatasetLoader):

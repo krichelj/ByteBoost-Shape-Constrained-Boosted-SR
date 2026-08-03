@@ -10,15 +10,20 @@ Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoos
 
 ## Student skeleton
 
-Implement the method in [`src/`](src/). Each subpackage maps to a section of the project description (setup, axioms, certificates, boosting, hard/soft paths, modeling track, …). Stubs use the description’s notation and raise `NotImplementedError` — see [`src/README.md`](src/README.md) for the full map and suggested order.
+Implement the method in [`src/`](src/), organized into five packages (`scaling`, `constraints`, `search`, `modeling`, `systems`). Stubs use the description’s notation and raise `NotImplementedError` — see [`src/README.md`](src/README.md) for the full map and suggested order.
 
-Run Python from the repository root so imports like `from src.setup…` resolve.
+Run Python from the repository root so imports like `from src.scaling.setup…` resolve.
 
 ## Repository layout
 
 ```
 documents/description/   # LaTeX source, bibliography, committed PDF
-src/                     # student implementation skeleton
+src/                     # student skeleton (5 packages — see src/README.md)
+  scaling/               # setup + datasets
+  constraints/           # axioms, certificates, guarantee
+  search/                # boosting / hard & soft SR paths
+  modeling/              # LM architecture + pretraining
+  systems/               # HPC profiling + deliverables pipeline
 scripts/                 # compile.sh, optional check-latex.sh
 Makefile                 # make / make clean / make check
 ```

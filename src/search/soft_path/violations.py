@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from src.setup.constants import AXIOM_INDICES, EPSILON_DECAY
+from src.scaling.setup.constants import AXIOM_INDICES, EPSILON_DECAY
 
 
 def compute_violations(

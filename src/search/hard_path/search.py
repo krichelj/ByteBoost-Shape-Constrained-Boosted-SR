@@ -44,7 +44,7 @@ class HardSearchBackend(ABC):
             ``L̂^{(j−1)}`` context (floors, exponents, prior programs, domains).
         certificate:
             Object implementing the sufficient IA + structural checks
-            (``src.certificates``, ``src.axioms.stage_conditions``).
+            (``src.constraints.certificates``, ``src.constraints.axioms.stage_conditions``).
         """
 
 

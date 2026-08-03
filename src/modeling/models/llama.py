@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.models.config import ModelConfig
+from src.modeling.models.config import ModelConfig
 
 
 class LlamaLikeLM:
