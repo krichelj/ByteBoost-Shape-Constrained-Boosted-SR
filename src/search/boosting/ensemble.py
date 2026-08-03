@@ -1,5 +1,11 @@
 """
-Helpers for the cumulative map ``L̂^{(j)} = L̂^{(j−1)} + L̂_j``.
+Helpers for the cumulative map ``L̂^{(j)} = L̂^{(j−1)} + L̂_j`` (``sec:algorithm``,
+``alg:boosting-bb``).
+
+Algorithm 1 maintains a running ensemble predictor: stage 0 is the Chinchilla
+baseline ``L̂_0``, and each later stage adds a symbolic correction ``L̂_j`` found
+by soft (primary) or hard (workshop) search. These helpers compose callables
+for prediction and for DualInterval evaluation of ``F = L̂^{(j−1)} + g``.
 """
 
 from __future__ import annotations

@@ -1,9 +1,11 @@
 """
 Pretraining corpora named in ``sec:datasets``.
 
-Wikipedia, RedPajama, FineWeb-Edu — used when generating new ``(N, D, L)``
-points on Neocortex / GPU baselines. Tokenization and packing details are
-left to students / site-specific storage layouts.
+Primary mixtures: Wikipedia, RedPajama, and related open text — used when
+generating new ``(N, D, L)`` points on Neocortex / GPU baselines.
+FineWeb-Edu is an optional workshop extension (not required for the core grid).
+
+Tokenization and packing details are left to students / site-specific storage.
 """
 
 from __future__ import annotations
@@ -31,8 +33,10 @@ class RedPajamaCorpus(Corpus):
 
 
 class FineWebEduCorpus(Corpus):
+    """Optional workshop-extension corpus (``sec:datasets``)."""
+
     def documents(self) -> Iterator[str]:
-        raise NotImplementedError("TODO: stream FineWeb-Edu shards")
+        raise NotImplementedError("TODO: stream FineWeb-Edu shards (optional)")
 
 
 def pretokenize(corpus: Corpus, *args: Any, **kwargs: Any) -> Any:

@@ -11,10 +11,11 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
 
 (A3) **Irreducible loss.**
     Joint floor ``L_∞ > 0`` with ``L̂(h) > L_∞`` for every ``h ∈ ℍ``;
-    marginal floors ``L^∞_x = lim_{t→∞} L̂(h)|_{x=t}`` exist, are finite,
-    and satisfy ``L^∞_x ≥ L_∞``.
+    marginal floors (eq. margfloor-bb)
+    ``L^∞_x = lim_{t→∞} L̂(h)|_{x=t}`` exist, are finite, and satisfy
+    ``L^∞_x ≥ L_∞``.
 
-(A4) **Asymptotic power-law decay.**
+(A4) **Asymptotic power-law decay** (eq. powerlaw-bb).
     Relative to the marginal floor,
     ``lim_{t→∞} log(L̂(h)|_{x=t} − L^∞_x) / log t = c_x`` for some ``c_x < 0``.
 
@@ -25,6 +26,10 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
 
 Continuum statements are decided by certificates in ``src.constraints.certificates``
 (sound IA on the compact box ``I_x``, structural checks for asymptotics).
+
+Soft-path scores (``sec:soft``, eq. violations-bb) cover A1–A4 via
+``mono / conv / irred / decay / leaf``; A5 is folded into the irreducible-floor
+gap and A6 into DualInterval finiteness / the smooth operator set.
 """
 
 from __future__ import annotations
@@ -39,8 +44,8 @@ class AxiomReport:
     """Per-axiom pass/fail (or soft score) for a candidate ``L̂`` or increment ``g``.
 
     Students may store booleans for the hard path and floats for soft gaps.
-    Keys should include at least the soft indices
-    ``mono, conv, irred, decay, leaf`` plus any explicit A5/A6 fields.
+    Soft keys should include ``mono, conv, irred, decay, leaf`` (see
+    ``AXIOM_INDICES``); hard-path reports may add explicit A5/A6 fields.
     """
 
     results: Mapping[str, Any]
@@ -55,7 +60,7 @@ class AdmissibleLaw(ABC):
 
     @abstractmethod
     def marginal_floor(self, scale_var: str) -> float:
-        """Marginal floor ``L^∞_x`` along ``scale_var ∈ {N, D}``."""
+        """Marginal floor ``L^∞_x`` along ``scale_var ∈ {N, D}`` (eq. margfloor-bb)."""
 
     @abstractmethod
     def asymptotic_exponent(self, scale_var: str) -> float:

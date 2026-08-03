@@ -1,5 +1,5 @@
 """
-Soft-path per-axiom violation scores (``sec:soft``, eq. violations).
+Soft-path per-axiom violation scores (``sec:soft``, eq. violations-bb).
 
 Using IA enclosures of ``F = L̂^{(j−1)} + g`` and structural quantities:
 
@@ -12,8 +12,9 @@ Using IA enclosures of ``F = L̂^{(j−1)} + g`` and structural quantities:
 Every score is nonnegative. Aggregate ``V(g) = Σ_a v_a(g)``.
 Soft fitness uses ``Σ_a λ_a v_a(g)²`` (typically with positive ``λ``); ``λ = 0``
 is the unconstrained ablation. ``V = 0`` at every stage recovers hard
-admissibility. A5/A6 may be folded into ``v_decay`` / ``v_leaf`` rather than
-scored as separate soft terms — match ``AXIOM_INDICES`` / your λ schedule.
+admissibility. Soft scores act as IA proxies for A1–A4; positivity (A5) is
+folded into the irreducible-floor gap and A6 into DualInterval finiteness /
+the smooth operator set (match ``AXIOM_INDICES`` / your λ schedule).
 """
 
 from __future__ import annotations
@@ -40,7 +41,7 @@ def compute_violations(
         Enough state to form ``F = L̂^{(j−1)} + g`` under IA
         (baseline IA, prior stages, domains, ``L_∞``, ``c_x^{(0)}``, …).
     """
-    raise NotImplementedError("TODO: implement eq. violations using DualInterval + ord")
+    raise NotImplementedError("TODO: implement eq. violations-bb using DualInterval + ord")
 
 
 def aggregate_violation(violations: Mapping[str, float]) -> float:

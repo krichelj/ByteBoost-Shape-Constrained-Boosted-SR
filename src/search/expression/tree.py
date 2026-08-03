@@ -1,9 +1,10 @@
 """
-Expression-tree abstraction for a candidate correction ``g``.
+Expression-tree abstraction for a candidate correction ``g`` (``sec:boosting``).
 
-The project description treats ``g`` as a finite expression tree. Concrete
-encodings (gplearn prefix lists, sympy, PySR expressions, …) are left to
-students; this protocol captures the operations certificates need.
+The project description treats ``g`` as a finite expression tree over
+``{+, −, ×, ÷} ∪ {pow_p}`` (and optional unary ablations). Concrete encodings
+(gplearn prefix lists, sympy, PySR expressions, …) are left to students; this
+protocol captures the operations DualInterval certificates and soft scores need.
 """
 
 from __future__ import annotations

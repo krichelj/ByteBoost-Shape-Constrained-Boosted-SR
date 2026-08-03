@@ -1,5 +1,5 @@
 """
-Soft-path penalized fitness (``sec:soft``, eq. penalized).
+Soft-path penalized fitness (``sec:soft``, Prop. 3 / ``prop:soft``, eq. penalized-bb).
 
 Stage ``j`` minimizes
 
@@ -27,7 +27,7 @@ def penalized_fitness(
     violations: Mapping[str, float],
     lambdas: Mapping[str, float] | None = None,
 ) -> float:
-    """Evaluate scalar fitness ``F_j(g)`` (eq. penalized).
+    """Evaluate scalar fitness ``F_j(g)`` (eq. penalized-bb).
 
     Parameters
     ----------

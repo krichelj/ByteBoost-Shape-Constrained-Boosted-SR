@@ -12,6 +12,9 @@ Formal objects
 * Labeled dataset ``D = {(h_ℓ, L(h_ℓ))}_{ℓ=1}^n ⊂ ℍ × R``.
 * For each scale ``x ∈ {N, D}``: ``x_min = min H_x > 0``, ``x_max = max H_x``;
   treat ``x`` as continuous on ``[x_min, ∞)``.
+* GP / symbolic features are typically ``log φ_h(h)`` for every coordinate
+  ``h ∈ {N, D} ∪ H`` (chain rule maps log-axis derivatives back to raw
+  ``N``, ``D`` before scoring axioms A1–A2).
 
 Students choose concrete dtypes / containers (e.g. ``numpy`` arrays, column
 maps). Keep the mathematical roles intact.

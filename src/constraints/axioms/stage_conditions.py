@@ -1,5 +1,6 @@
 """
-Stagewise admissibility of an increment (``sec:stage-admiss``, eq. stage-admiss).
+Stagewise admissibility of an increment (``sec:stage-admiss``, Prop. 2 /
+``prop:stage-iff``, eq. stage-admiss-bb).
 
 Given ``L̂^{(j−1)} ∈ S`` with joint floor ``L_∞``, the update
 ``L̂^{(j)} = L̂^{(j−1)} + L̂_j`` is admissible **iff** the increment
@@ -15,7 +16,8 @@ Given ``L̂^{(j−1)} ∈ S`` with joint floor ``L_∞``, the update
 
 Conditions (i)–(iv), (vi) on the compact box are handled by sound interval
 certificates; (v) by the structural exponent ``ord(g, x)``
-(see ``src.constraints.certificates``).
+(see ``src.constraints.certificates``). Soft path scores these as continuous
+``v_a`` (``sec:soft``); hard path rejects on failure (``src.search.hard_path``).
 """
 
 from __future__ import annotations

@@ -14,7 +14,12 @@ from typing import Any
 
 
 class SoftSearchBackend(ABC):
-    """Minimize penalized fitness ``F_j`` over expression trees."""
+    """Minimize penalized fitness ``F_j`` over expression trees.
+
+    ``X`` is typically the log-feature matrix ``log φ_h(h)``; targets are Huber
+    pseudo-residuals ``r̃_j``. ``ensemble_state`` carries ``L̂^{(j−1)}`` context
+    (floor, stage-0 exponents, prior programs) needed to score ``v_a``.
+    """
 
     @abstractmethod
     def fit_stage(

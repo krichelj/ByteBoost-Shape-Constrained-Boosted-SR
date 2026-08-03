@@ -1,5 +1,6 @@
 """
-Sound interval certificates on the compact box ``I_x`` (eq. interval).
+Sound interval certificates on the compact box ``I_x`` (``sec:certificates``,
+eq. interval-bb).
 
 Let ``F = L̂^{(j−1)} + g``. Forward-mode AD + IA returns enclosures of
 ``F``, ``∂F/∂x``, ``∂²F/∂x²`` on ``I_x = [x_min, x_max]``. Accept ``g`` when,
@@ -13,6 +14,11 @@ for each ``x ∈ {N, D}``:
 This is a *sufficient* certificate that the corresponding continuum conditions
 hold everywhere on ``I_x`` (one-sided: failure does not prove inadmissibility).
 Pair with structural checks from ``ia_eval`` for condition (v) / the ``x→∞`` tail.
+
+Despite the ``Hard*`` class name, the *enclosures* are shared infrastructure:
+the soft path (``sec:soft``) converts the same bounds into continuous
+``v_mono``, ``v_conv``, ``v_irred`` scores rather than a boolean reject gate.
+The hard path (workshop extension) uses ``passed`` as a reject filter.
 """
 
 from __future__ import annotations
@@ -26,7 +32,10 @@ from src.constraints.certificates.interval import DualInterval, Interval
 
 @dataclass(frozen=True)
 class IntervalCertificate:
-    """Result of the sufficient IA test (eq. interval) on one or more axes."""
+    """Result of the sufficient IA test (eq. interval-bb) on one or more axes.
+
+    Soft path: read ``enclosures`` to build ``v_a``. Hard path: use ``passed``.
+    """
 
     passed: bool
     enclosures: dict[str, DualInterval]
@@ -34,7 +43,11 @@ class IntervalCertificate:
 
 
 class HardIntervalCertificate(ABC):
-    """Certificate (a) of ``sec:stage-admiss`` / ``sec:certificates``."""
+    """Certificate (a) of ``sec:stage-admiss`` / ``sec:certificates``.
+
+    Name is historical for the boolean gate; soft search still calls
+    ``certify`` (or an equivalent enclosure helper) to obtain DualIntervals.
+    """
 
     @abstractmethod
     def certify(
