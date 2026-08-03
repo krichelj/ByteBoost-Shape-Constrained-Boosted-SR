@@ -1,6 +1,10 @@
 """
 Admissibility axioms (A1)–(A6) (project description ``sec:axioms``).
 
+Although the labeled grid ``ℍ`` is finite, ``L̂`` is constrained on the continuum
+domain ``ℍ̃`` of ``sec:setup``: each scale ranges over ``[x_min, ∞)``, other
+coordinates over finite ``H_h``, with ``ℍ ⊂ ℍ̃``.
+
 A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisfies:
 
 (A1) **Monotone decrease.**
@@ -8,28 +12,41 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
 
 (A2) **Diminishing returns.**
     ``∂²L̂/∂x² ≥ 0`` for all ``x ≥ x_min``.
+    Together with (A1): further increases in ``x`` yield weakly smaller loss
+    reductions.
 
 (A3) **Irreducible loss.**
-    Joint floor ``L_∞ > 0`` with ``L̂(h) > L_∞`` for every ``h ∈ ℍ``;
+    Joint floor ``L_∞ > 0`` with ``L̂(h) > L_∞`` for every ``h ∈ ℍ̃``;
     marginal floors (eq. margfloor-bb)
     ``L^∞_x = lim_{t→∞} L̂(h)|_{x=t}`` exist, are finite, and satisfy
-    ``L^∞_x ≥ L_∞``.
+    ``L^∞_x ≥ L_∞``.  (``L^∞_x`` depends on the frozen coordinates.)
+    In the stage-0 Chinchilla law, ``L_∞ = E`` is the joint limit as all scales
+    → ∞; a single-axis marginal is typically strictly larger.
 
 (A4) **Asymptotic power-law decay** (eq. powerlaw-bb).
     Relative to the marginal floor,
     ``lim_{t→∞} log(L̂(h)|_{x=t} − L^∞_x) / log t = c_x`` for some ``c_x < 0``.
+    The excess is eventually positive (log defined) when the marginal floor is
+    approached from above under (A1).
 
-(A5) **Positivity.** ``L̂(h) > 0`` for all ``h ∈ ℍ``.
+(A5) **Positivity.** ``L̂(h) > 0`` for every ``h ∈ ℍ̃``.
+    Implied by (A3) when ``L_∞ > 0``; retained as an explicit prior.
+    Soft path folds (A5) into ``v_irred``.
 
-(A6) **Graceful saturation.** ``L̂`` is ``C¹`` in ``x`` on ``[x_min, ∞)``,
-    with ``L̂(x_min, ·)`` finite and ``> L_∞``.
+(A6) **Graceful saturation.** ``L̂`` is ``C²`` in ``x`` on ``[x_min, ∞)``
+    (so the second derivative in (A2) exists), and ``L̂(x_min, ·)`` is finite.
+    Expression-tree corrections are ``C^∞`` on ``(0, ∞)``.
+    ``L̂(x_min, ·) > L_∞`` is already required by (A3)(i).
 
-Continuum statements are decided by certificates in ``src.constraints.certificates``
-(sound IA on the compact box ``I_x``, structural checks for asymptotics).
+Continuum statements are decided by certificates in ``src.constraints.certificates``:
+sound IA on compact boxes ``I_x ⊂ ℍ̃`` (observed scale range), structural ``ord``
+for the ``x → ∞`` tail.
 
 Soft-path scores (``sec:soft``, eq. violations-bb) cover A1–A4 via
-``mono / conv / irred / decay / leaf``; A5 is folded into the irreducible-floor
-gap and A6 into DualInterval finiteness / the smooth operator set.
+``mono / conv / irred / decay``, plus ``leaf`` for scale presence in the tree;
+A5 is folded into the irreducible-floor gap and A6 into DualInterval
+finiteness / the ``C²`` (in practice ``C^∞``) operator set (``V = 0`` recovers
+the hard path once enclosures are finite).
 """
 
 from __future__ import annotations
@@ -60,7 +77,11 @@ class AdmissibleLaw(ABC):
 
     @abstractmethod
     def marginal_floor(self, scale_var: str) -> float:
-        """Marginal floor ``L^∞_x`` along ``scale_var ∈ {N, D}`` (eq. margfloor-bb)."""
+        """Marginal floor ``L^∞_x`` along ``scale_var ∈ {N, D}`` (eq. margfloor-bb).
+
+        May depend on frozen non-``x`` coordinates; pass those via ``*args`` /
+        ``**kwargs`` in your implementation if needed.
+        """
 
     @abstractmethod
     def asymptotic_exponent(self, scale_var: str) -> float:

@@ -2,9 +2,15 @@
 Soft search backends (``sec:software``, ``sec:soft``).
 
 Primary engine: ``gplearn`` with IA axiom penalties in the fitness
-(``GPLearnSoftBackend``). Optional: PySR as an unconstrained / post-hoc
-ablation backend. A hard reject filter is a separate workshop extension
-(``src.search.hard_path``), not a second soft engine.
+(``GPLearnSoftBackend``). Penalties use DualInterval enclosures on compact
+slices ``I_x ⊂ ℍ̃`` (``I_x`` ≡ ``ℐ_x`` in the PDF) plus structural ``ord`` /
+leaf scores: A1–A4 via ``v_mono…v_decay``, leaf for scale presence, A5 folded
+into ``v_irred``, and A6 discharged by finite DualInterval enclosures under
+the ``C^∞`` operator set (not a separate ``v_a``).
+
+Optional: PySR as an unconstrained / post-hoc ablation backend. A hard reject
+filter is a separate workshop extension (``src.search.hard_path``), not a
+second soft engine.
 """
 
 from __future__ import annotations
@@ -16,9 +22,10 @@ from typing import Any
 class SoftSearchBackend(ABC):
     """Minimize penalized fitness ``F_j`` over expression trees.
 
-    ``X`` is typically the log-feature matrix ``log φ_h(h)``; targets are Huber
-    pseudo-residuals ``r̃_j``. ``ensemble_state`` carries ``L̂^{(j−1)}`` context
-    (floor, stage-0 exponents, prior programs) needed to score ``v_a``.
+    ``X`` is typically the log-feature matrix ``log φ_h(h)`` on labeled ``ℍ``;
+    targets are Huber pseudo-residuals ``r̃_j``. ``ensemble_state`` carries
+    ``L̂^{(j−1)}`` context (floor, stage-0 exponents, prior programs, ``I_x``
+    domains in ``ℍ̃``) needed to score ``v_a``.
     """
 
     @abstractmethod
@@ -50,7 +57,7 @@ class GPLearnSoftBackend(SoftSearchBackend):
 
 
 class PySRSoftBackend(SoftSearchBackend):
-    """Optional PySR engine (typically unconstrained; score V post hoc)."""
+    """Optional PySR engine (typically unconstrained; score V post hoc on ℍ̃)."""
 
     def fit_stage(
         self,

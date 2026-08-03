@@ -2,14 +2,15 @@
 Tree evaluation under DualInterval and structural asymptotic checks
 (``sec:certificates``).
 
-Helpers for both certificate (a) (IA enclosures of ``F``, ``∂F/∂x``, ``∂²F/∂x²``)
-and certificate (b) (structural ``ord`` / leaf checks). Soft scores (``sec:soft``)
-and the hard reject filter reuse the same routines.
+Helpers for both certificate (a) (IA enclosures of ``F``, ``∂F/∂x``, ``∂²F/∂x²``
+on a compact slice of ``ℍ̃``) and certificate (b) (structural ``ord`` / leaf
+checks for the ``x → ∞`` tail beyond ``I_x``). Soft scores (``sec:soft``) and
+the hard reject filter reuse the same routines.
 
 Search features are typically ``log φ_h(h)`` for every coordinate
 ``h ∈ {N, D} ∪ H``. Evaluate DualIntervals in that coordinate system, then map
 first/second derivatives to the raw scale axis via ``chain_rule_log_to_raw``
-before applying the interval tests of eq. interval-bb.
+before applying the interval tests of eq. interval-bb (raw-axis (A1)–(A2)).
 
 Structural checks (certificate (b))
 -----------------------------------
@@ -28,7 +29,9 @@ same primary operator set as search (``sec:boosting``):
 
     ``{+, −, ×, ÷} ∪ {pow_p : p ∈ P}``
 
-Optional unary helpers ``inv`` / ``log`` / ``sqrt`` may be enabled for ablations.
+These primitives are ``C^∞`` on ``(0, ∞)``, which discharges graceful
+saturation (A6) on ``I_x`` once ``F̄ < ∞``. Optional unary helpers
+``inv`` / ``log`` / ``sqrt`` may be enabled for ablations.
 """
 
 from __future__ import annotations
@@ -49,7 +52,8 @@ def evaluate_program(
     program:
         Student-defined tree encoding (e.g. gplearn prefix list).
     intervals:
-        Map from feature index → DualInterval operand.
+        Map from feature index → DualInterval operand on the relevant
+        ``I_x`` / frozen ``H_h`` ranges (slice of ``ℍ̃``).
     """
     raise NotImplementedError("TODO: recursive DualInterval evaluation of program")
 
@@ -82,7 +86,7 @@ def chain_rule_log_to_raw(
     """Map DualInterval derivatives from ``u = log x`` back to raw ``x``.
 
     If search features are ``log φ_h(h)``, IA evaluates ``(f, ∂f/∂u, ∂²f/∂u²)``.
-    Raw-axis certificates need ``∂f/∂x = (∂f/∂u)/x`` and
+    Raw-axis certificates (A1)–(A2) need ``∂f/∂x = (∂f/∂u)/x`` and
     ``∂²f/∂x² = (∂²f/∂u² − ∂f/∂u)/x²`` (enclose each term with DualInterval).
     """
     raise NotImplementedError("TODO: implement log→raw DualInterval chain rule")

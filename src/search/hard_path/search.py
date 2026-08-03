@@ -9,7 +9,8 @@ pass certificates (a)–(b) enter the stage argmin
 
 The primary shipped method is the soft-penalty gplearn path
 (``src.search.soft_path``, ``sec:soft``). Implement this hard filter on top of
-the same DualInterval certificate helpers.
+the same DualInterval certificate helpers (IA on ``I_x ⊂ ℍ̃``, structural
+``ord`` for the ``x→∞`` tail).
 """
 
 from __future__ import annotations
@@ -39,7 +40,8 @@ class HardSearchBackend(ABC):
         X, pseudo_residuals:
             Features (typically log-features) and Huber targets ``r̃_j``.
         ensemble_state:
-            ``L̂^{(j−1)}`` context (floors, exponents, prior programs, domains).
+            ``L̂^{(j−1)}`` context (floors, exponents, prior programs,
+            certification domains ``I_x ⊂ ℍ̃``).
         certificate:
             Object implementing sufficient IA + structural checks
             (``src.constraints.certificates``, ``src.constraints.axioms.stage_conditions``).

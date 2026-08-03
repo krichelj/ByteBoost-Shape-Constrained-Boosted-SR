@@ -2,8 +2,9 @@
 Boosting guarantee checks (``sec:guarantee``, Thm. 1 / ``thm:guarantee``).
 
 Hard path: floor and asymptotic exponents of ``L̂_0`` are preserved when every
-correction passes certificates (a)–(b). Soft path recovers the same conclusion
-when ``V = 0`` at every stage (``prop:soft``).
+correction passes certificates (a)–(b) on ``ℍ̃``. Soft path recovers the same
+conclusion when ``V = 0`` and DualInterval enclosures are finite (``prop:soft``;
+A5 via ``v_irred``; A6 via finiteness / ``C^∞`` ops).
 
 See ``invariants.py``.
 """

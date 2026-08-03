@@ -71,7 +71,7 @@ Training a modern AI language model can cost millions of dollars, so researchers
 
 Our project uses symbolic regression to discover the scaling-law equation directly from data. Symbolic regression searches many candidate formulas and returns an interpretable equation rather than a black-box model. Unconstrained searches, however, often produce formulas that fit existing measurements but extrapolate unrealistically, predicting negative error or worse performance with more data.
 
-We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive; and performance must approach an irreducible floor. We mathematically certify these properties across the full domain of interest, not only at measured points (\cref{sec:axioms,sec:stage-admiss,sec:guarantee}).
+We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive and approach an irreducible floor; excess loss must decay as a power law; and the formula must remain smoothly well-defined down to the smallest scales of interest. We mathematically certify these properties across the full continuum domain of interest, not only at measured points (\cref{sec:axioms,sec:stage-admiss,sec:guarantee}).
 
 The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{prop:chinchilla-admiss,prop:stage-iff,thm:guarantee}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement (\cref{thm:guarantee}). The primary search path \emph{penalizes} axiom violations inside a genetic-programming fitness and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft,prop:soft}); a second path \emph{rejects} inadmissible corrections outright and is a workshop extension of the soft engine (\cref{sec:stage-admiss,sec:algorithm}).
 
@@ -143,25 +143,35 @@ $x_{\min} \coloneqq \min H_x > 0$ and
 $x_{\max} \coloneqq \max H_x$,
 treat $x$ as continuous on
 $[x_{\min}, \infty)$, and take all derivatives with the other coordinates held fixed.
+Write $\widetilde{\bbH}$ for the corresponding continuum domain: each scale ranges over
+$[x_{\min},\infty)$ while non-scale coordinates still range over their finite~$H_h$,
+so $\bbH \subset \widetilde{\bbH}$.
+The labeled loss~$L$ is observed only on~$\bbH$; the approximant~$\Lhat$ is evaluated
+on~$\widetilde{\bbH}$ when stating shape constraints (\cref{sec:axioms}).
 
 \subsection{Admissibility axioms}\label{sec:axioms}
 \codeRef{\pyFile{src/constraints/axioms/admissibility.py}}
 $\Lhat$ is \emph{admissible} ($\Lhat \in \calS$) if it satisfies~(A1)--(A6) below.
 Where an axiom mentions a scale variable $x$, it is imposed for each
 $x \in \{N, D\}$ with the other coordinates held fixed.
+Although the labeled grid~$\bbH$ is finite, $\Lhat$ is constrained as a real function on
+the continuum domain~$\widetilde{\bbH}$ of \cref{sec:setup}, so that the derivatives
+in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
 
 \begin{enumerate}[nosep, leftmargin=2.2em, label=\textup{(A\arabic*)}]
     \item \textbf{Monotone decrease.}
     $\dfrac{\partial \Lhat}{\partial x} \leq 0$ for all $x \geq x_{\min}$.
     \item \textbf{Diminishing returns.}
     $\dfrac{\partial^2 \Lhat}{\partial x^2} \geq 0$ for all $x \geq x_{\min}$.
+    (Together with~(A1), this is the usual diminishing-returns shape: further
+    increases in~$x$ yield weakly smaller loss reductions.)
     \item \textbf{Irreducible loss.}
     There is a positive \emph{joint floor} $L_\infty$ and, along each axis, a
     \emph{marginal floor} $L^{\infty}_{x}$:
     \begin{enumerate}[nosep, leftmargin=1.4em, label=\textup{(\roman*)}]
         \item \emph{Joint floor.}
         There exists $L_\infty > 0$ such that
-        $\Lhat(\mathbf{h}) > L_\infty$ for every $\mathbf{h} \in \bbH$.
+        $\Lhat(\mathbf{h}) > L_\infty$ for every $\mathbf{h} \in \widetilde{\bbH}$.
         \item \emph{Marginal floor.}
         For each $x \in \{N,D\}$ and every fixed choice of the other
         coordinates, the single-axis limit
@@ -173,10 +183,12 @@ $x \in \{N, D\}$ with the other coordinates held fixed.
         \end{equation}
         exists and is finite, and satisfies
         $L^{\infty}_{x} \geq L_\infty$.
+        (The value $L^{\infty}_{x}$ depends on the frozen coordinates; the notation
+        suppresses that dependence.)
     \end{enumerate}
-    Equality $L^{\infty}_{x} = L_\infty$ holds only in the joint limit
-    (all scale variables $\to \infty$ together); along a single axis the
-    marginal floor is in general strictly larger.
+    In the stage-0 Chinchilla law, $L_\infty$ equals the joint limit as all scales
+    $\to\infty$ (namely~$E$), while a single-axis marginal is in general strictly
+    larger.
     \item \textbf{Asymptotic power-law decay.}
     Relative to the marginal floor~\eqref{eq:margfloor-bb},
     \begin{equation}\label{eq:powerlaw-bb}
@@ -186,11 +198,20 @@ $x \in \{N, D\}$ with the other coordinates held fixed.
         \;=\; c_x
         \qquad\text{for some } c_x < 0.
     \end{equation}
+    The excess $\Lhat(\mathbf{h})|_{x=t}-L^{\infty}_{x}$ is eventually positive (so the
+    logarithm is defined) whenever the limit in~(A3)(ii) is approached from above,
+    which follows from~(A1) when the floor is not attained at finite~$t$.
     \item \textbf{Positivity.}
-    $\Lhat(\mathbf{h}) > 0$ for all $\mathbf{h} \in \bbH$.
+    $\Lhat(\mathbf{h}) > 0$ for every $\mathbf{h} \in \widetilde{\bbH}$.
+    Since $L_\infty > 0$,~(A5) is implied by the joint-floor inequality in~(A3); we
+    retain it as an explicit physical prior (the soft path folds it into the floor
+    score~$v_{\mathrm{irred}}$).
     \item \textbf{Graceful saturation.}
-    $\Lhat$ is continuous and differentiable ($C^1$) in $x$ on $[x_{\min}, \infty)$, with
-    $\Lhat(x_{\min}, \cdot)$ finite and $> L_\infty$.
+    $\Lhat$ is twice continuously differentiable ($C^2$) in~$x$ on $[x_{\min}, \infty)$
+    ---so that the second derivative in~(A2) exists and is continuous---and
+    $\Lhat(x_{\min}, \cdot)$ is finite.
+    (Expression-tree corrections used later are in fact $C^\infty$ on $(0,\infty)$.
+    The inequality $\Lhat(x_{\min},\cdot)>L_\infty$ is already required by~(A3)(i).)
 \end{enumerate}
 
 These encode physical priors on loss surfaces that unconstrained symbolic regression routinely violates.
@@ -258,8 +279,8 @@ needed by~(A1)--(A2) are recovered by the chain rule (\cref{sec:certificates}).
 
 \subsection{Stagewise admissibility}\label{sec:stage-admiss}\label{sec:certificates}
 \codeRef{\pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}, \pyDir{src/search/hard_path}}
-Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axioms} is a continuum statement over $\bbH$.
-The next claim reduces that continuum check to conditions on the increment alone.
+Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axioms} is a continuum statement on~$\widetilde{\bbH}$ and along each scale half-line.
+The next claim reduces that check to conditions on the increment alone.
 \begin{equation}\label{eq:stage-admiss-bb}
 \begin{gathered}
 \text{(i) } \frac{\partial \Lhat_j}{\partial x}
@@ -271,10 +292,10 @@ The next claim reduces that continuum check to conditions on the increment alone
    \quad\text{for all } x \geq x_{\min},
 \\[2pt]
 \text{(iii) } \Lhat_j(\mathbf{h}) > -\Lhat^{(j-1)}(\mathbf{h})
-   \quad\text{for all } \mathbf{h} \in \bbH,
+   \quad\text{for all } \mathbf{h} \in \widetilde{\bbH},
 \\[2pt]
 \text{(iv) } \Lhat^{(j-1)}(\mathbf{h}) + \Lhat_j(\mathbf{h}) > L_\infty
-   \quad\text{for all } \mathbf{h} \in \bbH,
+   \quad\text{for all } \mathbf{h} \in \widetilde{\bbH},
 \\[2pt]
 \text{(v) } \Lhat_j(\mathbf{h})\big|_{x=t} = O\bigl(t^{c_{x,j}}\bigr)
    \text{ as } t \to \infty
@@ -286,19 +307,23 @@ The next claim reduces that continuum check to conditions on the increment alone
    \bigl|\Lhat_j(x_{\min}, \cdot)\bigr| < \infty.
 \end{gathered}
 \end{equation}
+When $L_\infty > 0$,~(iv) already implies~(iii); both are retained so positivity of the
+ensemble and preservation of the joint floor remain explicit.
 \begin{proposition}[Stagewise equivalence]\label{prop:stage-iff}
 Given $\Lhat^{(j-1)} \in \calS$ with joint floor $L_\infty$, the update
 $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$ lies in~$\calS$ with the same joint floor
 if and only if $\Lhat_j$ satisfies~\eqref{eq:stage-admiss-bb}(i)--(vi) for each $x \in \{N,D\}$.
 \end{proposition}
 (See \cref{sec:stage-iff-proof} for the proof.)
-Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\bbH$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
+Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\widetilde{\bbH}$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
 They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificates decide whether~$g$ preserves~\eqref{eq:stage-admiss-bb}: interval checks establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
 
 \smallskip\noindent
-\emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on~$\calI_x$).
-Over the compact box $\calI_x \coloneqq [x_{\min}, x_{\max}]$ (other coordinates ranging over their finite $H_h$), forward-mode automatic differentiation composed with interval arithmetic~\citep{moore2009interval,kronberger2022shape} evaluates~$g$ bottom-up on interval operands and returns guaranteed enclosures
+\emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on a compact slice of~$\widetilde{\bbH}$).
+Over the compact box $\calI_x \coloneqq [x_{\min}, x_{\max}]$ (other coordinates ranging over their finite $H_h$), the product of boxes is a compact continuum subset of~$\widetilde{\bbH}$ covering the observed scale range; the half-line $x>x_{\max}$ is handled by the structural test~(b) below.
+Forward-mode automatic differentiation composed with interval arithmetic~\citep{moore2009interval,kronberger2022shape} evaluates~$g$ bottom-up on interval operands and returns guaranteed enclosures
 $\underline{f} \leq f \leq \overline{f}$ on~$\calI_x$ for $f \in \{F,\, \partial F/\partial x,\, \partial^2 F/\partial x^2\}$, in time linear in the tree size.
+(The second-derivative enclosure is what makes~(A2) / stage~(ii) checkable;~(A6) asks only for~$C^2$, while the operator set of \cref{sec:boosting} in fact yields~$C^\infty$ on $(0,\infty)$.)
 When~$g$ is represented on log-features, DualInterval evaluation is performed in log-coordinates and first/second derivatives are mapped to the raw axis~$x$ by the chain rule before applying~\eqref{eq:interval-bb}.
 A candidate is accepted when, for each $x \in \{N,D\}$,
 \begin{equation}\label{eq:interval-bb}
@@ -310,10 +335,10 @@ A candidate is accepted when, for each $x \in \{N,D\}$,
     \quad
     \overline{F} < \infty .
 \end{equation}
-Because the enclosures are sound, \eqref{eq:interval-bb} is a \emph{sufficient} certificate that the corresponding continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points (\cref{lem:ia-sound,sec:cert-lemmas}):
+Because the enclosures are sound, \eqref{eq:interval-bb} is a \emph{sufficient} certificate that the corresponding continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points of~$\bbH$ (\cref{lem:ia-sound,sec:cert-lemmas}):
 $\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ on~$\calI_x$ (hence~(i) on the box), and likewise for~(ii);
-$\underline{F} > L_\infty > 0$ forces both~(iii) and~(iv) on the configurations covered by the product of boxes;
-$\overline{F} < \infty$ forces the finiteness half of~(vi) (smoothness of~$g$ on~$\calI_x$ follows from the operator set).
+$\underline{F} > L_\infty > 0$ forces~(iv) on the continuum configurations covered by the product of boxes, and hence also~(iii) / positivity~(A5);
+$\overline{F} < \infty$ forces the finiteness half of~(vi), while~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$ follows from the operator set and discharges~(A6) on the box.
 The test is conservative: a failure of~\eqref{eq:interval-bb} does \emph{not} prove that~$g$ fails~\eqref{eq:stage-admiss-bb} (interval over-approximation can reject a truly admissible update), but every accepted~$g$ is guaranteed to preserve admissibility on~$\calI_x$.
 That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
 In the primary soft path (\cref{sec:soft}), the same enclosures are converted to continuous violation scores rather than used as a reject gate.
@@ -323,7 +348,7 @@ In the primary soft path (\cref{sec:soft}), the same enclosures are converted to
 Define the asymptotic exponent $\mathrm{ord}(g,x)$ recursively on the tree: constants and leaves other than~$x$ contribute~$0$; $\mathrm{pow}_p(x)$ contributes~$p$; products add exponents; quotients subtract; sums take the maximum.
 Then~(v) holds with $c_{x,j} = \mathrm{ord}(g,x)$ precisely when $\mathrm{ord}(g,x) < c_x^{(0)}$ for each $x \in \{N,D\}$ (\cref{lem:ord,sec:cert-lemmas}).
 We additionally require that each scale variable $x \in \{N,D\}$ appears as a leaf of~$g$ (otherwise the exponent in~$x$ is undefined or vacuously~$0$).
-Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\bbH$.
+Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\widetilde{\bbH}$.
 
 \subsection{Algorithm}\label{sec:algorithm}
 \codeRef{\pyDir{src/search/boosting}}
@@ -388,7 +413,7 @@ Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural q
     \\
     v_{\mathrm{irred}}(g)
       &= \max\bigl(0,\; L_\infty - \underline{F}\bigr),
-    &\quad&\text{(floor gap)},
+    &\quad&\text{(floor / positivity gap)},
     \\
     v_{\mathrm{decay}}(g)
       &= \max_{x\in\{N,D\}}
@@ -417,13 +442,15 @@ Stage~$j$ then minimizes the penalized fitness
 where $F_j$ is a scalar fitness (distinct from the ensemble map~$F$ above), the first term is mean squared error of~$g$ against the Huber pseudo-residuals~\eqref{eq:pseudoresid-bb}, and the second term penalizes axiom gaps (squared so the penalty gradient vanishes at zero violation).
 Candidates that already satisfy~\eqref{eq:stage-admiss-bb} therefore incur no penalty pressure.
 \begin{proposition}[Soft-path recovery and containment]\label{prop:soft}
-If $V(g)=0$ at every stage then the soft path recovers the hard-path conclusion of \cref{thm:guarantee} exactly.
+If $V(g)=0$ at every stage \emph{and} DualInterval evaluation returns finite upper
+enclosures~$\overline{F}<\infty$ on each~$\calI_x$ (the finiteness half of~\eqref{eq:interval-bb},
+discharged in practice by the $C^\infty$ operator set of \cref{sec:boosting}), then the soft path recovers the hard-path conclusion of \cref{thm:guarantee} exactly.
 The scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-bound the corresponding true pointwise violations on~$\calI_x$ (while $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact).
-Moreover, for every finite operator set~$\calP$ there exists $\varepsilon_{\mathrm{decay}}>0$ small enough that every correction accepted by the hard certificates~(a)--(b) has $V(g)=0$, so the soft search contains the hard one of \cref{sec:stage-admiss}.
+Moreover, for every finite operator set~$\calP$ there exists $\varepsilon_{\mathrm{decay}}>0$ small enough that every correction accepted by the hard certificates~(a)--(b) has $V(g)=0$ (and finite enclosures), so the soft search contains the hard one of \cref{sec:stage-admiss}.
 \end{proposition}
 (See \cref{sec:soft-proof} for the proof.)
 The soft scores therefore yield a \emph{measured} admissibility gap rather than silent failure.
-Soft scores act as IA proxies for~(A1)--(A4) (with positivity~(A5) folded into the irreducible-floor gap and~(A6) into finiteness of the DualInterval enclosure / smooth operator set).
+Soft scores act as IA proxies for~(A1)--(A4) (with positivity~(A5) folded into the irreducible-floor gap and~(A6) into finiteness of the DualInterval enclosure / $C^2$---in practice $C^\infty$---operator set).
 Comparing soft-penalty search ($\lambda_a>0$) against an unconstrained baseline ($\lambda_a=0$), and optionally against a true hard reject filter, is one of the empirical questions the project settles.
 
 \section{Additional information}\label{sec:additional}
@@ -479,9 +506,13 @@ H_h
   & Strictly monotone preprocessing $\phi_h \colon H_h \to \bbR_{>0}$;
     $\phi_i \coloneqq \phi_{h_i}$. \\
 \bbH
-  & Configuration space $\prod_{h} H_h$. \\
+  & Discrete configuration space $\prod_{h} H_h$ (labeled grid). \\
+\widetilde{\bbH}
+  & Continuum domain of \cref{sec:setup,sec:axioms}: each scale ranges over
+    $[x_{\min},\infty)$, other coordinates over finite~$H_h$;
+    $\bbH \subset \widetilde{\bbH}$. \\
 \mathbf{h}
-  & Typical element of $\bbH$ (coordinates $N,D,h_i$). \\
+  & Typical element of $\bbH$ or $\widetilde{\bbH}$ (coordinates $N,D,h_i$). \\
 L,\; \Lhat
   & True validation loss and its approximation. \\
 \calD,\; n,\; \ell
@@ -501,7 +532,8 @@ L_\infty,\; L_\infty^{(j)}
   & Joint irreducible-loss floor; joint floor of~$\Lhat^{(j)}$
     ($L_\infty^{(j)}=E$ under the hard path). \\
 L^{\infty}_{x}
-  & Marginal floor along axis~$x$~\eqref{eq:margfloor-bb}. \\
+  & Marginal floor along axis~$x$~\eqref{eq:margfloor-bb}
+    (depends on the frozen coordinates). \\
 c_x,\; c_x^{(0)}
   & Asymptotic power-law exponent along~$x$~(A4);
     stage-0 value $c_N^{(0)}=-\alpha$, $c_D^{(0)}=-\beta$. \\
@@ -531,12 +563,18 @@ c_{x,j},\; \mathrm{ord}(g,x)
   & Asymptotic exponent of correction/candidate~$g$ along~$x$;
     $c_{x,j}=\mathrm{ord}(g,x)$ in~\eqref{eq:stage-admiss-bb}(v). \\
 \calI_x
-  & Compact certification box $[x_{\min},x_{\max}]$
-    (\cref{sec:stage-admiss}). \\
+  & Compact certification box $[x_{\min},x_{\max}]$ along scale~$x$
+    (written $I_x$ in the skeleton);
+    with other coordinates over finite~$H_h$, the product of boxes is a
+    compact continuum slice of~$\widetilde{\bbH}$ covering the observed
+    grid (\cref{sec:stage-admiss}); the tail $x>x_{\max}$ is controlled
+    by~$\mathrm{ord}$. \\
 \underline{f},\; \overline{f}
   & Interval-arithmetic lower/upper enclosures of~$f$ on~$\calI_x$
     (global over that box for fixed~$x$; soft scores take
-    $\max_{x\in\{N,D\}}$ of the per-axis gaps). \\
+    $\max_{x\in\{N,D\}}$ of the per-axis gaps).
+    $\underline{F}>L_\infty$ certifies~(A3)/(A5) on the box;
+    $\overline{F}<\infty$ with the smooth operator set certifies~(A6). \\
 a,\; v_a(g),\; V(g)
   & Soft-path axiom index $a\in\{\mathrm{mono},\mathrm{conv},\mathrm{irred},
     \mathrm{decay},\mathrm{leaf}\}$; per-axiom violation score;
@@ -578,10 +616,11 @@ The stage-0 baseline used by the boosting stubs is \cref{prop:chinchilla-admiss}
 \cref{sec:datasets} & \pyDir{src/scaling} & \pyFile{src/scaling/data/scaling_dataset.py}, \pyFile{src/scaling/data/corpora.py} \\
 \cref{sec:axioms} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/admissibility.py} \\
 \cref{sec:boosting} & \pyDir{src/search} & \pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression} \\
-\cref{sec:stage-admiss,sec:certificates} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}, \pyDir{src/search/hard_path} \\
+\cref{sec:stage-admiss,sec:certificates} & \pyDir{src/constraints}, \pyDir{src/search} & \pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}, \pyDir{src/search/hard_path} \\
 \cref{sec:algorithm}, Alg.~\ref{alg:boosting-bb} & \pyDir{src/search} & \pyDir{src/search/boosting} \\
 \cref{sec:guarantee} & \pyDir{src/constraints} & \pyFile{src/constraints/guarantee/invariants.py} \\
 \cref{sec:soft} & \pyDir{src/search} & \pyDir{src/search/soft_path} \\
+\cref{sec:software} (optional JAX) & \pyDir{src/constraints} & \pyFile{src/constraints/certificates/jax_backend.py} \\
 \cref{sec:models} & \pyDir{src/modeling} & \pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/transformer.py} \\
 \cref{sec:testbeds} (Neocortex) & \pyDir{src/modeling} & \pyDir{src/modeling/training} \\
 \cref{sec:testbeds,sec:baselines} (AMA27/CPU) & \pyDir{src/systems} & \pyDir{src/systems/hpc} \\
@@ -605,14 +644,15 @@ Since $G\in\calS$, one has $\partial G/\partial x\leq 0$ and $\partial^2 G/\part
 Thus $\partial(G+g)/\partial x\leq 0$ on that half-line if and only if~(i) holds, and $\partial^2(G+g)/\partial x^2\geq 0$ if and only if~(ii) holds.
 
 \paragraph{(A5) and joint floor~(A3).}
-Positivity $G+g>0$ on $\bbH$ is exactly~(iii).
-The joint-floor inequality $G+g>L_\infty$ on $\bbH$ is exactly~(iv).
-(Here $L_\infty$ is the joint floor already certified for~$G$;~(iv) keeps it for the update.)
+Positivity $G+g>0$ on $\widetilde{\bbH}$ is exactly~(iii).
+The joint-floor inequality $G+g>L_\infty$ on $\widetilde{\bbH}$ is exactly~(iv).
+(Here $L_\infty$ is the joint floor already certified for~$G$;~(iv) keeps it for the update.
+When $L_\infty>0$,~(iv) implies~(iii).)
 
 \paragraph{(A6).}
-If $G$ is $C^1$ on $[x_{\min},\infty)$ and $g$ is $C^\infty$ on $[x_{\min},x_{\max}]$ with finite boundary values~(vi), then $G+g$ is $C^1$ on the certification box.
-On the half-line beyond $x_{\max}$, the same $C^1$ regularity follows once~$g$ is realized by a finite expression tree from $\{+,-,\times,\div\}\cup\{\mathrm{pow}_p\}$ (each primitive is $C^\infty$ on $(0,\infty)$), which is the setting of \cref{sec:boosting}.
-The bound $(G+g)(x_{\min},\cdot)>L_\infty$ is the restriction of~(iv).
+If $G$ is $C^2$ on $[x_{\min},\infty)$ and $g$ is $C^\infty$ on $[x_{\min},x_{\max}]$ with finite boundary values~(vi), then $G+g$ is $C^2$ on the certification box.
+On the half-line beyond $x_{\max}$, the same $C^2$ regularity follows once~$g$ is realized by a finite expression tree from $\{+,-,\times,\div\}\cup\{\mathrm{pow}_p\}$ (each primitive is $C^\infty$ on $(0,\infty)$), which is the setting of \cref{sec:boosting}.
+Finiteness of $(G+g)(x_{\min},\cdot)$ is the restriction of~(vi) together with~$G\in\calS$; the bound $(G+g)(x_{\min},\cdot)>L_\infty$ is the restriction of~(iv).
 
 \paragraph{(A3) marginal floors and~(A4).}
 Because $G\in\calS$, the marginal floor $L^{\infty}_{x}(G)$ exists and the excess $G|_{x=t}-L^{\infty}_{x}(G)$ is asymptotic to a constant times $t^{c_x^{(0)}}$ with $c_x^{(0)}<0$.
@@ -642,15 +682,17 @@ $f\in\{F,\partial F/\partial x,\partial^2 F/\partial x^2\}$.
 If~\eqref{eq:interval-bb} holds, then on~$\calI_x$:
 $\partial F/\partial x\leq 0$, $\partial^2 F/\partial x^2\geq 0$, and $F>L_\infty$,
 and $\lvert F\rvert<\infty$.
-In particular, writing $F=G+g$ with $G=\Lhat^{(j-1)}$, conditions~(i)--(iv) and the finiteness half of~(vi) hold on the configurations covered by the product of boxes~$\calI_x$.
+In particular, writing $F=G+g$ with $G=\Lhat^{(j-1)}$, conditions~(i)--(iv) and the finiteness half of~(vi) hold on the continuum configurations covered by the product of boxes~$\calI_x$ (a compact slice of~$\widetilde{\bbH}$).
+When $L_\infty>0$, the floor test also yields positivity~(A5) /~(iii).
+Smoothness~(A6) on the box follows from the $C^\infty$ operator set once finiteness holds.
 \end{lemma}
 
 \begin{proof}
 Soundness means every true value on~$\calI_x$ lies in the returned interval.
 Hence $\overline{\partial F/\partial x}\leq 0$ forces $\partial F/\partial x\leq 0$ everywhere on~$\calI_x$;
 $\underline{\partial^2 F/\partial x^2}\geq 0$ forces $\partial^2 F/\partial x^2\geq 0$;
-and $\underline{F}>L_\infty$ forces $F>L_\infty$ (hence also $F>0$ when $L_\infty>0$), which is~(iv) and yields~(iii) because $G>L_\infty$ already gives $g=F-G>-G$.
-Boundedness of~$\overline{F}$ is the finiteness claim.
+and $\underline{F}>L_\infty$ forces $F>L_\infty$ on the box (hence also $F>0$ when $L_\infty>0$), which is~(iv) and yields~(iii).
+Boundedness of~$\overline{F}$ is the finiteness claim of~(vi).
 The argument is one-sided: failure of~\eqref{eq:interval-bb} does not refute~\eqref{eq:stage-admiss-bb}.
 \end{proof}
 
@@ -676,8 +718,8 @@ Induct on the stage index~$j$.
 For $j=0$, the claim is \cref{prop:chinchilla-admiss}: $\Lhat_0\in\calS$ with $L_\infty^{(0)}=E$ and the stated $c_x^{(0)}$.
 
 Fix $j\geq 1$ and assume the claim holds through stage~$j-1$.
-Certificates~(a)--(b) accept $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and~(vi) hold on each certification box~$\calI_x$, and by \cref{lem:ord} condition~(v) holds on the half-line.
-The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess).
+Certificates~(a)--(b) accept $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A3),~(A5)--(A6) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
+The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A6) extends by the operator set.
 \Cref{prop:stage-iff} therefore yields $\Lhat^{(j)}\in\calS$ with the same joint floor $L_\infty^{(j)}=L_\infty^{(j-1)}=E$.
 The marginal-floor / rate calculation in the proof of \cref{prop:stage-iff} gives~\eqref{eq:guarantee-bb}.
 \end{proof}
@@ -688,10 +730,11 @@ By definition each $v_a(g)\geq 0$, and $V(g)=\sum_a v_a(g)$.
 Hence $V(g)=0$ if and only if every score vanishes.
 
 \paragraph{Recovery.}
-$v_{\mathrm{mono}}(g)=0$ iff $\overline{\partial F/\partial x}\leq 0$ for all $x\in\{N,D\}$, which is the monotonicity half of~\eqref{eq:interval-bb}; likewise $v_{\mathrm{conv}}=0$ and $v_{\mathrm{irred}}=0$ recover the remaining interval tests of \cref{lem:ia-sound}.
+$v_{\mathrm{mono}}(g)=0$ iff $\overline{\partial F/\partial x}\leq 0$ for all $x\in\{N,D\}$, which is the monotonicity half of~\eqref{eq:interval-bb}; likewise $v_{\mathrm{conv}}=0$ recovers the convexity test and $v_{\mathrm{irred}}=0$ recovers the floor test of \cref{lem:ia-sound} (hence also positivity~(A5) when $L_\infty>0$).
+The remaining interval test~$\overline{F}<\infty$ is not encoded as a soft score~$v_a$: under the smooth operator set of \cref{sec:boosting}, a completed DualInterval evaluation already yields finite enclosures, so~(A6) /~(vi) holds whenever the IA layer succeeds.
 $v_{\mathrm{leaf}}(g)=0$ iff both scale variables appear as leaves.
 $v_{\mathrm{decay}}(g)=0$ iff $\mathrm{ord}(g,x)\leq c_x^{(0)}-\varepsilon_{\mathrm{decay}}<c_x^{(0)}$, which is a strict strengthening of~(v).
-Thus $V(g)=0$ implies certificates~(a)--(b) (with the decay margin), and \cref{thm:guarantee} applies stage by stage.
+Thus $V(g)=0$ together with finite DualInterval enclosures implies certificates~(a)--(b) (with the decay margin), and \cref{thm:guarantee} applies stage by stage.
 
 \paragraph{Measured gaps.}
 Soundness of DualInterval enclosures yields
@@ -702,15 +745,15 @@ $\partial^2 F/\partial x^2\geq\underline{\partial^2 F/\partial x^2}$ on~$\calI_x
   \;\leq\;
   \max\bigl(0,\overline{\partial F/\partial x}\bigr)
 \]
-pointwise on the box (and likewise for the convexity and floor gaps).
-Taking maxima over $x\in\{N,D\}$ shows that $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ upper-bound the corresponding true violations.
+pointwise on the box (and likewise for the convexity and floor / positivity gaps).
+Taking maxima over $x\in\{N,D\}$ shows that $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ upper-bound the corresponding true violations on the compact slice of~$\widetilde{\bbH}$.
 The quantities $\mathrm{ord}(g,x)$ and $\mathrm{leaves}(g)$ are exact combinatorial reads of the tree, so $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact.
 
 \paragraph{Containment.}
 The attainable values of $\mathrm{ord}(g,x)$ for trees over a finite power set~$\calP$ form a finite subset of~$\bbR$.
 Let $\Delta$ be the minimal positive gap between $c_x^{(0)}$ and any attainable exponent strictly below it (or $\Delta=1$ if no such exponent exists).
 Choosing $0<\varepsilon_{\mathrm{decay}}<\Delta$ forces: every $g$ with $\mathrm{ord}(g,x)<c_x^{(0)}$ automatically satisfies $\mathrm{ord}(g,x)\leq c_x^{(0)}-\varepsilon_{\mathrm{decay}}$.
-Therefore every hard-accepted correction has $v_{\mathrm{decay}}=0$ as well as vanishing mono/conv/irred/leaf scores, i.e.\ $V(g)=0$, and is a zero-penalty feasible point of~\eqref{eq:penalized-bb}.
+Therefore every hard-accepted correction has $v_{\mathrm{decay}}=0$ as well as vanishing mono/conv/irred/leaf scores, i.e.\ $V(g)=0$, and already satisfies~$\overline{F}<\infty$ by~\eqref{eq:interval-bb}, so it is a zero-penalty feasible point of~\eqref{eq:penalized-bb}.
 \end{proof}
 
 \subsection{Stage-0 Chinchilla admissibility}\label{sec:chinchilla-proof}
@@ -722,7 +765,7 @@ Write the hyperparameter remainder
     \sum_{i=1}^{m} \frac{C_i}{\phi_i(h_i)^{\gamma_i}} + E,
 \]
 so $\Lhat_0 = A N^{-\alpha} + B D^{-\beta} + R(\mathbf{h})$.
-Every summand of~$R$ is strictly positive on~$\bbH$, hence $R(\mathbf{h}) > E > 0$.
+Every summand of~$R$ is strictly positive on~$\widetilde{\bbH}$, hence $R(\mathbf{h}) > E > 0$.
 Shape axioms~(A1),~(A2),~(A4), and~(A6) are imposed only along $x \in \{N,D\}$ with the other coordinates held fixed; under that restriction $R$ is constant in~$x$.
 
 \paragraph{(A1)--(A2).}
@@ -741,7 +784,8 @@ Fix $x = N$ and freeze $(D,h_1,\ldots,h_m)$. Then
 for all $N \geq N_{\min} > 0$. The same identities with $(A,\alpha,N)$ replaced by $(B,\beta,D)$ give~(A1)--(A2) along~$D$.
 
 \paragraph{(A3).}
-Set $L_\infty \coloneqq E > 0$. For every $\mathbf{h} \in \bbH$,
+Set $L_\infty \coloneqq E > 0$. For every continuum configuration with $N,D \geq$ their minima
+(and hyperparameters in their~$H_h$),
 \[
     \Lhat_0(\mathbf{h}) - E
     \;=\;
@@ -749,7 +793,7 @@ Set $L_\infty \coloneqq E > 0$. For every $\mathbf{h} \in \bbH$,
     + \sum_{i=1}^{m} \frac{C_i}{\phi_i(h_i)^{\gamma_i}}
     \;>\; 0,
 \]
-so the joint-floor inequality of~(A3) holds strictly.
+so the joint-floor inequality of~(A3) holds strictly on~$\widetilde{\bbH}$.
 Along $N$ with the other coordinates fixed,
 \[
     L^{\infty}_{N}
@@ -775,9 +819,10 @@ $\Lhat_0\big|_{N=t} - L^{\infty}_{N} = A\, t^{-\alpha}$, hence
 The $D$-axis calculation yields $c_D^{(0)} = -\beta < 0$.
 
 \paragraph{(A5)--(A6).}
-Positivity~(A5) is immediate from $\Lhat_0(\mathbf{h}) > E > 0$.
-For~(A6): on $[N_{\min},\infty)$ the map $N \mapsto A N^{-\alpha}$ is $C^\infty$ (hence $C^1$), the remaining terms are independent of~$N$, and
-$\Lhat_0(N_{\min},\cdot) = A N_{\min}^{-\alpha} + B D^{-\beta} + R(\mathbf{h})$ is finite and strictly larger than~$E$.
+Positivity~(A5) is immediate from $\Lhat_0(\mathbf{h}) > E > 0$ on~$\widetilde{\bbH}$.
+For~(A6): on $[N_{\min},\infty)$ the map $N \mapsto A N^{-\alpha}$ is $C^\infty$ (hence $C^2$), the remaining terms are independent of~$N$, and
+$\Lhat_0(N_{\min},\cdot) = A N_{\min}^{-\alpha} + B D^{-\beta} + R(\mathbf{h})$ is finite
+(and strictly larger than~$E$ by~(A3)).
 The same holds with $N$ replaced by~$D$.
 
 Thus $\Lhat_0$ satisfies~(A1)--(A6), i.e.\ $\Lhat_0 \in \calS$.

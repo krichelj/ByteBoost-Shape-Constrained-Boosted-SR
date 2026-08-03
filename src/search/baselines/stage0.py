@@ -3,19 +3,27 @@ Stage-0 generalized Chinchilla law (``sec:boosting``, Prop. 1 / ``prop:chinchill
 eq. chinchilla-bb).
 
 Stage 0 fits by nonlinear least squares (positive parameter constraints) an
-admissible baseline. The canonical power-law form is
+admissible baseline on the labeled grid ``ℍ``. The closed-form law extends to
+the continuum domain ``ℍ̃`` and lies in ``S`` (A1)–(A6). The canonical power-law
+form is
 
     L̂^{(0)} = L̂_0
             = A / N^α + B / D^β + Σ_{i=1}^m C_i / φ_i(h_i)^{γ_i} + E,
 
     with all coefficients/exponents positive. By construction:
-* joint floor ``L_∞ = E``;
-* stage-0 asymptotic exponents ``c_N^{(0)} = −α``, ``c_D^{(0)} = −β``.
+* joint floor ``L_∞ = E`` (joint limit as all scales → ∞);
+* stage-0 asymptotic exponents ``c_N^{(0)} = −α``, ``c_D^{(0)} = −β``;
+* positivity (A5) follows from ``L̂_0 > E > 0`` on ``ℍ̃``;
+* graceful saturation (A6): power maps are ``C^∞`` (hence ``C²``) on
+  ``[x_min, ∞)``.
 
 Concrete grids: 2D ``(N, D)`` and 4D ``(N, D, WD, lr)``. For 4D, hyperparameter
 terms may instead be quadratic penalties in ``log φ_lr(lr)`` /
 ``log φ_wd(wd)`` (U-shaped loss in the preprocessed log features); shape
 axioms still act only on ``N`` and ``D``.
+
+``evaluate_ia`` should return DualInterval images on certification boxes
+``I_x ⊂ ℍ̃`` for use as the stage-0 contribution to ensemble enclosures.
 """
 
 from __future__ import annotations
@@ -27,7 +35,7 @@ from src.constraints.certificates.interval import DualInterval, Interval
 
 
 class BaselineFit(ABC):
-    """Admissible stage-0 approximant ``L̂_0 ∈ S``."""
+    """Admissible stage-0 approximant ``L̂_0 ∈ S`` on ``ℍ̃``."""
 
     @abstractmethod
     def fit(self, X: Any, y: Any) -> None:
@@ -62,7 +70,7 @@ class BaselineFit(ABC):
         raw_domains: dict[str, Interval],
         diff_var: str,
     ) -> DualInterval:
-        """IA+AD image of ``L̂_0`` differentiating w.r.t. ``diff_var``."""
+        """IA+AD image of ``L̂_0`` on a box in ``ℍ̃``, differentiating w.r.t. ``diff_var``."""
 
 
 class GeneralizedChinchilla(BaselineFit):
@@ -94,4 +102,4 @@ class GeneralizedChinchilla(BaselineFit):
         raw_domains: dict[str, Interval],
         diff_var: str,
     ) -> DualInterval:
-        raise NotImplementedError("TODO: DualInterval evaluation of L̂_0")
+        raise NotImplementedError("TODO: DualInterval evaluation of L̂_0 on I_x ⊂ ℍ̃")

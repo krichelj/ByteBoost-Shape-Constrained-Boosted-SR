@@ -9,8 +9,10 @@ for a finite set ``P ⊂ R ∖ {0}``, where ``pow_p(z) = |z|^p`` for ``z > 0``,
 and with bounded depth. Soft ablations may also expose unary ``inv`` / ``log`` /
 ``sqrt``.
 
-Trees are evaluated on log-features ``log φ_h(h)``; DualInterval certificates
-map derivatives back to raw ``N``/``D`` via the chain rule (``ia_eval``).
+These primitives are ``C^∞`` on ``(0, ∞)`` (hence ``C²`` for A6). Trees are
+evaluated on log-features ``log φ_h(h)``; DualInterval certificates on
+``I_x ⊂ ℍ̃`` map derivatives back to raw ``N``/``D`` via the chain rule
+(``ia_eval``).
 
 Primary backend registration targets gplearn ``make_function``; optional PySR
 uses its own operator table.

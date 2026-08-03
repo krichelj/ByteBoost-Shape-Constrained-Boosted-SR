@@ -1,10 +1,11 @@
 """
 Boosting guarantee (``sec:guarantee``, Thm. 1 / ``thm:guarantee``, eq. guarantee-bb).
 
-Hard path: if ``L̂_0 ∈ S`` and every ``L̂_j`` is accepted by certificates (a)–(b),
-then for all ``j``:
+Hard path: if ``L̂_0 ∈ S`` and every ``L̂_j`` is accepted by certificates (a)–(b)
+(IA on compact slices of ``ℍ̃``, structural ``ord`` on the ``x→∞`` tail), then for
+all ``j``:
 
-* ``L̂^{(j)} ∈ S``;
+* ``L̂^{(j)} ∈ S`` on ``ℍ̃`` (A1–A6);
 * writing ``L_∞^{(j)}`` for the joint floor of ``L̂^{(j)}``, one has
   ``L_∞^{(j)} = E``;
 * asymptotic exponents are preserved:
@@ -12,12 +13,15 @@ then for all ``j``:
     lim_{t→∞} log(L̂^{(j)}(h)|_{x=t} − L^∞_x) / log t  =  c_x^{(0)},
 
   where ``L^∞_x`` is the marginal floor of ``L̂^{(j)}`` along ``x``
-  (equal to that of ``L̂_0``).
+  (depends on frozen coordinates; equal to that of ``L̂_0``).
 
-Soft path recovers the same conclusion when ``V = 0`` at every stage
-(``prop:soft``). Boosting therefore improves fit *without* corrupting the
-interpretable constants researchers quote. Implement empirical checks / unit
-tests that probe these invariants on fitted ensembles.
+Soft path recovers the same conclusion when ``V = 0`` at every stage and
+DualInterval enclosures are finite (``prop:soft``), with ``v_irred = 0``
+covering both the joint floor and positivity (A5); A6 is discharged by
+successful finite IA under the ``C^∞`` operator set. Boosting therefore
+improves fit *without* corrupting the interpretable constants researchers
+quote. Implement empirical checks / unit tests that probe these invariants
+on fitted ensembles.
 """
 
 from __future__ import annotations
