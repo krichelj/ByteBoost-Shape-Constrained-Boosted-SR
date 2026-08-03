@@ -2,10 +2,13 @@
 Pretraining corpora named in ``sec:datasets``.
 
 Primary mixtures: Wikipedia, RedPajama, and related open text — used when
-generating new ``(N, D, L)`` points on Neocortex / GPU baselines.
-FineWeb-Edu is an optional workshop extension (not required for the core grid).
+generating new ``(N, D, L)`` points on Neocortex (and any portable PyTorch
+prototype). FineWeb-Edu is an optional workshop extension (not required for
+the core grid).
 
 Tokenization and packing details are left to students / site-specific storage.
+Loss-level baselines for comparison are the public HF inventory
+(``sec:baselines``), not re-training on the original cluster.
 """
 
 from __future__ import annotations

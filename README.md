@@ -40,7 +40,7 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make 
 
 ## Related
 
-- Scaling-grid checkpoints: [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models)
+- Public HF loss / checkpoint baselines (`sec:baselines`): [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models) — compare *losses*, not original training hardware
 - Method: shape-constrained boosted SR with a primary soft path (IA violation penalties) and an optional hard path (IA reject certificates)
 
 ## License
