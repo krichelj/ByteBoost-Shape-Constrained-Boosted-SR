@@ -12,6 +12,9 @@ LaTeX sources for a ByteBoost 2026 workshop project description (ACCESS cyberinf
 documents/
   abstract/       # one-page participant abstract
   description/    # full project description + bibliography
+src/              # student implementation skeleton (see src/README.md)
+reference/
+  axiomatic_neural_scaling_laws/   # git submodule — study reference
 ```
 
 ## Build commands
