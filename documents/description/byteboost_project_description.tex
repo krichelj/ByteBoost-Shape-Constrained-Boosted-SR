@@ -65,9 +65,9 @@ Our project uses symbolic regression to discover the scaling-law equation direct
 
 We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive; and performance must approach an irreducible floor. We mathematically certify these properties across the full domain of interest, not only at measured points (\cref{sec:axioms,sec:guarantee,sec:stage-admiss}).
 
-The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{sec:boosting,sec:stage-admiss}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement. One search method rejects inadmissible corrections; another penalizes violations and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft}).
+The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{sec:boosting,sec:stage-admiss}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement. The primary search path \emph{penalizes} axiom violations inside a genetic-programming fitness and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft}); a second path \emph{rejects} inadmissible corrections outright and is a workshop extension of the soft engine (\cref{sec:boosting,sec:stage-admiss}).
 
-The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform and will be compared with completed NVIDIA GPU runs (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python and JAX code, Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
+The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform and will be compared with completed NVIDIA GPU runs (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python (with optional JAX acceleration), Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
 
 Deliverables will include a certified scaling-law formula fitted to our training data, an open-source discovery library, and a concise methods report (\cref{sec:deliverables}). An initial set of trained models is already public (\cref{sec:datasets}).
 
@@ -83,7 +83,7 @@ Deliverables will include a certified scaling-law formula fitted to our training
  \item \textbf{AMA27 (Stony Brook Supercomputing Center / ACCESS):} Arm-based AmpereOne A192-32M cluster for the CPU-bound symbolic-regression search of \cref{sec:boosting} and the certification inner loop of \cref{sec:certificates}.
  Per the ACCESS resource description, phase~1 deploys 312 single-socket compute nodes, each with a 192-core AmpereOne A192-32M CPU and 384\,GB DDR5, linked by 200\,Gbps NDR InfiniBand, with a 5\,PB GPFS filesystem (\url{https://support.access-ci.org/affinity-groups/ama27}).
  AMA27 is the Stony Brook Arm testbed featured in ByteBoost~2.0 (in place of the retired Ookami A64FX system).
- We do \emph{not} rely on A64FX-style 512-bit SVE or HBM: the GP/IA workload is population-parallel and largely scalar, so the useful AMA27 properties are Arm ISA diversity versus our AMD EPYC (x86) baselines, high core counts per node, and dense node count for concurrent candidate evaluation.
+ We do \emph{not} rely on A64FX-style 512-bit SVE or HBM: the GP/IA workload is population-parallel and largely scalar Python DualInterval evaluation, so the useful AMA27 properties are Arm ISA diversity versus our AMD EPYC (x86) baselines, high core counts per node, and dense node count for concurrent candidate evaluation.
 \end{itemize}
 
 \subsection{Baseline hardware (already available to us)}\label{sec:baselines}
@@ -93,15 +93,20 @@ Deliverables will include a certified scaling-law formula fitted to our training
 
 \subsection{Software and tools}\label{sec:software}
 \codeRef{\pyDir{src/modeling/training}, \pyDir{src/search}, \pyDir{src/constraints/certificates}}
-PyTorch 2.x with FlashAttention for pretraining; \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}; \texttt{gplearn} for the hard-constrained symbolic-regression path of \cref{sec:boosting,sec:stage-admiss} with custom admissibility predicates~\citep{stephens2015gplearn}; Deep Symbolic Optimization (DSO) with a transformer-based controller for the soft-constrained path of \cref{sec:soft}; JAX with custom JVP rules and a Python interval-arithmetic backend for the automatic-differentiation-plus-interval-arithmetic proof step of \cref{sec:certificates}.
+PyTorch~2.x for pretraining (distributed data-parallel training; optional mixed precision), with \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}.
+Symbolic search uses \texttt{gplearn}~\citep{stephens2015gplearn} with a custom fitness that adds soft interval-arithmetic axiom penalties (\cref{sec:soft}); an optional PySR backend provides an unconstrained alternate engine for ablation.
+Certificates are evaluated with a pure-Python forward-mode \emph{DualInterval} interval-arithmetic layer (\cref{sec:certificates}); JAX with custom JVPs is an optional acceleration path, not required.
+A hard reject filter that discards inadmissible candidates during search (\cref{sec:stage-admiss}) is a workshop extension built on the same certificate primitives.
 
 \subsection{Models}\label{sec:models}
-\codeRef{\pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/llama.py}}
-Decoder-only transformer language models in the LLaMA architecture~\citep{touvron2023llama}, spanning roughly 10M--1.4B parameters, across several tokens-per-parameter ratios ($M = D/N$), following the Step Law protocol~\citep{li2025steplaw} and the overtraining regime of Gadre et al.~\citep{gadre2024overtraining}, with $\mu$P~/~$\mu$Transfer~\citep{yang2022mup} to decouple optimization from scale.
+\codeRef{\pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/transformer.py}}
+Decoder-only transformer language models (a compact post-LN causal stack suitable for scaling grids), spanning roughly 10M--1.4B parameters, across several tokens-per-parameter ratios ($M = D/N$).
+Workshop ports may adopt LLaMA-style blocks~\citep{touvron2023llama}, FlashAttention, and $\mu$P~/~$\mu$Transfer~\citep{yang2022mup}; the core method only requires consistent $(N,D,L)$ measurements in the Step Law~\citep{li2025steplaw} / overtraining~\citep{gadre2024overtraining} regimes.
 
 \subsection{Datasets}\label{sec:datasets}
 \codeRef{\pyFile{src/scaling/data/scaling_dataset.py}, \pyFile{src/scaling/data/corpora.py}}
-Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and FineWeb-Edu~\citep{penedo2024finewebedu} pretraining corpora; an already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} (trained checkpoints and loss curves from an initial DeltaAI grid).
+Pretraining corpora used to generate new grid points include Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and related open text mixtures (optional FineWeb-Edu~\citep{penedo2024finewebedu} for workshop extensions).
+An already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} supplies trained checkpoints and loss curves from an initial DeltaAI grid for the symbolic-regression track.
 
 \section{Method summary (technical)}\label{sec:method}
 \codeRef{\pyDir{src/scaling}, \pyDir{src/constraints}, \pyDir{src/search}; map: \pyFile{src/README.md}}
@@ -109,10 +114,14 @@ Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama
 \subsection{Setup}\label{sec:setup}
 \codeRef{\pyFile{src/scaling/setup/configuration.py}, \pyFile{src/scaling/setup/constants.py}}
 Let $N$ be the parameter count, $D$ the training-token count, and
-$\calH = \{h_1, \ldots, h_m\}$ a finite set of remaining hyperparameters.
+$\calH = \{h_1, \ldots, h_m\}$ a finite set of remaining hyperparameters
+(in the concrete 4D grids used here, typically width-multiplier / weight-decay style axes and learning rate).
 For each coordinate $h \in \{N, D\} \cup \calH$, let $H_h$ be its finite set of
 admissible values and $\phi_h \colon H_h \to \bbR_{>0}$ a strictly monotone
 preprocessing map; write $\phi_i \coloneqq \phi_{h_i}$ for brevity.
+In the search implementation, genetic-programming features are the logarithms
+$\log\phi_h(h)$ (so stage corrections are fit in log-coordinates and mapped back
+to raw-scale derivatives by the chain rule; \cref{sec:certificates}).
 The configuration space is the product
 $\bbH \coloneqq \prod_{h \in \{N,D\}\cup\calH} H_h$,
 with typical element $\mathbf{h} \in \bbH$ (so $N, D, h_i$ denote the corresponding
@@ -179,16 +188,23 @@ These encode physical priors on loss surfaces that unconstrained symbolic regres
 In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a single axis the excess over the joint floor need not vanish, so a power-law rate would not be identifiable against $L_\infty$.
 
 \subsection{Boosted construction}\label{sec:boosting}
-\codeRef{\pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression}, \pyDir{src/search/boosting}, \pyDir{src/search/hard_path}}
+\codeRef{\pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression}, \pyDir{src/search/boosting}, \pyDir{src/search/soft_path}, \pyDir{src/search/hard_path}}
 The ensemble is built stagewise,
 $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$, under an \emph{admissibility invariant}:
 $\Lhat^{(j)} \in \calS$ for every $j = 0, \ldots, K$ (\cref{sec:axioms}).
 Throughout, $\Lhat_j$ (subscript) is the stage-$j$ correction and
 $\Lhat^{(j)}$ (superscript) is the cumulative ensemble through stage~$j$,
 so in particular $\Lhat^{(0)} = \Lhat_0$.
-Stage~$0$ is a generalized Chinchilla law, fit in closed form and admissible by
+Stage~$0$ is a generalized Chinchilla law, fit by nonlinear least squares with
+positive parameter constraints and admissible by
 construction with joint floor $L_\infty = E$ and stage-0 asymptotic exponents
-$c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ (the rates $c_x$ in~(A4) of \cref{sec:axioms} along $N$ and~$D$):
+$c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ (the rates $c_x$ in~(A4) of \cref{sec:axioms} along $N$ and~$D$).
+Concrete instances include a 2D law in $(N,D)$ and a 4D law that adds two
+hyperparameter axes (e.g.\ weight decay and learning rate). The 4D hyperparameter
+terms may be power laws of the same form as in~\eqref{eq:chinchilla-bb}, or---matching
+U-shaped loss in $\mathrm{lr}$/$\mathrm{wd}$---quadratic penalties in
+$\log\phi_{\mathrm{lr}}(\mathrm{lr})$ and $\log\phi_{\mathrm{wd}}(\mathrm{wd})$
+(shape axioms still act only on~$N$ and~$D$):
 \begin{equation}\label{eq:chinchilla-bb}
     \Lhat^{(0)} \;=\; \Lhat_0 \;=\;
     \frac{A}{N^{\alpha}} + \frac{B}{D^{\beta}}
@@ -219,9 +235,12 @@ so that outlier runs cannot dominate:
     \end{cases}
 \end{equation}
 Corrections are sought by genetic-programming search over expression trees with
-operators $\{+, \times, \div\} \cup \{\mathrm{pow}_p : p \in \calP\}$
+primary operators $\{+, -, \times, \div\} \cup \{\mathrm{pow}_p : p \in \calP\}$
 for a finite set $\calP \subset \bbR \setminus \{0\}$
-(where $\mathrm{pow}_p(z) = |z|^p$ for $z > 0$) and bounded depth.
+(where $\mathrm{pow}_p(z) = |z|^p$ for $z > 0$) and bounded depth;
+optional unary helpers such as $\mathrm{inv}$/$\mathrm{log}$/$\mathrm{sqrt}$ may be enabled for ablations.
+Trees are evaluated on \emph{log-features} $\log\phi_h(h)$; raw-scale derivatives
+needed by~(A1)--(A2) are recovered by the chain rule (\cref{sec:certificates}).
 
 \subsection{Stagewise admissibility}\label{sec:stage-admiss}\label{sec:certificates}
 \codeRef{\pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}}
@@ -253,12 +272,13 @@ Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axio
 \end{gathered}
 \end{equation}
 Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\bbH$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
-They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificates decide whether~$g$ preserves~\eqref{eq:stage-admiss-bb}: interval checks establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
+They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificates decide whether~$g$ preserves~\eqref{eq:stage-admiss-bb}: interval checks establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
 
 \smallskip\noindent
 \emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on~$\calI_x$).
 Over the compact box $\calI_x \coloneqq [x_{\min}, x_{\max}]$ (other coordinates ranging over their finite $H_h$), forward-mode automatic differentiation composed with interval arithmetic~\citep{moore2009interval,kronberger2022shape} evaluates~$g$ bottom-up on interval operands and returns guaranteed enclosures
 $\underline{f} \leq f \leq \overline{f}$ on~$\calI_x$ for $f \in \{F,\, \partial F/\partial x,\, \partial^2 F/\partial x^2\}$, in time linear in the tree size.
+When~$g$ is represented on log-features, DualInterval evaluation is performed in log-coordinates and first/second derivatives are mapped to the raw axis~$x$ by the chain rule before applying~\eqref{eq:interval-bb}.
 A candidate is accepted when, for each $x \in \{N,D\}$,
 \begin{equation}\label{eq:interval-bb}
     \overline{\partial F / \partial x} \leq 0,
@@ -275,6 +295,7 @@ $\underline{F} > L_\infty > 0$ forces both~(iii) and~(iv) on the configurations 
 $\overline{F} < \infty$ forces the finiteness half of~(vi) (smoothness of~$g$ on~$\calI_x$ follows from the operator set).
 The test is conservative: a failure of~\eqref{eq:interval-bb} does \emph{not} prove that~$g$ fails~\eqref{eq:stage-admiss-bb} (interval over-approximation can reject a truly admissible update), but every accepted~$g$ is guaranteed to preserve admissibility on~$\calI_x$.
 That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
+In the primary soft path (\cref{sec:soft}), the same enclosures are converted to continuous violation scores rather than used as a reject gate.
 
 \smallskip\noindent
 \emph{(b) Exact structural checks} (condition~(v), and prerequisites for it).
@@ -302,6 +323,7 @@ Algorithm~\ref{alg:boosting-bb} enforces~\eqref{eq:stage-admiss-bb} via certific
            $\Lhat_j \in \argmin_{g}
            \dfrac{1}{n}\sum_{\ell=1}^{n}\bigl(\tilde{r}_j^{(\ell)} - g(\mathbf{h}_\ell)\bigr)^2$
            subject to certificates~(a)--(b) for~\eqref{eq:stage-admiss-bb}
+           \Comment{hard filter extension; soft path uses~\eqref{eq:penalized-bb}}
     \State $\Lhat^{(j)} \gets \Lhat^{(j-1)} + \Lhat_j$
 \EndFor
 \State \Return $\Lhat^{(K)}$
@@ -321,7 +343,7 @@ where $L^{\infty}_{x}$ is the marginal floor of $\Lhat^{(j)}$ along~$x$ (equal t
 
 \subsection{Soft-constrained variant}\label{sec:soft}
 \codeRef{\pyFile{src/search/soft_path/violations.py}, \pyFile{src/search/soft_path/fitness.py}, \pyFile{src/search/soft_path/backends.py}}
-A second path replaces the hard admissibility filter of Algorithm~\ref{alg:boosting-bb} and \cref{sec:stage-admiss} with per-axiom violation scores on the same candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$.
+The primary implemented path replaces a hard admissibility reject filter with per-axiom violation scores on the same candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$, folded into the \texttt{gplearn} fitness (\cref{sec:software}).
 Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural quantities of~(b), define
 \begin{equation}\label{eq:violations-bb}
 \begin{aligned}
@@ -365,8 +387,9 @@ Stage~$j$ then minimizes the penalized fitness
 \end{equation}
 where $F_j$ is a scalar fitness (distinct from the ensemble map~$F$ above), the first term is mean squared error of~$g$ against the Huber pseudo-residuals~\eqref{eq:pseudoresid-bb}, and the second term penalizes axiom gaps (squared so the penalty gradient vanishes at zero violation).
 Candidates that already satisfy~\eqref{eq:stage-admiss-bb} therefore incur no penalty pressure.
-This path carries its own guarantee: $V = 0$ at every stage recovers the hard result exactly; the interval-based scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-bound the corresponding true pointwise violations (while $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact), yielding a \emph{measured} admissibility gap rather than silent failure; and for a sufficiently small decay margin every correction that passes the hard admissibility certificates has zero penalty, so the soft search provably contains the hard one of \cref{sec:stage-admiss}.
-Comparing the two paths (certified-but-restricted versus free-but-scored) is one of the empirical questions the project settles.
+This path carries its own guarantee: $V = 0$ at every stage recovers the hard result exactly; the interval-based scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-bound the corresponding true pointwise violations (while $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact), yielding a \emph{measured} admissibility gap rather than silent failure; and for a sufficiently small decay margin every correction that passes the hard admissibility certificates has zero penalty, so the soft search contains the hard one of \cref{sec:stage-admiss} when the latter is implemented.
+Soft scores act as IA proxies for~(A1)--(A4) (with positivity~(A5) folded into the irreducible-floor gap and~(A6) into finiteness of the DualInterval enclosure / smooth operator set).
+Comparing soft-penalty search ($\lambda_a>0$) against an unconstrained baseline ($\lambda_a=0$), and optionally against a true hard reject filter, is one of the empirical questions the project settles.
 
 \section{Additional information}\label{sec:additional}
 
@@ -374,7 +397,7 @@ Comparing the two paths (certified-but-restricted versus free-but-scored) is one
 \codeRef{\pyDir{src/modeling} (modeling); \pyDir{src/search}, \pyDir{src/systems/hpc} (search)}
 The project splits into two fairly independent tracks, so a teammate could own either one.
 The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and profiles it against our NVIDIA GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras software stack).
-The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to AMA27 (\cref{sec:testbeds}) and profiles the certification inner loop of \cref{sec:certificates} on AmpereOne against our AMD EPYC (x86) CPU baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting,sec:soft} to AMA27 (\cref{sec:testbeds}) and profiles the DualInterval certification inner loop of \cref{sec:certificates} on AmpereOne against our AMD EPYC (x86) CPU baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking soft-penalty search against $\lambda_a=0$ and against a hard reject filter (\cref{sec:stage-admiss}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 
 \subsection{Deliverables}\label{sec:deliverables}
@@ -406,9 +429,9 @@ Each technical subsection above also points to those files; the table summarizes
 \cref{sec:axioms} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/admissibility.py} \\
 \cref{sec:stage-admiss,sec:certificates} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates} \\
 \cref{sec:guarantee} & \pyDir{src/constraints} & \pyFile{src/constraints/guarantee/invariants.py} \\
-\cref{sec:boosting}, Alg.~\ref{alg:boosting-bb} & \pyDir{src/search} & \pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression}, \pyDir{src/search/boosting}, \pyDir{src/search/hard_path} \\
+\cref{sec:boosting}, Alg.~\ref{alg:boosting-bb} & \pyDir{src/search} & \pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression}, \pyDir{src/search/boosting}, \pyDir{src/search/soft_path}, \pyDir{src/search/hard_path} \\
 \cref{sec:soft} & \pyDir{src/search} & \pyDir{src/search/soft_path} \\
-\cref{sec:models} & \pyDir{src/modeling} & \pyDir{src/modeling/models} \\
+\cref{sec:models} & \pyDir{src/modeling} & \pyFile{src/modeling/models/transformer.py} \\
 \cref{sec:testbeds} (Neocortex) & \pyDir{src/modeling} & \pyDir{src/modeling/training} \\
 \cref{sec:testbeds,sec:baselines} (AMA27/CPU) & \pyDir{src/systems} & \pyDir{src/systems/hpc} \\
 \cref{sec:deliverables} & \pyDir{src/systems} & \pyFile{src/systems/pipeline/run_discovery.py} \\

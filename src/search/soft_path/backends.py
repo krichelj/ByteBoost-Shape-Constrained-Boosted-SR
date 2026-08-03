@@ -1,10 +1,10 @@
 """
 Soft search backends (``sec:software``, ``sec:soft``).
 
-The project description names Deep Symbolic Optimization (DSO) with a
-transformer-based controller for the soft-constrained path, and also allows
-a gplearn-style search with soft IA penalties in the fitness. Implement at
-least one backend; comparing them is a natural workshop slice.
+Primary engine: ``gplearn`` with IA axiom penalties in the fitness
+(``GPLearnSoftBackend``). Optional: PySR as an unconstrained / post-hoc
+ablation backend. A hard reject filter is a separate workshop extension
+(``src.search.hard_path``), not a second soft engine.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class SoftSearchBackend(ABC):
 
 
 class GPLearnSoftBackend(SoftSearchBackend):
-    """Soft IA penalties inside a gplearn-style fitness."""
+    """Primary soft path: patch gplearn fitness with MSE + Σ λ_a v_a²."""
 
     def fit_stage(
         self,
@@ -40,12 +40,12 @@ class GPLearnSoftBackend(SoftSearchBackend):
         **kwargs: Any,
     ) -> Any:
         raise NotImplementedError(
-            "TODO: patch / supply fitness = MSE + Σ λ_a v_a² during GP search"
+            "TODO: install IA-penalized raw_fitness during SymbolicRegressor.fit"
         )
 
 
-class DSOBackend(SoftSearchBackend):
-    """Deep Symbolic Optimization controller (named soft engine in ``sec:software``)."""
+class PySRSoftBackend(SoftSearchBackend):
+    """Optional PySR engine (typically unconstrained; score V post hoc)."""
 
     def fit_stage(
         self,
@@ -55,6 +55,4 @@ class DSOBackend(SoftSearchBackend):
         *args: Any,
         **kwargs: Any,
     ) -> Any:
-        raise NotImplementedError(
-            "TODO: wire DSO / transformer controller with soft violation rewards"
-        )
+        raise NotImplementedError("TODO: fit PySR stage; optionally report V after the fact")

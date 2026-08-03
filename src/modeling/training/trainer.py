@@ -35,7 +35,11 @@ class PretrainTrainer(ABC):
 
 
 class TorchPretrainTrainer(PretrainTrainer):
-    """PyTorch + FlashAttention path (GPU baselines / portable prototype)."""
+    """PyTorch DDP path (GPU baselines / portable prototype).
+
+    FlashAttention / μP / LLaMA-style blocks are optional ports — not required
+    for a consistent ``(N, D, L)`` measurement grid.
+    """
 
     def train(
         self,
