@@ -8,6 +8,20 @@ Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ook
 
 - [Project description](documents/description/byteboost_project_description.pdf)
 
+## Student skeleton
+
+Implement the method in [`src/`](src/). Each subpackage maps to a section of the project description (setup, axioms, certificates, boosting, hard/soft paths, modeling track, …). Stubs use the description’s notation and raise `NotImplementedError` — see [`src/README.md`](src/README.md) for the full map and suggested order.
+
+## Reference implementation
+
+Study (do not copy wholesale) the lab implementation vendored as a submodule:
+
+```bash
+git submodule update --init --recursive
+```
+
+Path: [`reference/axiomatic_neural_scaling_laws`](reference/axiomatic_neural_scaling_laws) ([lab-v2/axiomatic_neural_scaling_laws](https://github.com/lab-v2/axiomatic_neural_scaling_laws)).
+
 ## Build
 
 ```bash
