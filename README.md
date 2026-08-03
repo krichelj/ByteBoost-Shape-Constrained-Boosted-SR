@@ -6,7 +6,6 @@ Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ook
 
 ## Documents
 
-- [Abstract](documents/abstract/byteboost_abstract.pdf)
 - [Project description](documents/description/byteboost_project_description.pdf)
 
 ## Build
