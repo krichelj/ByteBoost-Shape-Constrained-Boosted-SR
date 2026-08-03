@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-LaTeX sources for a ByteBoost 2026 workshop project description (ACCESS cyberinfrastructure testbeds): "Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws." There is no application code — the deliverables are the compiled PDFs, which are committed to the repo.
+LaTeX sources and a student implementation skeleton for a ByteBoost 2026 workshop
+project (ACCESS cyberinfrastructure testbeds): "Shape-Constrained Boosted
+Symbolic Regression for Interpretable Neural Scaling Laws." Compiled PDFs are
+committed deliverables alongside the ``.tex`` sources.
 
 ## Layout
 
@@ -13,8 +16,6 @@ documents/
   abstract/       # one-page participant abstract
   description/    # full project description + bibliography
 src/              # student implementation skeleton (see src/README.md)
-reference/
-  axiomatic_neural_scaling_laws/   # git submodule — study reference
 ```
 
 ## Build commands

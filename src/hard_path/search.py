@@ -9,9 +9,9 @@ stage argmin
           subject to certificates (a)–(b).
 
 Project software note (``sec:software``): ``gplearn`` with custom admissibility
-predicates is the intended hard-path engine. The reference submodule currently
-emphasizes soft penalties / post-hoc selection — implementing a true reject
-filter during search is a primary ByteBoost exercise.
+predicates is the intended hard-path engine. Implementing a true reject filter
+during search (only survivors of certificates (a)–(b) enter the stage argmin)
+is a primary ByteBoost exercise.
 """
 
 from __future__ import annotations

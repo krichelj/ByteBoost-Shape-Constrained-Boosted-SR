@@ -3,41 +3,31 @@
 This package is a **formal skeleton** for the ByteBoost project described in
 [`documents/description/byteboost_project_description.pdf`](../documents/description/byteboost_project_description.pdf).
 
-Fill in the `NotImplementedError` stubs. Do **not** copy-paste from the
-reference submodule; use it to understand algorithms, then implement your own
-version.
+Fill in the `NotImplementedError` stubs. Use the project description’s notation
+and equations; concrete dtypes, backends, and grids are yours to choose.
 
-## Reference implementation
+## Description ↔ skeleton
 
-```
-reference/axiomatic_neural_scaling_laws/
-```
-
-Clone already present as a git submodule (`lab-v2/axiomatic_neural_scaling_laws`).
-Study it; implement here.
-
-## Description ↔ skeleton ↔ reference
-
-| Project description | Skeleton package | Reference (study only) |
-|---------------------|------------------|------------------------|
-| §Setup (`sec:setup`) | `setup/` | `src/data/`, feature maps in boosting |
-| §Admissibility axioms A1–A6 (`sec:axioms`) | `axioms/` | `src/constraints/` |
-| Stagewise conditions (i)–(vi) (`sec:stage-admiss`) | `axioms/stage_conditions.py` | `docs/methodology.tex`, constraints |
-| Interval certificates (`sec:certificates`, eq. interval) | `certificates/` | `src/core/interval.py`, `src/constraints/ia_eval.py` |
-| Stage-0 Chinchilla (`sec:boosting`, eq. chinchilla) | `baselines/` | `src/models/baselines.py` |
-| Huber \(\delta_j\), \(\tilde r_j\) (eq. delta, pseudoresid) | `residuals/` | `src/core/math_utils.py` |
-| Expression trees / \(\mathrm{pow}_p\) | `expression/` | gplearn programs + `ALL_POWERS` |
-| Algorithm 1 boosting (`alg:boosting-bb`) | `boosting/` | `src/models/base_boosting.py` |
-| Hard path (reject inadmissible \(g\)) | `hard_path/` | *partial* — selection in `axioms_lab.py` |
-| Soft path \(v_a\), \(F_j\) (`sec:soft`) | `soft_path/` | `src/constraints/constraints.py`, `fitness.py` |
-| Soft search backend (DSO named in description) | `soft_path/backends.py` (`DSOBackend`) | *not in reference* (gplearn used instead) |
-| JAX+JVP certificate option (`sec:software`) | `certificates/jax_backend.py` | pure-Python DualInterval in reference |
-| Guarantee (`sec:guarantee`) | `guarantee/` | theorems in `docs/methodology.tex` |
-| Datasets (`sec:datasets`) | `data/` | `src/data/hf_scaling.py`, … |
-| Models (`sec:models`) | `models/` | `src/llm_models/` |
-| Pretraining / Neocortex (`sec:testbeds`) | `training/` | `src/training/`, `src/distributed/` |
-| AMA27 search profiling (`sec:testbeds`) | `hpc/` | `scripts/tuning/benchmarks/` |
-| End-to-end wire-up / deliverables | `pipeline/` | `src/cli.py`, `src/pipeline/` |
+| Project description | Skeleton package |
+|---------------------|------------------|
+| §Setup (`sec:setup`) | `setup/` |
+| §Admissibility axioms A1–A6 (`sec:axioms`) | `axioms/` |
+| Stagewise conditions (i)–(vi) (`sec:stage-admiss`) | `axioms/stage_conditions.py` |
+| Interval certificates (`sec:certificates`, eq. interval) | `certificates/` |
+| Stage-0 Chinchilla (`sec:boosting`, eq. chinchilla) | `baselines/` |
+| Huber \(\delta_j\), \(\tilde r_j\) (eq. delta, pseudoresid) | `residuals/` |
+| Expression trees / \(\mathrm{pow}_p\) | `expression/` |
+| Algorithm 1 boosting (`alg:boosting-bb`) | `boosting/` |
+| Hard path (reject inadmissible \(g\)) | `hard_path/` |
+| Soft path \(v_a\), \(F_j\) (`sec:soft`) | `soft_path/` |
+| Soft search backends (gplearn / DSO) | `soft_path/backends.py` |
+| JAX+JVP certificate option (`sec:software`) | `certificates/jax_backend.py` |
+| Guarantee (`sec:guarantee`) | `guarantee/` |
+| Datasets (`sec:datasets`) | `data/` |
+| Models (`sec:models`) | `models/` |
+| Pretraining / Neocortex (`sec:testbeds`) | `training/` |
+| AMA27 search profiling (`sec:testbeds`) | `hpc/` |
+| End-to-end wire-up / deliverables | `pipeline/` |
 
 ## Suggested implementation order
 

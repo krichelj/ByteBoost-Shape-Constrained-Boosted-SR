@@ -2,9 +2,9 @@
 Soft search backends (``sec:software``, ``sec:soft``).
 
 The project description names Deep Symbolic Optimization (DSO) with a
-transformer-based controller for the soft-constrained path. The reference
-submodule instead implements soft IA penalties inside gplearn. Both are valid
-student targets: implement at least one; the DSO stub captures the named engine.
+transformer-based controller for the soft-constrained path, and also allows
+a gplearn-style search with soft IA penalties in the fitness. Implement at
+least one backend; comparing them is a natural workshop slice.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class SoftSearchBackend(ABC):
 
 
 class GPLearnSoftBackend(SoftSearchBackend):
-    """Soft IA penalties inside a gplearn-style fitness (reference approach)."""
+    """Soft IA penalties inside a gplearn-style fitness."""
 
     def fit_stage(
         self,

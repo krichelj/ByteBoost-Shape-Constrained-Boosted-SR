@@ -20,7 +20,7 @@ SCALE_VARS: Final[tuple[str, str]] = ("N", "D")
 # Soft-path axiom indices a ∈ {mono, conv, irred, decay, leaf}
 # (``sec:soft``, eq. violations). Positivity (A5) and graceful saturation (A6)
 # are certified via the irreducible-floor / finiteness IA checks rather than
-# separate soft scores (see project description and reference methodology).
+# separate soft scores (see project description).
 AXIOM_INDICES: Final[tuple[str, ...]] = (
     "mono",
     "conv",
