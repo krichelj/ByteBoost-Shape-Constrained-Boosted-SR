@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "Shape-Constrained Boosted Symbolic Regression for Interpretable Neural Scaling Laws: A Cross-Testbed Investigation"
-message: If you use this project description or method, please cite it.
+message: If you use this workshop project description, skeleton, or method, please cite it.
 type: software
 authors:
   - family-names: Kricheli
@@ -11,6 +11,7 @@ abstract: >-
   ByteBoost 2026 workshop project on discovering neural scaling laws via
   shape-constrained boosted symbolic regression, with interval-arithmetic
   certificates, evaluated across Cerebras CS-3 (Neocortex) and AmpereOne (AMA27).
+  Repository includes the project description and a student implementation skeleton.
 keywords:
   - neural scaling laws
   - symbolic regression

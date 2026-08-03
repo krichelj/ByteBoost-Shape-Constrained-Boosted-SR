@@ -6,6 +6,9 @@ This package is a **formal skeleton** for the ByteBoost project described in
 Fill in the `NotImplementedError` stubs. Use the project description’s notation
 and equations; concrete dtypes, backends, and grids are yours to choose.
 
+Work from the repository root so package imports resolve, e.g.
+`from src.setup.configuration import ConfigurationSpace`.
+
 ## Description ↔ skeleton
 
 | Project description | Skeleton package |
