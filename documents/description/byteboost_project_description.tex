@@ -30,6 +30,12 @@
 \newcommand{\Lhat}{\hat{L}}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
+% Pointer from a description section to the student implementation skeleton.
+% Use \path so long repo paths can break at ``/'' without overfull boxes.
+\newcommand{\codeRef}[1]{%
+  \par\nobreak\noindent
+  {\footnotesize\textit{Code skeleton:}~\path{#1}}\par\smallskip}
+
 \begin{document}
 
 % ======================================================================
@@ -65,6 +71,7 @@ Deliverables will include a certified scaling-law formula fitted to our training
 \section{Key requirements}\label{sec:requirements}
 
 \subsection{Testbed hardware (requested)}\label{sec:testbeds}
+\codeRef{src/modeling/training/; src/systems/hpc/; src/search/}
 \begin{itemize}[nosep, leftmargin=1.4em]
  \item \textbf{Neocortex (PSC):} Cerebras CS-3 wafer-scale systems for the model-pretraining grid in \cref{sec:models,sec:datasets}
  (\url{https://www.psc.edu/resources/neocortex/}).
@@ -77,21 +84,27 @@ Deliverables will include a certified scaling-law formula fitted to our training
 \end{itemize}
 
 \subsection{Baseline hardware (already available to us)}\label{sec:baselines}
+\codeRef{src/systems/hpc/profiling.py; src/modeling/training/trainer.py}
 \textbf{GPU baselines (pretraining comparisons):} 200 NVIDIA GH200 superchips on DeltaAI at NCSA, plus a local four-GH200 cluster.
 \textbf{CPU baselines (search/certification comparisons):} three 256-core AMD EPYC (x86) machines, against which we will profile the AMA27 AmpereOne port.
 
 \subsection{Software and tools}\label{sec:software}
+\codeRef{src/modeling/training/; src/search/; src/constraints/certificates/}
 PyTorch 2.x with FlashAttention for pretraining; \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}; \texttt{gplearn} for the hard-constrained symbolic-regression path of \cref{sec:boosting,sec:stage-admiss} with custom admissibility predicates~\citep{stephens2015gplearn}; Deep Symbolic Optimization (DSO) with a transformer-based controller for the soft-constrained path of \cref{sec:soft}; JAX with custom JVP rules and a Python interval-arithmetic backend for the automatic-differentiation-plus-interval-arithmetic proof step of \cref{sec:certificates}.
 
 \subsection{Models}\label{sec:models}
+\codeRef{src/modeling/models/config.py; src/modeling/models/llama.py}
 Decoder-only transformer language models in the LLaMA architecture~\citep{touvron2023llama}, spanning roughly 10M--1.4B parameters, across several tokens-per-parameter ratios ($M = D/N$), following the Step Law protocol~\citep{li2025steplaw} and the overtraining regime of Gadre et al.~\citep{gadre2024overtraining}, with $\mu$P~/~$\mu$Transfer~\citep{yang2022mup} to decouple optimization from scale.
 
 \subsection{Datasets}\label{sec:datasets}
+\codeRef{src/scaling/data/scaling_dataset.py; src/scaling/data/corpora.py}
 Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and FineWeb-Edu~\citep{penedo2024finewebedu} pretraining corpora; an already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} (trained checkpoints and loss curves from an initial DeltaAI grid).
 
 \section{Method summary (technical)}\label{sec:method}
+\codeRef{src/ packages scaling/, constraints/, search/ (full map in src/README.md)}
 
 \subsection{Setup}\label{sec:setup}
+\codeRef{src/scaling/setup/configuration.py; src/scaling/setup/constants.py}
 Let $N$ be the parameter count, $D$ the training-token count, and
 $\calH = \{h_1, \ldots, h_m\}$ a finite set of remaining hyperparameters.
 For each coordinate $h \in \{N, D\} \cup \calH$, let $H_h$ be its finite set of
@@ -111,6 +124,7 @@ treat $x$ as continuous on
 $[x_{\min}, \infty)$, and take all derivatives with the other coordinates held fixed.
 
 \subsection{Admissibility axioms}\label{sec:axioms}
+\codeRef{src/constraints/axioms/admissibility.py}
 $\Lhat$ is \emph{admissible} ($\Lhat \in \calS$) if it satisfies~(A1)--(A6) below.
 Where an axiom mentions a scale variable $x$, it is imposed for each
 $x \in \{N, D\}$ with the other coordinates held fixed.
@@ -162,6 +176,7 @@ These encode physical priors on loss surfaces that unconstrained symbolic regres
 In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a single axis the excess over the joint floor need not vanish, so a power-law rate would not be identifiable against $L_\infty$.
 
 \subsection{Boosted construction}\label{sec:boosting}
+\codeRef{src/search/ (baselines/, residuals/, expression/, boosting/, hard_path/)}
 The ensemble is built stagewise,
 $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$, under an \emph{admissibility invariant}:
 $\Lhat^{(j)} \in \calS$ for every $j = 0, \ldots, K$ (\cref{sec:axioms}).
@@ -206,6 +221,7 @@ for a finite set $\calP \subset \bbR \setminus \{0\}$
 (where $\mathrm{pow}_p(z) = |z|^p$ for $z > 0$) and bounded depth.
 
 \subsection{Stagewise admissibility}\label{sec:stage-admiss}\label{sec:certificates}
+\codeRef{src/constraints/axioms/stage_conditions.py; src/constraints/certificates/}
 Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axioms} is a continuum statement over $\bbH$. Admissibility of the update is nonetheless equivalent to local conditions on the \emph{increment}: given $\Lhat^{(j-1)} \in \calS$ with joint floor $L_\infty$, $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$ is admissible \emph{if and only if} $\Lhat_j$ satisfies, for each $x \in \{N,D\}$,
 \begin{equation}\label{eq:stage-admiss-bb}
 \begin{gathered}
@@ -265,6 +281,7 @@ We additionally require that each scale variable $x \in \{N,D\}$ appears as a le
 Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\bbH$.
 
 Algorithm~\ref{alg:boosting-bb} enforces~\eqref{eq:stage-admiss-bb} via certificates~(a)--(b) at every stage.
+\codeRef{src/search/boosting/algorithm.py}
 \begin{algorithm}[H]
 \caption{Shape-constrained boosted symbolic regression}
 \label{alg:boosting-bb}
@@ -289,6 +306,7 @@ Algorithm~\ref{alg:boosting-bb} enforces~\eqref{eq:stage-admiss-bb} via certific
 \end{algorithm}
 
 \subsection{Guarantee}\label{sec:guarantee}
+\codeRef{src/constraints/guarantee/invariants.py}
 If $\Lhat_0 \in \calS$ and every $\Lhat_j$ is accepted by certificates~(a)--(b) of \cref{sec:stage-admiss}, then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
 \begin{equation}\label{eq:guarantee-bb}
     \lim_{t \to \infty}
@@ -299,6 +317,7 @@ If $\Lhat_0 \in \calS$ and every $\Lhat_j$ is accepted by certificates~(a)--(b) 
 where $L^{\infty}_{x}$ is the marginal floor of $\Lhat^{(j)}$ along~$x$ (equal to that of~$\Lhat_0$). Boosting therefore improves fit \emph{without} corrupting the interpretable constants researchers actually quote.
 
 \subsection{Soft-constrained variant}\label{sec:soft}
+\codeRef{src/search/soft_path/}
 A second path replaces the hard admissibility filter of Algorithm~\ref{alg:boosting-bb} and \cref{sec:stage-admiss} with per-axiom violation scores on the same candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$.
 Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural quantities of~(b), define
 \begin{equation}\label{eq:violations-bb}
@@ -349,13 +368,48 @@ Comparing the two paths (certified-but-restricted versus free-but-scored) is one
 \section{Additional information}\label{sec:additional}
 
 \subsection{Collaborators welcome}\label{sec:collaborators}
+\codeRef{src/modeling/ (modeling track); src/search/ + src/systems/hpc/ (search track)}
 The project splits into two fairly independent tracks, so a teammate could own either one.
 The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and profiles it against our NVIDIA GPU runs (\cref{sec:baselines}; useful background: PyTorch, or curiosity about the Cerebras software stack).
 The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting} to AMA27 (\cref{sec:testbeds}) and profiles the certification inner loop of \cref{sec:certificates} on AmpereOne against our AMD EPYC (x86) CPU baselines (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking the hard-constrained path (\cref{sec:stage-admiss}) against the soft-constrained one (\cref{sec:soft}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 
 \subsection{Deliverables}\label{sec:deliverables}
+\codeRef{src/systems/pipeline/run_discovery.py}
 (1) An admissible boosted scaling law (\cref{sec:axioms,sec:guarantee}) fit on the collected training grid (\cref{sec:datasets}); (2) a public release of the shape-constrained symbolic-regression library with the interval-arithmetic-certified admissibility checking of \cref{sec:certificates}; and (3) a short paper on the method of \cref{sec:method}.
+
+\subsection{Code skeleton map}\label{sec:code-map}
+The repository ships a student implementation skeleton under \texttt{src/}, grouped into five packages.
+Each technical subsection above points to the corresponding paths; the table summarizes the map.
+
+{\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.28\textwidth}
+  >{\ttfamily}l
+  >{\raggedright\arraybackslash}p{0.42\textwidth}@{}}
+\toprule
+\textbf{Description} & \textbf{Package} & \textbf{Primary paths} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Description} & \textbf{Package} & \textbf{Primary paths} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+\cref{sec:setup} & \texttt{scaling/} & \texttt{setup/configuration.py}, \texttt{setup/constants.py} \\
+\cref{sec:datasets} & \texttt{scaling/} & \texttt{data/scaling\_dataset.py}, \texttt{data/corpora.py} \\
+\cref{sec:axioms} & \texttt{constraints/} & \texttt{axioms/admissibility.py} \\
+\cref{sec:stage-admiss,sec:certificates} & \texttt{constraints/} & \texttt{axioms/stage\_conditions.py}, \texttt{certificates/} \\
+\cref{sec:guarantee} & \texttt{constraints/} & \texttt{guarantee/invariants.py} \\
+\cref{sec:boosting}, Alg.~\ref{alg:boosting-bb} & \texttt{search/} & \texttt{baselines/}, \texttt{residuals/}, \texttt{expression/}, \texttt{boosting/}, \texttt{hard\_path/} \\
+\cref{sec:soft} & \texttt{search/} & \texttt{soft\_path/} \\
+\cref{sec:models} & \texttt{modeling/} & \texttt{models/} \\
+\cref{sec:testbeds} (Neocortex) & \texttt{modeling/} & \texttt{training/} \\
+\cref{sec:testbeds,sec:baselines} (AMA27/CPU) & \texttt{systems/} & \texttt{hpc/} \\
+\cref{sec:deliverables} & \texttt{systems/} & \texttt{pipeline/run\_discovery.py} \\
+\end{longtable}
+}
 
 \clearpage
 \renewcommand{\refname}{References}
