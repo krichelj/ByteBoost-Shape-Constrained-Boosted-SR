@@ -17,15 +17,15 @@ documents/
 ## Build commands
 
 ```bash
-make          # builds documents/description/byteboost_project_description.pdf (pdflatex → bibtex → pdflatex ×2)
-make clean    # removes aux files (.aux, .bbl, .blg, .log, .out); keeps PDFs
+bash scripts/compile.sh              # description + abstract PDFs
+bash scripts/compile.sh description  # project description only
+bash scripts/compile.sh abstract     # participant abstract only
+bash scripts/compile.sh clean        # remove aux files; keeps PDFs
 ```
 
-The abstract is NOT covered by the Makefile — build it directly (it has no citations, so no bibtex pass):
-
-```bash
-cd documents/abstract && pdflatex -interaction=nonstopmode byteboost_abstract
-```
+Or: `make` / `make description` / `make abstract` / `make clean` / `make check`
+(wrappers around the scripts). `make check` is the from-scratch quality gate
+(no errors or warnings) used by CI and the optional pre-push hook.
 
 Requires a standard TeX Live / MacTeX install. After editing a `.tex` file, rebuild and commit the updated PDF alongside the source, since the PDFs are tracked deliverables.
 

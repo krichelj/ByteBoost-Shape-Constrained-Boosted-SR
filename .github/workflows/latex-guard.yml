@@ -3,7 +3,7 @@ name: latex-guard
 # Rejects any change to main whose from-scratch compile of
 # documents/description/byteboost_project_description produces errors or
 # warnings. The check never looks at the committed PDF —
-# scripts/check-latex.sh rebuilds from source.
+# `make check` (scripts/check-latex.sh) rebuilds from source.
 
 on:
   push:
@@ -28,4 +28,4 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Recompile from scratch and reject on any error or warning
-        run: bash scripts/check-latex.sh
+        run: make check

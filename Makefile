@@ -1,15 +1,17 @@
-.PHONY: pdf clean
+.PHONY: pdf clean abstract all check description
 
-DOC_DIR = documents/description
-MAIN = byteboost_project_description
+pdf all:
+	bash scripts/compile.sh all
 
-pdf: $(DOC_DIR)/$(MAIN).pdf
+description:
+	bash scripts/compile.sh description
 
-$(DOC_DIR)/$(MAIN).pdf: $(DOC_DIR)/$(MAIN).tex $(DOC_DIR)/byteboost_refs.bib
-	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
-	cd $(DOC_DIR) && bibtex $(MAIN)
-	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
-	cd $(DOC_DIR) && pdflatex -interaction=nonstopmode $(MAIN)
+abstract:
+	bash scripts/compile.sh abstract
 
 clean:
-	cd $(DOC_DIR) && rm -f $(MAIN).aux $(MAIN).bbl $(MAIN).blg $(MAIN).log $(MAIN).out
+	bash scripts/compile.sh clean
+
+# From-scratch quality gate (errors + warnings). Used by CI and pre-push.
+check:
+	bash scripts/check-latex.sh

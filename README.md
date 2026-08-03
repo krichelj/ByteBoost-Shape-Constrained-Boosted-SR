@@ -6,30 +6,34 @@ Workshop project description for [ByteBoost 2026](https://www.stonybrook.edu/ook
 
 ## Documents
 
-| File | Description |
-|------|-------------|
-| [`documents/description/byteboost_project_description.pdf`](documents/description/byteboost_project_description.pdf) | Full project description (compiled) |
-| [`documents/description/byteboost_project_description.tex`](documents/description/byteboost_project_description.tex) | LaTeX source |
-| [`documents/description/byteboost_refs.bib`](documents/description/byteboost_refs.bib) | Bibliography |
-| [`documents/abstract/ABSTRACT.md`](documents/abstract/ABSTRACT.md) / [`documents/abstract/byteboost_abstract.tex`](documents/abstract/byteboost_abstract.tex) | Shared participant abstract (Dave Carlson's condensed version) |
+- [Abstract](documents/abstract/byteboost_abstract.pdf)
+- [Project description](documents/description/byteboost_project_description.pdf)
 
 ## Build
 
 ```bash
-cd documents/description
-pdflatex byteboost_project_description
-bibtex   byteboost_project_description
-pdflatex byteboost_project_description
-pdflatex byteboost_project_description
+bash scripts/compile.sh
+# or
+make
 ```
 
-Or from the repo root: `make`.
-
-Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the packages listed in the preamble).
+Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, and the packages listed in the preamble). Pass `description`, `abstract`, or `clean` to compile one document or remove aux files (`make` accepts the same targets).
 
 ## Build guard
 
-`main` is protected: a from-scratch recompile must produce **no errors and no warnings**, or the change is rejected. CI runs `scripts/check-latex.sh` on every push and PR; enable the same check locally with `git config core.hooksPath githooks`. See [`scripts/README.md`](scripts/README.md).
+`make` / `compile.sh` builds the PDFs; `make check` is a stricter quality gate. It copies only the `.tex`/`.bib` sources into a temp directory, rebuilds from scratch with `latexmk`, and rejects the change if the log has any LaTeX error, package/font/class warning, over/underfull box, or BibTeX warning. It never trusts the committed PDF.
+
+```bash
+make check
+```
+
+CI (`.github/workflows/latex-guard.yml`) runs `make check` on every push and PR to `main`; branch protection requires the `compile-check` status. Optionally run the same gate before every push:
+
+```bash
+git config core.hooksPath githooks
+```
+
+If TeX Live is missing locally, the pre-push hook skips and lets CI enforce.
 
 ## Related
 
