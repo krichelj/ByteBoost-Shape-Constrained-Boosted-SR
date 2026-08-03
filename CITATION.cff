@@ -5,8 +5,8 @@ type: software
 authors:
   - family-names: Kricheli
     given-names: Joshua Shay
-repository-code: https://github.com/krichelj/ByteBoost2026
-url: https://github.com/krichelj/ByteBoost2026
+repository-code: https://github.com/krichelj/ByteBoost-Shape-Constrained-Boosted-SR
+url: https://github.com/krichelj/ByteBoost-Shape-Constrained-Boosted-SR
 abstract: >-
   ByteBoost 2026 workshop project on discovering neural scaling laws via
   shape-constrained boosted symbolic regression, with interval-arithmetic
