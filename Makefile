@@ -1,13 +1,7 @@
-.PHONY: pdf clean abstract all check description
+.PHONY: pdf clean all check description
 
-pdf all:
-	bash scripts/compile.sh all
-
-description:
+pdf all description:
 	bash scripts/compile.sh description
-
-abstract:
-	bash scripts/compile.sh abstract
 
 clean:
 	bash scripts/compile.sh clean

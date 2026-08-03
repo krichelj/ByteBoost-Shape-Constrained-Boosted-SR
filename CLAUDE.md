@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ByteBoost 2026 workshop materials for **Shape-Constrained Boosted Symbolic Regression
 for Interpretable Neural Scaling Laws**:
 
-- LaTeX project description / abstract (committed PDFs are deliverables)
+- LaTeX project description (committed PDF is a deliverable)
 - Student implementation skeleton under ``src/`` (formal stubs; students fill in)
 
 There is no private reference implementation in this repository. Students work from
@@ -17,11 +17,10 @@ the project description and the ``src/`` stubs only.
 
 ```
 documents/
-  abstract/       # one-page participant abstract (.tex, .pdf, ABSTRACT.md)
-  description/    # full project description + bibliography
+  description/    # project description (.tex, .pdf) + bibliography
 src/              # student skeleton (see src/README.md)
 scripts/
-  compile.sh      # build PDFs
+  compile.sh      # build the description PDF
   check-latex.sh  # optional from-scratch warning-strict check
 Makefile          # wraps scripts/compile.sh (+ make check)
 ```
@@ -29,31 +28,18 @@ Makefile          # wraps scripts/compile.sh (+ make check)
 ## Build commands
 
 ```bash
-bash scripts/compile.sh              # description + abstract PDFs
-bash scripts/compile.sh description  # project description only
-bash scripts/compile.sh abstract     # participant abstract only
-bash scripts/compile.sh clean        # remove aux files; keeps PDFs
+bash scripts/compile.sh          # project description PDF
+bash scripts/compile.sh clean    # remove aux files; keeps PDF
 ```
 
-Or: `make` / `make description` / `make abstract` / `make clean` / `make check`
-(wrappers around the scripts). `make check` is an optional from-scratch quality
-gate (no errors or warnings).
+Or: `make` / `make clean` / `make check` (wrappers around the scripts).
+`make check` is an optional from-scratch quality gate (no errors or warnings).
 
-Requires a standard TeX Live / MacTeX install. After editing a `.tex` file, rebuild and commit the updated PDF alongside the source, since the PDFs are tracked deliverables.
+Requires a standard TeX Live / MacTeX install. After editing the `.tex` file, rebuild and commit the updated PDF alongside the source, since the PDF is a tracked deliverable.
 
-## Document structure and sync invariants
+## Document
 
-Two documents, one bibliography:
-
-- `documents/description/byteboost_project_description.tex` — the full project description (fields of science, testbed requirements, technical method with theorems/algorithms, deliverables). Uses natbib + cleveref; cites `byteboost_refs.bib` (same directory).
-- `documents/abstract/byteboost_abstract.tex` — standalone one-page participant abstract (Dave Carlson's condensed version circulated to ByteBoost 2.0 participants).
-
-**The abstract prose exists in three places that must stay in sync:**
-1. `documents/abstract/ABSTRACT.md` (Markdown version, with the metadata table)
-2. `documents/abstract/byteboost_abstract.tex`
-3. The `\section{Abstract / summary}` of `documents/description/byteboost_project_description.tex` — identical prose, except it adds `\cref{...}` cross-references to later sections
-
-If you edit the abstract wording anywhere, propagate the change to all three (keeping the `\cref` additions only in the project description).
+- `documents/description/byteboost_project_description.tex` — full project description (fields of science, abstract/summary, testbed requirements, technical method with theorems/algorithms, deliverables). Uses natbib + cleveref; cites `byteboost_refs.bib` in the same directory.
 
 ## Student skeleton
 

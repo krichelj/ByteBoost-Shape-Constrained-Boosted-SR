@@ -17,10 +17,10 @@ Run Python from the repository root so imports like `from src.setup…` resolve.
 ## Repository layout
 
 ```
-documents/   # LaTeX sources + committed PDFs
-src/         # student implementation skeleton
-scripts/     # compile.sh, optional check-latex.sh
-Makefile     # make / make description / make abstract / make clean / make check
+documents/description/   # LaTeX source, bibliography, committed PDF
+src/                     # student implementation skeleton
+scripts/                 # compile.sh, optional check-latex.sh
+Makefile                 # make / make clean / make check
 ```
 
 ## Build (LaTeX)
@@ -31,7 +31,7 @@ bash scripts/compile.sh
 make
 ```
 
-Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Pass `description`, `abstract`, or `clean` to compile one document or remove aux files (`make` accepts the same targets). Optionally run `make check` for a from-scratch rebuild that also fails on LaTeX/BibTeX warnings.
+Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make clean` to remove aux files. Optionally run `make check` for a from-scratch rebuild that also fails on LaTeX/BibTeX warnings.
 
 ## Related
 
