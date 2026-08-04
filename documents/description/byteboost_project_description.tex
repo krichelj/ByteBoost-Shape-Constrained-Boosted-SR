@@ -169,12 +169,16 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     $\dfrac{\partial^2 \Lhat}{\partial x^2} \geq 0$ for all $x \geq x_{\min}$.
     (Together with~(A1), this is the usual diminishing-returns shape: further
     increases in~$x$ yield weakly smaller loss reductions.
-    The direction is worth stating, because diminishing returns is classically
-    drawn as a \emph{concave} curve: that picture is of a gain, whereas~$\Lhat$
-    is a loss, and a gain such as $\Lhat(x_{\min},\cdot)-\Lhat$ is concave
-    exactly when~$\Lhat$ is convex. Everything below certifies the convex form,
-    which is why the score of \cref{sec:soft} is called
-    $v_{\mathrm{conv}}$.)
+    The direction is worth stating, because the textbook form of diminishing
+    returns is \emph{concavity}. That convention is for an increasing
+    production or utility function, whose marginal gain falls; here~$\Lhat$ is
+    a decreasing \emph{loss}, so the same shape carries the opposite sign. The
+    two statements agree, since a gain such as $\Lhat(x_{\min},\cdot)-\Lhat$ is
+    concave exactly when~$\Lhat$ is convex. Everything below certifies the
+    convex form, which is why the score of \cref{sec:soft} is called
+    $v_{\mathrm{conv}}$, and~(A2) is what
+    \cref{prop:chinchilla-admiss} verifies for the stage-0 law via
+    $\partial^2\Lhat_0/\partial N^2=\alpha(\alpha+1)A N^{-\alpha-2}>0$.)
     \item \textbf{Irreducible loss}~\citep{hestness2017scaling,hoffmann2022chinchilla}.
     There is a positive \emph{joint floor} $L_\infty$ and, along each axis, a
     \emph{marginal floor} $L^{\infty}_{x}$:
