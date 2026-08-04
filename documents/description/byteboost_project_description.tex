@@ -168,7 +168,13 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     \item \textbf{Diminishing returns}~\citep{hestness2017scaling,kaplan2020scaling}.
     $\dfrac{\partial^2 \Lhat}{\partial x^2} \geq 0$ for all $x \geq x_{\min}$.
     (Together with~(A1), this is the usual diminishing-returns shape: further
-    increases in~$x$ yield weakly smaller loss reductions.)
+    increases in~$x$ yield weakly smaller loss reductions.
+    The direction is worth stating, because diminishing returns is classically
+    drawn as a \emph{concave} curve: that picture is of a gain, whereas~$\Lhat$
+    is a loss, and a gain such as $\Lhat(x_{\min},\cdot)-\Lhat$ is concave
+    exactly when~$\Lhat$ is convex. Everything below certifies the convex form,
+    which is why the score of \cref{sec:soft} is called
+    $v_{\mathrm{conv}}$.)
     \item \textbf{Irreducible loss}~\citep{hestness2017scaling,hoffmann2022chinchilla}.
     There is a positive \emph{joint floor} $L_\infty$ and, along each axis, a
     \emph{marginal floor} $L^{\infty}_{x}$:

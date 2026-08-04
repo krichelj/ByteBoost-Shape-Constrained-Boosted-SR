@@ -31,9 +31,15 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
     ``∂L̂/∂x ≤ 0`` for all ``x ≥ x_min`` (each scale ``x ∈ {N, D}``).
 
 (A2) **Diminishing returns.**
-    ``∂²L̂/∂x² ≥ 0`` for all ``x ≥ x_min``.
+    ``∂²L̂/∂x² ≥ 0`` for all ``x ≥ x_min``, i.e. ``L̂`` is **convex** in ``x``.
     Together with (A1): further increases in ``x`` yield weakly smaller loss
     reductions.
+    Mind the direction. Diminishing returns is classically drawn *concave*, but
+    that picture is of a gain; ``L̂`` is a loss, and a gain like
+    ``L̂(x_min, ·) − L̂`` is concave exactly when ``L̂`` is convex. The certified
+    quantity is the convex one throughout: (A2), stage condition (ii)
+    (``∂²F/∂x² ≥ 0``), the interval test ``∂²F/∂x²̲ ≥ 0``, and
+    ``v_conv = max(0, −∂²F/∂x²̲)`` all carry the same sign.
 
 (A3) **Irreducible loss.**
     Joint floor ``L_∞ > 0`` with ``L̂(h) > L_∞`` for every ``h ∈ ℍ̃``;
