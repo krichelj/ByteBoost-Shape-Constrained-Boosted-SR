@@ -3,7 +3,7 @@ Expression-tree abstraction for a candidate correction ``g`` (``sec:boosting``).
 
 The project description treats ``g`` as a finite expression tree over
 ``{+, −, ×, ÷} ∪ {pow_p}`` (and optional unary ablations). Those primitives are
-``C^∞`` on ``(0, ∞)``, which discharges graceful saturation (A6) on
+``C^∞`` on ``(0, ∞)``, which discharges graceful saturation (A5) on
 certification boxes once ``F̄ < ∞``. Concrete encodings (gplearn prefix lists,
 sympy, PySR expressions, …) are left to students; this protocol captures the
 operations DualInterval certificates on ``I_x ⊂ ℍ̃`` and soft scores need.

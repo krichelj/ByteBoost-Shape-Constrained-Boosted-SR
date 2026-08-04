@@ -9,7 +9,7 @@ for a finite set ``P ⊂ R ∖ {0}``, where ``pow_p(z) = |z|^p`` for ``z > 0``,
 and with bounded depth. Soft ablations may also expose unary ``inv`` / ``log`` /
 ``sqrt``.
 
-These primitives are ``C^∞`` on ``(0, ∞)`` (hence ``C²`` for A6). Trees are
+These primitives are ``C^∞`` on ``(0, ∞)`` (hence ``C²`` for A5). Trees are
 evaluated on log-features ``log φ_h(h)``; DualInterval certificates on
 ``I_x ⊂ ℍ̃`` map derivatives back to raw ``N``/``D`` via the chain rule
 (``ia_eval``).

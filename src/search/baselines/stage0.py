@@ -4,17 +4,17 @@ eq. chinchilla-bb).
 
 Stage 0 fits by nonlinear least squares (positive parameter constraints) an
 admissible baseline on the labeled grid ``ℍ``. The closed-form law extends to
-the continuum domain ``ℍ̃`` and lies in ``S`` (A1)–(A6). The canonical power-law
+the continuum domain ``ℍ̃`` and lies in ``S`` (A1)–(A5). The canonical power-law
 form is
 
     L̂^{(0)} = L̂_0
             = A / N^α + B / D^β + Σ_{i=1}^m C_i / φ_i(h_i)^{γ_i} + E,
 
     with all coefficients/exponents positive. By construction:
-* joint floor ``L_∞ = E`` (joint limit as all scales → ∞);
+* joint floor ``L_∞ = E`` (joint limit as all scales → ∞), which already
+  forces ``L̂_0 > 0`` on ``ℍ̃``;
 * stage-0 asymptotic exponents ``c_N^{(0)} = −α``, ``c_D^{(0)} = −β``;
-* positivity (A5) follows from ``L̂_0 > E > 0`` on ``ℍ̃``;
-* graceful saturation (A6): power maps are ``C^∞`` (hence ``C²``) on
+* graceful saturation (A5): power maps are ``C^∞`` (hence ``C²``) on
   ``[x_min, ∞)``.
 
 Concrete grids: 2D ``(N, D)`` and 4D ``(N, D, WD, lr)``. For 4D, hyperparameter

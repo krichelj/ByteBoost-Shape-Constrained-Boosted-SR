@@ -4,17 +4,16 @@ Soft-search per-axiom violation scores (``sec:soft``, eq. violations-bb).
 Using IA enclosures of ``F = L̂^{(j−1)} + g`` on compact slices ``I_x ⊂ ℍ̃``
 and structural quantities for the ``x → ∞`` tail:
 
-    v_mono(g)  = max_{x∈{N,D}} max(0,  ∂F/∂x̄)     # (A1)
-    v_conv(g)  = max_{x∈{N,D}} max(0, −∂²F/∂x²̲)    # (A2)
-    v_irred(g) = max(0, L_∞ − F̲)   # (A3) floor; also (A5) when L_∞ > 0
+    v_mono(g)  = max_{x∈{N,D}} max(0,  ∂F/∂x̄)     # (A1) / stage (i)
+    v_conv(g)  = max_{x∈{N,D}} max(0, −∂²F/∂x²̲)    # (A2) / stage (ii)
+    v_irred(g) = max_{x∈{N,D}} max(0, L_∞ − F̲)  # (A3) / stage (iv); ⇒ (iii) if L_∞ > 0
     v_decay(g) = max_{x∈{N,D}} max(0, ord(g,x) − c_x^{(0)} + ε_decay)  # (A4)/(v)
-    v_leaf(g)  = |{x ∈ {N,D} : x ∉ leaves(g)}|
+    v_leaf(g)  = |{x ∈ {N,D} : x ∉ leaves(g)}|  # prerequisite for ord
 
 Every score is nonnegative. Aggregate ``V(g) = Σ_a v_a(g)``.
 Soft fitness uses ``Σ_a λ_a v_a(g)²`` (typically with positive ``λ``); ``λ = 0``
 is the unconstrained ablation. Soft scores act as IA proxies for A1–A4;
-positivity (A5) is folded into the irreducible-floor gap (implied by A3 when
-``L_∞ > 0``) and A6 into DualInterval finiteness / the ``C²`` (in practice
+A5 is discharged by DualInterval finiteness / the ``C²`` (in practice
 ``C^∞``) operator set — not a separate ``v_a``. ``V = 0`` with finite
 enclosures implies certificates (a)–(b) and the boosting guarantee
 (match ``AXIOM_INDICES`` / your λ schedule).

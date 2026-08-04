@@ -6,7 +6,7 @@ Primary certificates use pure-Python ``DualInterval``
 ``ℍ̃``. This module is an optional acceleration / alternate AD+IA backend
 behind the same ``IntervalArithmeticCertificate`` interface — not required for
 the soft search. Must still return sound enclosures for eq. interval-bb
-(including second derivatives for (A2) and floor tests for (A3)/(A5)).
+(including second derivatives for (A2) and floor tests for (A3)).
 """
 
 from __future__ import annotations

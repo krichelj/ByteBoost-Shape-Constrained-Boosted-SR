@@ -1,5 +1,5 @@
 """
-Admissibility axioms (A1)–(A6) (project description ``sec:axioms``).
+Admissibility axioms (A1)–(A5) (project description ``sec:axioms``).
 
 Although the labeled grid ``ℍ`` is finite, ``L̂`` is constrained on the continuum
 domain ``ℍ̃`` of ``sec:setup``: each scale ranges over ``[x_min, ∞)``, other
@@ -22,6 +22,8 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
     ``L^∞_x ≥ L_∞``.  (``L^∞_x`` depends on the frozen coordinates.)
     In the stage-0 Chinchilla law, ``L_∞ = E`` is the joint limit as all scales
     → ∞; a single-axis marginal is typically strictly larger.
+    Joint-floor positivity ``L_∞ > 0`` already forces ``L̂ > 0`` on ``ℍ̃``, so a
+    separate positivity axiom is unnecessary.
 
 (A4) **Asymptotic power-law decay** (eq. powerlaw-bb).
     Relative to the marginal floor,
@@ -29,11 +31,7 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
     The excess is eventually positive (log defined) when the marginal floor is
     approached from above under (A1).
 
-(A5) **Positivity.** ``L̂(h) > 0`` for every ``h ∈ ℍ̃``.
-    Implied by (A3) when ``L_∞ > 0``; retained as an explicit prior.
-    Soft search (``sec:soft``) folds (A5) into ``v_irred``.
-
-(A6) **Graceful saturation.** ``L̂`` is ``C²`` in ``x`` on ``[x_min, ∞)``
+(A5) **Graceful saturation.** ``L̂`` is ``C²`` in ``x`` on ``[x_min, ∞)``
     (so the second derivative in (A2) exists), and ``L̂(x_min, ·)`` is finite.
     Expression-tree corrections are ``C^∞`` on ``(0, ∞)``.
     ``L̂(x_min, ·) > L_∞`` is already required by (A3)(i).
@@ -44,9 +42,9 @@ for the ``x → ∞`` tail.
 
 Soft-search scores (``sec:soft``, eq. violations-bb) cover A1–A4 via
 ``mono / conv / irred / decay``, plus ``leaf`` for scale presence in the tree;
-A5 is folded into the irreducible-floor gap and A6 into DualInterval
-finiteness / the ``C²`` (in practice ``C^∞``) operator set (``V = 0`` with
-finite enclosures implies certificates (a)–(b) and the boosting guarantee).
+A5 is discharged by DualInterval finiteness / the ``C²`` (in practice ``C^∞``)
+operator set (``V = 0`` with finite enclosures implies certificates (a)–(b)
+and the boosting guarantee).
 """
 
 from __future__ import annotations
@@ -89,4 +87,4 @@ class AdmissibleLaw(ABC):
 
     @abstractmethod
     def check_axioms(self, *args: Any, **kwargs: Any) -> AxiomReport:
-        """Attempt to certify (A1)–(A6); details of evidence are student-defined."""
+        """Attempt to certify (A1)–(A5); details of evidence are student-defined."""
