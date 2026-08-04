@@ -56,7 +56,11 @@ Dependency order for the soft-only discovery stack. Modeling / systems tracks
 are independent of this list.
 
 1. `scaling/` — discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
-2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2)
+2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2).
+   Make division and `pow_p` return a **non-finite** enclosure when the operand
+   straddles 0: the whole A5 discharge rests on "finite enclosure ⇒ nothing
+   vanished". gplearn's stock protected division (returns 1.0 near zero) is
+   discontinuous and will silently break that argument.
 3. `constraints/axioms/admissibility.py` — A1–A5 on \(\widetilde{\mathbb{H}}\)
 4. `search/baselines/` — NLS admissible \(\widehat L_0\)
 5. `search/residuals/` — Huber stage targets

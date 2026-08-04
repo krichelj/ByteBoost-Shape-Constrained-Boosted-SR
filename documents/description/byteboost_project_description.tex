@@ -128,7 +128,7 @@ Symbols used below are collected in \cref{sec:notation}; the student skeleton la
 \codeRef{\pyFile{src/scaling/setup/configuration.py}, \pyFile{src/scaling/setup/constants.py}}
 Let $N$ be the parameter count, $D$ the training-token count, and
 $\calH = \{h_1, \ldots, h_m\}$ a finite set of remaining hyperparameters
-(in the concrete 4D grids used here, typically width-multiplier / weight-decay style axes and learning rate); see also \cref{sec:notation}.
+(in the concrete 4D grid used here, weight decay and learning rate); see also \cref{sec:notation}.
 For each coordinate $h \in \{N, D\} \cup \calH$, let $H_h$ be its finite set of
 admissible values and $\phi_h \colon H_h \to \bbR_{>0}$ a strictly monotone
 preprocessing map; write $\phi_i \coloneqq \phi_{h_i}$ for brevity.
@@ -319,17 +319,27 @@ The next claim reduces that check to conditions on the increment alone.
    \text{ for some } c_{x,j} < c_x^{(0)},
 \\[2pt]
 \text{(vi) } \Lhat_j \in C^\infty
-   \text{ on } [x_{\min}, x_{\max}]
+   \text{ on } [x_{\min}, \infty)
    \text{ with }
    \bigl|\Lhat_j(x_{\min}, \cdot)\bigr| < \infty.
 \end{gathered}
 \end{equation}
 When $L_\infty > 0$,~(iv) already implies~(iii); both are retained so positivity of the
 ensemble and preservation of the joint floor remain explicit.
-\begin{proposition}[Stagewise equivalence]\label{prop:stage-iff}
-Given $\Lhat^{(j-1)} \in \calS$ with joint floor $L_\infty$, the update
+Note that~(vi) is required on the whole half-line, not merely on the certification box: the~(A5) half of \cref{prop:stage-iff} needs $\Lhat^{(j-1)}+\Lhat_j$ to stay $C^2$ wherever~(A1)--(A2) are asserted.
+For a finite expression tree this amounts to no division denominator and no $\mathrm{pow}_p$ argument vanishing on $[x_{\min},\infty)$; interval arithmetic discharges it on~$\calI_x$ and the remainder is a structural side condition, as discussed in~(a) below.
+\begin{proposition}[Stagewise conditions]\label{prop:stage-iff}
+Let $\Lhat^{(j-1)} \in \calS$ have joint floor $L_\infty$ and stage-0 rates $c_x^{(0)}$.
+If $\Lhat_j$ satisfies~\eqref{eq:stage-admiss-bb}(i)--(vi) for each $x \in \{N,D\}$, then
 $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$ lies in~$\calS$ with the same joint floor
-if and only if $\Lhat_j$ satisfies~\eqref{eq:stage-admiss-bb}(i)--(vi) for each $x \in \{N,D\}$.
+and the same asymptotic rates.
+Conversely, any update with those three properties satisfies~(i)--(iv) and~(vi)
+together with the tail bound
+$\Lhat_j(\mathbf{h})|_{x=t} = o\bigl(t^{c_x^{(0)}}\bigr)$.
+The gap between that bound and~(v) is deliberate:~(v) is the strictly stronger
+form---it excludes borderline tails such as $t^{c_x^{(0)}}/\log t$---and we adopt
+it because it is what the structural test of~(b) decides exactly on a finite
+tree, while only the sufficient direction is needed by \cref{thm:guarantee}.
 \end{proposition}
 (See \cref{sec:stage-iff-proof} for the proof.)
 Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\widetilde{\bbH}$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
@@ -342,7 +352,8 @@ Forward-mode automatic differentiation composed with interval arithmetic~\citep{
 $\underline{f} \leq f \leq \overline{f}$ on~$\calI_x$ for $f \in \{F,\, \partial F/\partial x,\, \partial^2 F/\partial x^2\}$, in time linear in the tree size.
 (The second-derivative enclosure is what makes~(A2) / stage~(ii) checkable;~(A5) asks only for~$C^2$, while the operator set of \cref{sec:boosting} in fact yields~$C^\infty$ on $(0,\infty)$.)
 When~$g$ is represented on log-features, DualInterval evaluation is performed in log-coordinates and first/second derivatives are mapped to the raw axis~$x$ by the chain rule before applying~\eqref{eq:interval-bb}.
-Those enclosures are exactly the inputs to the soft violation scores of \cref{sec:soft}: writing $v_{\mathrm{mono}}=\max(0,\overline{\partial F/\partial x})$ and likewise for the other gaps, the sufficient inequalities
+Those enclosures are exactly the inputs to the soft violation scores of \cref{sec:soft}: the per-axis monotonicity gap is $\max(0,\overline{\partial F/\partial x})$ and likewise for the other gaps, with $v_{\mathrm{mono}}$ and its companions in~\eqref{eq:violations-bb} taking $\max_{x\in\{N,D\}}$ of those per-axis quantities.
+The sufficient inequalities
 \begin{equation}\label{eq:interval-bb}
     \overline{\partial F / \partial x} \leq 0,
     \quad
@@ -356,15 +367,22 @@ hold for each $x \in \{N,D\}$ precisely when the corresponding soft gaps vanish 
 Because the enclosures are sound, vanishing gaps are a \emph{sufficient} certificate that the continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points of~$\bbH$ (\cref{lem:ia-sound,sec:cert-lemmas}):
 $\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ on~$\calI_x$ (hence~(i) on the box), and likewise for~(ii);
 $\underline{F} > L_\infty > 0$ forces~(iv) on the continuum configurations covered by the product of boxes, and hence also~(iii) (ensemble positivity);
-$\overline{F} < \infty$ forces the finiteness half of~(vi), while~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$ follows from the operator set and discharges~(A5) on the box.
+$\overline{F} < \infty$ forces the finiteness half of~(vi), and---because a finite enclosure also certifies that no denominator or $\mathrm{pow}_p$ argument vanished---yields~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$, discharging~(A5) on the box.
 The implication is one-sided: inflated enclosures can produce positive soft scores for a truly admissible update, but every~$g$ with vanishing gaps on~\eqref{eq:interval-bb} is guaranteed to preserve admissibility on~$\calI_x$.
 Evaluating DualInterval enclosures (and the soft scores built from them) on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
 
 \smallskip\noindent
+\emph{Where the smoothness in~(A5) actually comes from.}
+The primitives are smooth only away from the zeros of their arguments: $z_1/z_2$ is $C^\infty$ where $z_2 \neq 0$, and $\mathrm{pow}_p(z)=|z|^p$ is $C^\infty$ where $z \neq 0$ (at the origin it is unbounded for $p<0$ and, for the fractional $p$ that dominate a useful~$\calP$, not even $C^2$).
+A finite tree~$g$ is therefore $C^\infty$ precisely on the set where every division denominator and every $\mathrm{pow}_p$ argument is nonzero; the shorthand ``the operator set is $C^\infty$ on $(0,\infty)$'' used below abbreviates that condition and is \emph{not} a consequence of the tree merely being finite.
+On the box the condition is discharged for free \emph{provided the DualInterval layer is implemented to fail loudly}: an operand interval straddling~$0$ beneath~$\div$ or $\mathrm{pow}_p$ must yield a non-finite enclosure, so a completed evaluation with $\overline{F}<\infty$ certifies that no such subtree vanished anywhere on~$\calI_x$, and with it~(A5) and the finiteness half of~(vi).
+Beyond~$x_{\max}$ there is no enclosure to lean on, so the tail half of~(A5) carries the side condition that no denominator or $\mathrm{pow}_p$ argument vanishes on $(x_{\max},\infty)$ either; an implementation discharges it by restricting divisors to subtrees of certified sign, or by widening~$\calI_x$ past the range over which extrapolations are actually reported.
+
+\smallskip\noindent
 \emph{(b) Exact structural checks} (condition~(v), and prerequisites for it).
 Define the asymptotic exponent $\mathrm{ord}(g,x)$ recursively on the tree: constants and leaves other than~$x$ contribute~$0$; $\mathrm{pow}_p(x)$ contributes~$p$; products add exponents; quotients subtract; sums take the maximum.
-Then~(v) holds with $c_{x,j} = \mathrm{ord}(g,x)$ precisely when $\mathrm{ord}(g,x) < c_x^{(0)}$ for each $x \in \{N,D\}$ (\cref{lem:ord,sec:cert-lemmas}).
-We additionally require that each scale variable $x \in \{N,D\}$ appears as a leaf of~$g$ (otherwise the exponent in~$x$ is undefined or vacuously~$0$).
+Then~(v) holds with $c_{x,j} = \mathrm{ord}(g,x)$ whenever $\mathrm{ord}(g,x) < c_x^{(0)}$ for each $x \in \{N,D\}$ (\cref{lem:ord,sec:cert-lemmas}); when two sibling subtrees share the leading exponent their leading coefficients may cancel, in which case $\mathrm{ord}$ is a sound over-estimate of the true order and the test stays sufficient.
+We additionally require that each scale variable $x \in \{N,D\}$ appears as a leaf of~$g$; this is a prerequisite for the exponent rather than a constraint in its own right, since otherwise $\mathrm{ord}(g,x)$ is vacuously~$0$ and~(v) could be passed by a correction that ignores that axis.
 Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\widetilde{\bbH}$.
 
 \subsection{Shape-constrained search}\label{sec:soft}
@@ -422,7 +440,7 @@ Our $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ are that 
 Where we depart from \citet{kronberger2022shape} is the \emph{handling} of a violation: they enforce constraints as a hard feasibility filter, discarding infeasible candidates during selection or segregating them into a second population, whereas~\eqref{eq:penalized-bb} adds $\sum_a \lambda_a v_a(g)^2$ to the fitness and lets violations shrink continuously.
 That soft, penalty-based treatment follows \citet{martinek2024penalized}, who minimize shape-constraint violations inside the objective rather than applying them only as a post-hoc selection filter, and who report the clearest gains in the data-scarce regime---which is the regime a scaling grid of expensive pretraining runs puts us in.
 The one-sidedness recorded after~\eqref{eq:interval-bb}---inflated enclosures may penalize a candidate that is in fact admissible, but never certify one that is not---is the \emph{pessimistic} constraint evaluation compared against optimistic sampling-based evaluation by \citet{haider2022optimistic}; we take the pessimistic side deliberately, because \cref{thm:guarantee} needs soundness rather than tightness.
-The remaining two scores have no counterpart in that literature: $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ encode the asymptotic-rate axiom~(A4), which is specific to scaling laws, and they do so through the structural exponent $\mathrm{ord}(g,x)$ of \cref{sec:stage-admiss}(b) on the half-line $x > x_{\max}$ rather than through an interval bound on a compact box.
+The remaining two scores have no counterpart in that literature: $v_{\mathrm{decay}}$ encodes the asymptotic-rate axiom~(A4), which is specific to scaling laws, through the structural exponent $\mathrm{ord}(g,x)$ of \cref{sec:stage-admiss}(b) on the half-line $x > x_{\max}$ rather than through an interval bound on a compact box, and $v_{\mathrm{leaf}}$ is the prerequisite that makes that exponent meaningful.
 \begin{proposition}[Zero-penalty implies certificates]\label{prop:soft}
 If $V(g)=0$ at every stage \emph{and} DualInterval evaluation returns finite upper
 enclosures~$\overline{F}<\infty$ on each~$\calI_x$ (the finiteness half of~\eqref{eq:interval-bb},
@@ -597,7 +615,9 @@ c_{x,j},\; \mathrm{ord}(g,x)
     (global over that box for fixed~$x$; soft scores take
     $\max_{x\in\{N,D\}}$ of the per-axis gaps).
     $\underline{F}>L_\infty$ certifies~(A3) on the box (hence ensemble positivity);
-    $\overline{F}<\infty$ with the smooth operator set certifies~(A5). \\
+    $\overline{F}<\infty$ certifies~(A5) on the box, since a completed finite
+    evaluation also rules out a vanishing denominator or $\mathrm{pow}_p$
+    argument (\cref{sec:stage-admiss}(a)). \\
 a,\; v_a(g),\; V(g)
   & Soft-search axiom index $a\in\{\mathrm{mono},\mathrm{conv},\mathrm{irred},
     \mathrm{decay},\mathrm{leaf}\}$; per-axiom violation score;
@@ -655,10 +675,10 @@ The table follows the soft-only method order of \cref{sec:method}: DualInterval 
 
 
 \section{Proofs}\label{sec:proofs}
-Proofs follow the dependency order of \cref{sec:method}: stagewise equivalence, then the certificate lemmas, then zero-penalty implies certificates, then the boosting guarantee.
+Proofs follow the dependency order of \cref{sec:method}: the stagewise conditions, then the certificate lemmas, then zero-penalty implies certificates, then the boosting guarantee.
 Stage-0 admissibility (\cref{prop:chinchilla-admiss}) is independent of the boosting loop and is proved last.
 
-\subsection{Stagewise equivalence}\label{sec:stage-iff-proof}
+\subsection{Stagewise conditions}\label{sec:stage-iff-proof}
 \begin{proof}[Proof of \cref{prop:stage-iff}]
 Write $G\coloneqq\Lhat^{(j-1)}$ and $g\coloneqq\Lhat_j$, so $\Lhat^{(j)}=G+g$.
 Throughout, derivatives along $x\in\{N,D\}$ hold the other coordinates fixed.
@@ -674,13 +694,16 @@ The joint-floor inequality $G+g>L_\infty$ on $\widetilde{\bbH}$ is exactly~(iv).
 When $L_\infty>0$,~(iv) also yields ensemble positivity~$G+g>0$, which is~(iii).)
 
 \paragraph{(A5).}
-If $G$ is $C^2$ on $[x_{\min},\infty)$ and $g$ is $C^\infty$ on $[x_{\min},x_{\max}]$ with finite boundary values~(vi), then $G+g$ is $C^2$ on the certification box.
-On the half-line beyond $x_{\max}$, the same $C^2$ regularity follows once~$g$ is realized by a finite expression tree from $\{+,-,\times,\div\}\cup\{\mathrm{pow}_p\}$ (each primitive is $C^\infty$ on $(0,\infty)$), which is the setting of \cref{sec:boosting}.
+If $G$ is $C^2$ on $[x_{\min},\infty)$ and $g$ is $C^\infty$ on $[x_{\min},\infty)$ with finite boundary values~(vi), then $G+g$ is $C^2$ on $[x_{\min},\infty)$, which is~(A5).
+The two halves of that hypothesis on~$g$ are certified separately: on the box $\calI_x=[x_{\min},x_{\max}]$ by the interval layer, and beyond it structurally.
+On the half-line beyond $x_{\max}$, the same $C^2$ regularity follows once~$g$ is realized by a finite expression tree from $\{+,-,\times,\div\}\cup\{\mathrm{pow}_p\}$ \emph{and} no division denominator or $\mathrm{pow}_p$ argument vanishes there, since each primitive is $C^\infty$ away from the zeros of its arguments (\cref{sec:stage-admiss}(a), ``where the smoothness in~(A5) actually comes from''); that nonvanishing side condition is what the tail half of~(vi) asks for, and it is the setting of \cref{sec:boosting}.
 Finiteness of $(G+g)(x_{\min},\cdot)$ is the restriction of~(vi) together with~$G\in\calS$; the bound $(G+g)(x_{\min},\cdot)>L_\infty$ is the restriction of~(iv).
 
 \paragraph{(A3) marginal floors and~(A4).}
-Because $G\in\calS$, the marginal floor $L^{\infty}_{x}(G)$ exists and the excess $G|_{x=t}-L^{\infty}_{x}(G)$ is asymptotic to a constant times $t^{c_x^{(0)}}$ with $c_x^{(0)}<0$.
-Condition~(v) gives $g|_{x=t}=O(t^{c_{x,j}})$ with $c_{x,j}<c_x^{(0)}$, so $g|_{x=t}=o\bigl(t^{c_x^{(0)}}\bigr)$.
+Because $G\in\calS$, the marginal floor $L^{\infty}_{x}(G)$ exists and, by~(A4), the excess satisfies
+$G|_{x=t}-L^{\infty}_{x}(G) = t^{\,c_x^{(0)}+o(1)}$ with $c_x^{(0)}<0$.
+(We use only this log-rate form, not the stronger ``constant times $t^{c_x^{(0)}}$'', which~(A4) does not assert.)
+Condition~(v) gives $g|_{x=t}=O(t^{c_{x,j}})$ with $c_{x,j}<c_x^{(0)}$; since $t^{c_{x,j}}/t^{\,c_x^{(0)}+o(1)} = t^{\,c_{x,j}-c_x^{(0)}+o(1)} \to 0$, the correction is negligible against the excess, and in particular $g|_{x=t}=o\bigl(t^{c_x^{(0)}}\bigr)$.
 Therefore
 \[
   \lim_{t\to\infty}(G+g)\big|_{x=t}
@@ -693,9 +716,13 @@ the marginal floor is unchanged, and
   \frac{\log\bigl((G+g)|_{x=t}-L^{\infty}_{x}(G)\bigr)}{\log t}
   \;=\; c_x^{(0)}.
 \]
-Conversely, if $G+g\in\calS$ with the same joint floor and the same asymptotic rate~$c_x^{(0)}$, the difference $g=(G+g)-G$ must be $o(t^{c_x^{(0)}})$ along each axis (else the leading excess exponent of $G+g$ would differ from that of~$G$), which is~(v); the remaining items~(i)--(iv) and~(vi) are the rearrangements already used above.
-
-Thus $G+g\in\calS$ with joint floor $L_\infty$ if and only if~\eqref{eq:stage-admiss-bb} holds.
+\paragraph{Converse.}
+Suppose $G+g\in\calS$ with the same joint floor and the same asymptotic rate~$c_x^{(0)}$.
+Items~(i)--(iv) and~(vi) are the rearrangements already used above, read in the opposite direction.
+For the tail, the difference $g=(G+g)-G$ must be $o(t^{c_x^{(0)}})$ along each axis, since otherwise the leading excess exponent of $G+g$ would differ from that of~$G$.
+This is weaker than~(v): $o(t^{c_x^{(0)}})$ does not supply any single exponent $c_{x,j}<c_x^{(0)}$ with $g=O(t^{c_{x,j}})$, as $g=t^{c_x^{(0)}}/\log t$ shows.
+So~(i)--(vi) are sufficient, and necessary only with~(v) relaxed to the $o(\cdot)$ bound.
+We work with~(v) rather than the exact necessary condition because~(v) is what $\mathrm{ord}$ decides exactly on a finite tree (\cref{lem:ord}), and because only the sufficient direction is used in \cref{thm:guarantee}.
 \end{proof}
 
 \subsection{Interval and structural certificates}\label{sec:cert-lemmas}
@@ -708,7 +735,7 @@ $\partial F/\partial x\leq 0$, $\partial^2 F/\partial x^2\geq 0$, and $F>L_\inft
 and $\lvert F\rvert<\infty$.
 In particular, writing $F=G+g$ with $G=\Lhat^{(j-1)}$, conditions~(i)--(iv) and the finiteness half of~(vi) hold on the continuum configurations covered by the product of boxes~$\calI_x$ (a compact slice of~$\widetilde{\bbH}$).
 When $L_\infty>0$, the floor test also yields~(iii).
-Smoothness~(A5) on the box follows from the $C^\infty$ operator set once finiteness holds.
+Smoothness~(A5) on the box follows once finiteness holds, because a completed finite evaluation certifies that no division denominator or $\mathrm{pow}_p$ argument vanished on~$\calI_x$, and the operator set is $C^\infty$ there (\cref{sec:stage-admiss}(a)).
 \end{lemma}
 
 \begin{proof}
@@ -723,7 +750,8 @@ The argument is one-sided: failure of~\eqref{eq:interval-bb} does not refute~\eq
 \begin{lemma}[Structural exponent]\label{lem:ord}
 Let $g$ be a finite expression tree over $\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$ in which the scale leaf~$x$ appears.
 Define $\mathrm{ord}(g,x)$ recursively as in \cref{sec:stage-admiss}(b).
-Then $g(\mathbf{h})|_{x=t}=\Theta\bigl(t^{\mathrm{ord}(g,x)}\bigr)$ as $t\to\infty$ (leading homogeneous term), and hence~\eqref{eq:stage-admiss-bb}(v) holds with $c_{x,j}=\mathrm{ord}(g,x)$ if and only if $\mathrm{ord}(g,x)<c_x^{(0)}$.
+Then $g(\mathbf{h})|_{x=t}=O\bigl(t^{\mathrm{ord}(g,x)}\bigr)$ as $t\to\infty$, with matching $\Theta$ asymptotics whenever no exact cancellation of leading terms occurs.
+Hence~\eqref{eq:stage-admiss-bb}(v) holds with $c_{x,j}=\mathrm{ord}(g,x)$ whenever $\mathrm{ord}(g,x)<c_x^{(0)}$, and the test is exact on trees free of leading-term cancellation.
 \end{lemma}
 
 \begin{proof}
@@ -743,7 +771,7 @@ Hence $V(g)=0$ if and only if every score vanishes.
 
 \paragraph{Implication.}
 $v_{\mathrm{mono}}(g)=0$ iff $\overline{\partial F/\partial x}\leq 0$ for all $x\in\{N,D\}$, which is the monotonicity half of~\eqref{eq:interval-bb}; likewise $v_{\mathrm{conv}}=0$ is equivalent to the convexity test and $v_{\mathrm{irred}}=0$ is equivalent to the floor test of \cref{lem:ia-sound} (and~(iii) when $L_\infty>0$).
-The remaining interval test~$\overline{F}<\infty$ is not encoded as a soft score~$v_a$: under the smooth operator set of \cref{sec:boosting}, a completed DualInterval evaluation already yields finite enclosures, so~(A5) /~(vi) holds whenever the IA layer succeeds.
+The remaining interval test~$\overline{F}<\infty$ is not encoded as a soft score~$v_a$: a DualInterval evaluation that completes with finite enclosures has in particular kept every division denominator and every $\mathrm{pow}_p$ argument away from~$0$ on the box, which is exactly the condition under which the operator set of \cref{sec:boosting} is $C^\infty$ there, so~(A5) /~(vi) holds on~$\calI_x$ whenever the IA layer succeeds (\cref{sec:stage-admiss}(a)).
 $v_{\mathrm{leaf}}(g)=0$ iff both scale variables appear as leaves.
 $v_{\mathrm{decay}}(g)=0$ iff $\mathrm{ord}(g,x)\leq c_x^{(0)}-\varepsilon_{\mathrm{decay}}<c_x^{(0)}$, which is a strict strengthening of~(v).
 Thus $V(g)=0$ together with finite DualInterval enclosures implies certificates~(a)--(b) (with the decay margin), and \cref{thm:guarantee} applies stage by stage.
@@ -769,8 +797,8 @@ Induct on the stage index~$j$.
 For $j=0$, the claim is \cref{prop:chinchilla-admiss}: $\Lhat_0\in\calS$ with $L_\infty^{(0)}=E$ and the stated $c_x^{(0)}$.
 
 Fix $j\geq 1$ and assume the claim holds through stage~$j-1$.
-Certificates~(a)--(b) hold for $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A5) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
-The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A5) extends by the operator set.
+Certificates~(a)--(b) hold for $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and the box half of~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A5) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
+The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A5) extends by the operator set under the nonvanishing side condition of~(vi) (\cref{sec:stage-admiss}(a)).
 \Cref{prop:stage-iff} therefore yields $\Lhat^{(j)}\in\calS$ with the same joint floor $L_\infty^{(j)}=L_\infty^{(j-1)}=E$.
 The marginal-floor / rate calculation in the proof of \cref{prop:stage-iff} gives~\eqref{eq:guarantee-bb}.
 \end{proof}

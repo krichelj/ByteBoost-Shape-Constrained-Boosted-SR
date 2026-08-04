@@ -16,7 +16,8 @@ gaps vanish (and ``F̄ < ∞``):
     ``∂F/∂x̄ ≤ 0``,          # (A1) / stage (i)  ↔  v_mono = 0
     ``∂²F/∂x²̲ ≥ 0``,         # (A2) / stage (ii) ↔  v_conv = 0
     ``F̲ > L_∞``,             # (A3) / (iv)  ↔  v_irred = 0  (⇒ (iii) if L_∞ > 0)
-    ``F̄ < ∞``.              # finiteness half of (A5)/(vi)
+    ``F̄ < ∞``.              # (A5)/(vi) on the box: finite *and* no subtree
+                             #   hit a zero denominator / pow_p argument
 
 This is a *sufficient* certificate that the continuum conditions hold
 everywhere on ``I_x`` (one-sided: large gaps do not prove inadmissibility).

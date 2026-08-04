@@ -19,8 +19,12 @@ Structural checks (certificate (b))
   quotients subtract; sums take the maximum.
   Decay scoring must compare against ``c_x^{(0)}`` (do not drop the stage-0 rate).
 * Stage condition (v) holds with ``c_{x,j} = ord(g, x)`` when
-  ``ord(g, x) < c_x^{(0)}`` for each ``x ∈ {N, D}``.
-* Each scale leaf ``x ∈ {N, D}`` must appear in ``leaves(g)``.
+  ``ord(g, x) < c_x^{(0)}`` for each ``x ∈ {N, D}``. Sibling subtrees sharing the
+  maximal exponent may cancel, so ``ord`` is a sound *over*-estimate of the true
+  order and the test stays sufficient (never falsely admitting).
+* Each scale leaf ``x ∈ {N, D}`` must appear in ``leaves(g)`` — a prerequisite
+  for ``ord`` to mean anything, since otherwise ``ord(g, x)`` is vacuously 0 and
+  (v) would be passed by a correction that ignores that axis.
 
 IA evaluation (certificate (a) substrate)
 -----------------------------------------
@@ -29,9 +33,16 @@ same primary operator set as search (``sec:boosting``):
 
     ``{+, −, ×, ÷} ∪ {pow_p : p ∈ P}``
 
-These primitives are ``C^∞`` on ``(0, ∞)``, which discharges graceful
-saturation (A5) on ``I_x`` once ``F̄ < ∞``. Optional unary helpers
-``inv`` / ``log`` / ``sqrt`` may be enabled for ablations.
+These primitives are ``C^∞`` only *away from the zeros of their arguments*:
+``z1/z2`` needs ``z2 ≠ 0`` and ``pow_p(z) = |z|^p`` needs ``z ≠ 0``. So the (A5)
+discharge is not free — **evaluation must fail loudly**: if an operand interval
+straddles 0 beneath ``÷`` or ``pow_p``, return a non-finite enclosure rather than
+a plausible-looking finite one. Done that way, a completed evaluation with
+``F̄ < ∞`` certifies no such subtree vanished on ``I_x``, which is exactly what
+discharges graceful saturation (A5) there. Past ``x_max`` there is no enclosure,
+so the tail half of (A5) is a structural side condition (see
+``stage_conditions``). Optional unary helpers ``inv`` / ``log`` / ``sqrt`` may be
+enabled for ablations — they carry the same domain caveat.
 """
 
 from __future__ import annotations
