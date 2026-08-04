@@ -4,8 +4,8 @@ Tree evaluation under DualInterval and structural asymptotic checks
 
 Helpers for both certificate (a) (IA enclosures of ``F``, ``∂F/∂x``, ``∂²F/∂x²``
 on a compact slice of ``ℍ̃``) and certificate (b) (structural ``ord`` / leaf
-checks for the ``x → ∞`` tail beyond ``I_x``). Soft scores (``sec:soft``) and
-the hard reject filter reuse the same routines.
+checks for the ``x → ∞`` tail beyond ``I_x``). Soft scores (``sec:soft``)
+reuse the same routines.
 
 Search features are typically ``log φ_h(h)`` for every coordinate
 ``h ∈ {N, D} ∪ H``. Evaluate DualIntervals in that coordinate system, then map
@@ -72,9 +72,9 @@ def check_scale_leaves(
     program: Sequence[Any],
     required_indices: Iterable[int],
 ) -> float:
-    """Soft/hard leaf score: count how many required scale indices are missing.
+    """Soft leaf score: count how many required scale indices are missing.
 
-    Used as ``v_leaf(g) = |{x ∈ {N,D} : x ∉ leaves(g)}|`` on the soft path.
+    Used as ``v_leaf(g) = |{x ∈ {N,D} : x ∉ leaves(g)}|`` in soft search.
     """
     raise NotImplementedError("TODO: compare leaves(program) to required_indices")
 

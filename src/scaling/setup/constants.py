@@ -1,7 +1,7 @@
 """
 Global symbols aligned with project-description §Notation / ``sec:setup``.
 
-Includes scale names, soft-path axiom indices, and illustrative ``λ_a`` /
+Includes scale names, soft-search axiom indices, and illustrative ``λ_a`` /
 ``ε_decay``. Continuum domain ``ℍ̃`` and certification boxes ``I_x`` are
 constructed from the configuration space (``configuration.py``), not stored
 as globals here.
@@ -22,7 +22,7 @@ SCALE_VARS: Final[tuple[str, str]] = ("N", "D")
 # Concrete grids are experiment-specific; define them when loading data.
 # M_GRID: Sequence[float] = ...
 
-# Soft-path axiom indices a ∈ {mono, conv, irred, decay, leaf}
+# Soft-search axiom indices a ∈ {mono, conv, irred, decay, leaf}
 # (``sec:soft``, eq. violations-bb). Positivity (A5) is implied by the joint
 # floor when L_∞ > 0 and is folded into v_irred; graceful saturation (A6) is
 # certified via DualInterval finiteness / the C² (in practice C^∞) operator set

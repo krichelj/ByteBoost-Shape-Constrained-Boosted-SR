@@ -31,7 +31,7 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
 
 (A5) **Positivity.** ``L̂(h) > 0`` for every ``h ∈ ℍ̃``.
     Implied by (A3) when ``L_∞ > 0``; retained as an explicit prior.
-    Soft path folds (A5) into ``v_irred``.
+    Soft search (``sec:soft``) folds (A5) into ``v_irred``.
 
 (A6) **Graceful saturation.** ``L̂`` is ``C²`` in ``x`` on ``[x_min, ∞)``
     (so the second derivative in (A2) exists), and ``L̂(x_min, ·)`` is finite.
@@ -42,11 +42,11 @@ Continuum statements are decided by certificates in ``src.constraints.certificat
 sound IA on compact boxes ``I_x ⊂ ℍ̃`` (observed scale range), structural ``ord``
 for the ``x → ∞`` tail.
 
-Soft-path scores (``sec:soft``, eq. violations-bb) cover A1–A4 via
+Soft-search scores (``sec:soft``, eq. violations-bb) cover A1–A4 via
 ``mono / conv / irred / decay``, plus ``leaf`` for scale presence in the tree;
 A5 is folded into the irreducible-floor gap and A6 into DualInterval
-finiteness / the ``C²`` (in practice ``C^∞``) operator set (``V = 0`` recovers
-the hard path once enclosures are finite).
+finiteness / the ``C²`` (in practice ``C^∞``) operator set (``V = 0`` with
+finite enclosures implies certificates (a)–(b) and the boosting guarantee).
 """
 
 from __future__ import annotations
@@ -58,11 +58,11 @@ from typing import Any, Mapping
 
 @dataclass(frozen=True)
 class AxiomReport:
-    """Per-axiom pass/fail (or soft score) for a candidate ``L̂`` or increment ``g``.
+    """Per-axiom soft scores (and optional diagnostics) for ``L̂`` or ``g``.
 
-    Students may store booleans for the hard path and floats for soft gaps.
     Soft keys should include ``mono, conv, irred, decay, leaf`` (see
-    ``AXIOM_INDICES``); hard-path reports may add explicit A5/A6 fields.
+    ``AXIOM_INDICES``). Booleans, if present, are derived diagnostics
+    (e.g. gap == 0), not a search reject gate.
     """
 
     results: Mapping[str, Any]

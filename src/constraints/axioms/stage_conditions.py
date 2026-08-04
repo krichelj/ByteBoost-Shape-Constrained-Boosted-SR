@@ -19,38 +19,46 @@ floor preservation stay explicit. ``ℍ̃`` is the continuum domain of ``sec:set
 (scales on ``[x_min, ∞)``, other coords in finite ``H_h``).
 
 Conditions (i)–(iv), (vi) on the compact box ``I_x ⊂ ℍ̃`` are handled by sound
-interval certificates (A1–A3/A5/A6 on the observed scale range); (v) by the
+interval enclosures (A1–A3/A5/A6 on the observed scale range); (v) by the
 structural exponent ``ord(g, x)`` for the ``x → ∞`` tail
-(see ``src.constraints.certificates``). Soft path scores these as continuous
-``v_a`` (``sec:soft``); hard path rejects on failure (``src.search.hard_path``).
+(see ``src.constraints.certificates``). Soft search (``sec:soft`` /
+``src.search.soft``) turns those quantities into continuous ``v_a`` that enter
+the fitness—the sole discovery method. This module scores increments; it is
+not a search-time accept/reject filter.
 """
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any
+from dataclasses import dataclass, field
+from typing import Any, Mapping
 
 
 @dataclass(frozen=True)
-class StageAdmissibilityVerdict:
-    """Outcome of checking (i)–(vi) for a candidate increment ``g``."""
+class StageAdmissibilityScores:
+    """Soft scores / diagnostics for stage conditions (i)–(vi) on ``g``.
 
-    accepted: bool
-    details: dict[str, Any]
+    Prefer ``violations`` / ``V`` for search. ``zero_penalty`` is a derived
+    diagnostic (``V == 0`` with finite DualInterval enclosures), not a gate.
+    """
+
+    violations: Mapping[str, float]
+    V: float
+    zero_penalty: bool = False
+    details: dict[str, Any] = field(default_factory=dict)
 
 
-class StageAdmissibilityChecker(ABC):
-    """Decide whether ``g`` preserves admissibility of the ensemble."""
+class StageAdmissibilityScorer(ABC):
+    """Score how far ``g`` is from preserving ensemble admissibility."""
 
     @abstractmethod
-    def check(
+    def score(
         self,
         candidate: Any,
         ensemble_state: Any,
         *args: Any,
         **kwargs: Any,
-    ) -> StageAdmissibilityVerdict:
+    ) -> StageAdmissibilityScores:
         """
         Parameters
         ----------

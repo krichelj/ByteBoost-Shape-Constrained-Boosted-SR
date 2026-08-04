@@ -1,5 +1,5 @@
 """
-Soft-path per-axiom violation scores (``sec:soft``, eq. violations-bb).
+Soft-search per-axiom violation scores (``sec:soft``, eq. violations-bb).
 
 Using IA enclosures of ``F = L̂^{(j−1)} + g`` on compact slices ``I_x ⊂ ℍ̃``
 and structural quantities for the ``x → ∞`` tail:
@@ -15,9 +15,9 @@ Soft fitness uses ``Σ_a λ_a v_a(g)²`` (typically with positive ``λ``); ``λ 
 is the unconstrained ablation. Soft scores act as IA proxies for A1–A4;
 positivity (A5) is folded into the irreducible-floor gap (implied by A3 when
 ``L_∞ > 0``) and A6 into DualInterval finiteness / the ``C²`` (in practice
-``C^∞``) operator set — not a separate ``v_a``. ``V = 0`` recovers hard
-certificates (a)–(b) once enclosures are finite (match ``AXIOM_INDICES`` /
-your λ schedule).
+``C^∞``) operator set — not a separate ``v_a``. ``V = 0`` with finite
+enclosures implies certificates (a)–(b) and the boosting guarantee
+(match ``AXIOM_INDICES`` / your λ schedule).
 """
 
 from __future__ import annotations
