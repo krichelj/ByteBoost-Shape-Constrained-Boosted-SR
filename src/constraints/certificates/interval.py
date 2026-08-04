@@ -7,8 +7,8 @@ for continuum certificates on a slice of ``ℍ̃`` (``sec:setup``, ``sec:axioms`
 
 * (A1)/(i)  via ``∂F/∂x̄ ≤ 0``
 * (A2)/(ii) via ``∂²F/∂x²̲ ≥ 0``  (needs the second-derivative dual)
-* (A3)/(iv) and (A5)/(iii) via ``F̲ > L_∞`` (``L_∞ > 0`` ⇒ positivity)
-* (A6)/(vi) via ``F̄ < ∞`` plus the ``C²`` (in practice ``C^∞``) operator set
+* (A3)/(iv) via ``F̲ > L_∞`` (``L_∞ > 0`` ⇒ ensemble positivity / stage (iii))
+* (A5)/(vi) via ``F̄ < ∞`` plus the ``C²`` (in practice ``C^∞``) operator set
 
 The half-line ``x > x_max`` is *not* covered by ``I_x``; structural ``ord``
 handles that tail (certificate (b)). Composition with forward-mode AD yields

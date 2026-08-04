@@ -2,7 +2,7 @@
 Huber clipping and pseudo-residuals (``sec:boosting``, eq. delta-bb, eq. pseudoresid-bb).
 
 At boosting stage ``j ≥ 1``, computed on the labeled grid ``ℍ`` (not the
-continuum domain ``ℍ̃`` used by A1–A6):
+continuum domain ``ℍ̃`` used by A1–A5):
 
     δ_j := median_{ℓ=1…n} |L(h_ℓ) − L̂^{(j−1)}(h_ℓ)|
 

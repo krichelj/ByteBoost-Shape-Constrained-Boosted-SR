@@ -11,7 +11,7 @@ Formal objects
 * Continuum domain ``ℍ̃`` for admissibility (``sec:axioms``): each scale ranges
   over ``[x_min, ∞)``, other coordinates over finite ``H_h``; ``ℍ ⊂ ℍ̃``.
 * Validation loss ``L : ℍ → R``; approximation ``L̂ ≈ L`` (extended along scales
-  to ``ℍ̃`` when stating A1–A6).
+  to ``ℍ̃`` when stating A1–A5).
 * Labeled dataset ``D = {(h_ℓ, L(h_ℓ))}_{ℓ=1}^n ⊂ ℍ × R``.
 * For each scale ``x ∈ {N, D}``: ``x_min = min H_x > 0``, ``x_max = max H_x``;
   treat ``x`` as continuous on ``[x_min, ∞)``.
@@ -72,7 +72,7 @@ class CoordinateSpec:
 class ConfigurationSpace:
     """Product space ``ℍ = ∏_h H_h`` (``sec:setup``).
 
-    Also defines the continuum domain ``ℍ̃`` used by A1–A6: scale coordinates
+    Also defines the continuum domain ``ℍ̃`` used by A1–A5: scale coordinates
     extend to ``[x_min, ∞)`` while non-scale coordinates stay on finite ``H_h``.
     Certification boxes ``I_x = [x_min, x_max]`` are compact slices of ``ℍ̃``.
     """

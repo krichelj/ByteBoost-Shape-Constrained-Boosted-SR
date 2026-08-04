@@ -32,7 +32,7 @@ order is close to, but not identical to, the narrative order in §4 of the PDF
 |---------------------|---------------|
 | §Setup (`sec:setup`) | `scaling/setup/` (`ℍ`, continuum `ℍ̃`) |
 | §Datasets (`sec:datasets`) | `scaling/data/` |
-| §Admissibility axioms A1–A6 (`sec:axioms`) | `constraints/axioms/admissibility.py` |
+| §Admissibility axioms A1–A5 (`sec:axioms`) | `constraints/axioms/admissibility.py` |
 | Stage-0 Chinchilla / NLS (`sec:boosting`, Prop. 1) | `search/baselines/` |
 | Huber \(\delta_j\), \(\tilde r_j\) (`sec:boosting`) | `search/residuals/` |
 | Expression trees / \(\mathrm{pow}_p\) (`sec:boosting`) | `search/expression/` |
@@ -57,12 +57,12 @@ are independent of this list.
 
 1. `scaling/` — discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
 2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2)
-3. `constraints/axioms/admissibility.py` — A1–A6 on \(\widetilde{\mathbb{H}}\)
+3. `constraints/axioms/admissibility.py` — A1–A5 on \(\widetilde{\mathbb{H}}\)
 4. `search/baselines/` — NLS admissible \(\widehat L_0\)
 5. `search/residuals/` — Huber stage targets
 6. `search/expression/` + `constraints/certificates/ia_eval.py` — trees, \(\mathrm{ord}\), log→raw
 7. `constraints/axioms/stage_conditions.py` + certificate enclosures on \(I_x\subset\widetilde{\mathbb{H}}\)
-8. `search/soft/` — gplearn + IA penalties (A5 via `v_irred`; A6 via finiteness)
+8. `search/soft/` — gplearn + IA penalties (A5 via DualInterval finiteness / ``C^∞``)
 9. `search/boosting/` — Algorithm 1 (`sec:algorithm`)
 10. `constraints/guarantee/` — floor / exponent checks on \(\widetilde{\mathbb{H}}\)
 11. Modeling / systems tracks as assigned: `modeling/`, `systems/hpc/`

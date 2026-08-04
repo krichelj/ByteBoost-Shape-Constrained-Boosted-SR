@@ -15,8 +15,8 @@ gaps vanish (and ``F̄ < ∞``):
 
     ``∂F/∂x̄ ≤ 0``,          # (A1) / stage (i)  ↔  v_mono = 0
     ``∂²F/∂x²̲ ≥ 0``,         # (A2) / stage (ii) ↔  v_conv = 0
-    ``F̲ > L_∞``,             # (A3)/(A5) / (iv)  ↔  v_irred = 0
-    ``F̄ < ∞``.              # finiteness half of (A6)/(vi)
+    ``F̲ > L_∞``,             # (A3) / (iv)  ↔  v_irred = 0  (⇒ (iii) if L_∞ > 0)
+    ``F̄ < ∞``.              # finiteness half of (A5)/(vi)
 
 This is a *sufficient* certificate that the continuum conditions hold
 everywhere on ``I_x`` (one-sided: large gaps do not prove inadmissibility).
@@ -37,9 +37,9 @@ from src.constraints.certificates.interval import DualInterval, Interval
 class IntervalCertificate:
     """IA enclosures on one or more axes (eq. interval-bb).
 
-    Soft search reads ``enclosures`` to build ``v_a`` (including floor /
-    positivity via ``v_irred``). ``zero_gap`` is an optional diagnostic
-    equivalent to ``V``-related gaps vanishing on the box (not a search gate).
+    Soft search reads ``enclosures`` to build ``v_a`` (including the joint-floor
+    gap via ``v_irred``). ``zero_gap`` is an optional diagnostic equivalent to
+    ``V``-related gaps vanishing on the box (not a search gate).
     """
 
     enclosures: dict[str, DualInterval]

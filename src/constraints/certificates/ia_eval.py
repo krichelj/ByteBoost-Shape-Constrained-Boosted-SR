@@ -30,7 +30,7 @@ same primary operator set as search (``sec:boosting``):
     ``{+, −, ×, ÷} ∪ {pow_p : p ∈ P}``
 
 These primitives are ``C^∞`` on ``(0, ∞)``, which discharges graceful
-saturation (A6) on ``I_x`` once ``F̄ < ∞``. Optional unary helpers
+saturation (A5) on ``I_x`` once ``F̄ < ∞``. Optional unary helpers
 ``inv`` / ``log`` / ``sqrt`` may be enabled for ablations.
 """
 

@@ -14,9 +14,10 @@ Candidates that already satisfy stage admissibility incur no penalty pressure.
 
 Guarantee sketch (see description): ``V = 0`` plus finite DualInterval
 enclosures implies certificates (a)–(b) and the boosting guarantee on ``ℍ̃``;
-``v_irred`` covers joint floor (A3) and positivity (A5); A6 is discharged by
-successful finite IA under the ``C^∞`` operator set (not a separate ``v_a``);
-interval-based scores upper-bound true pointwise violations on ``I_x``.
+``v_irred`` covers the joint floor (A3) (hence ensemble positivity when
+``L_∞ > 0``); A5 is discharged by successful finite IA under the ``C^∞``
+operator set (not a separate ``v_a``); interval-based scores upper-bound true
+pointwise violations on ``I_x``.
 """
 
 from __future__ import annotations

@@ -14,12 +14,12 @@ Given ``L̂^{(j−1)} ∈ S`` with joint floor ``L_∞``, the update
       ``c_{x,j} < c_x^{(0)}`` (equivalently ``ord(g, x) < c_x^{(0)}``)
 (vi)  ``g ∈ C^∞`` on ``[x_min, x_max]`` with ``|g(x_min, ·)| < ∞``
 
-When ``L_∞ > 0``, (iv) already implies (iii); both are kept so positivity and
-floor preservation stay explicit. ``ℍ̃`` is the continuum domain of ``sec:setup``
-(scales on ``[x_min, ∞)``, other coords in finite ``H_h``).
+When ``L_∞ > 0``, (iv) already implies (iii); both are kept so ensemble
+positivity and floor preservation stay explicit. ``ℍ̃`` is the continuum domain
+of ``sec:setup`` (scales on ``[x_min, ∞)``, other coords in finite ``H_h``).
 
 Conditions (i)–(iv), (vi) on the compact box ``I_x ⊂ ℍ̃`` are handled by sound
-interval enclosures (A1–A3/A5/A6 on the observed scale range); (v) by the
+interval enclosures (A1–A3/A5 on the observed scale range); (v) by the
 structural exponent ``ord(g, x)`` for the ``x → ∞`` tail
 (see ``src.constraints.certificates``). Soft search (``sec:soft`` /
 ``src.search.soft``) turns those quantities into continuous ``v_a`` that enter

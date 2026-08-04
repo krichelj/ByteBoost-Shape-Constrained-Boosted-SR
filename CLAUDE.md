@@ -48,7 +48,7 @@ Requires a standard TeX Live / MacTeX install. After editing the `.tex` file, re
 
 ## Student skeleton
 
-See `src/README.md` for the description ↔ package map and suggested implementation order. Keep stub comments aligned with project-description notation (`sec:*`, eq. labels, A1–A6, Algorithm 1). Soft IA-penalty search (`sec:soft`) is the sole discovery method; do not reintroduce a hard reject-filter path. Prefer extending stubs over inventing a parallel layout.
+See `src/README.md` for the description ↔ package map and suggested implementation order. Keep stub comments aligned with project-description notation (`sec:*`, eq. labels, A1–A5, Algorithm 1). Soft IA-penalty search (`sec:soft`) is the sole discovery method; do not reintroduce a hard reject-filter path. Prefer extending stubs over inventing a parallel layout.
 
 ## Domain consistency
 

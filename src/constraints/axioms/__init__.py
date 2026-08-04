@@ -1,5 +1,5 @@
 """
-Admissibility axioms (A1)–(A6) on ``ℍ̃`` and stagewise soft scores for
+Admissibility axioms (A1)–(A5) on ``ℍ̃`` and stagewise soft scores for
 conditions (i)–(vi) (``sec:axioms``, ``sec:stage-admiss``).
 
 See ``admissibility.py`` (global axioms) and ``stage_conditions.py``

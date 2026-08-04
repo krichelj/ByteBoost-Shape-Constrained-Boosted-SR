@@ -23,11 +23,12 @@ SCALE_VARS: Final[tuple[str, str]] = ("N", "D")
 # M_GRID: Sequence[float] = ...
 
 # Soft-search axiom indices a ∈ {mono, conv, irred, decay, leaf}
-# (``sec:soft``, eq. violations-bb). Positivity (A5) is implied by the joint
-# floor when L_∞ > 0 and is folded into v_irred; graceful saturation (A6) is
-# certified via DualInterval finiteness / the C² (in practice C^∞) operator set
-# rather than a separate soft score — prop:soft requires V=0 *and* finite
-# enclosures (see project description ``sec:axioms``, ``sec:soft``).
+# (``sec:soft``, eq. violations-bb). Soft scores cover A1–A4; graceful
+# saturation (A5) is certified via DualInterval finiteness / the C²
+# (in practice C^∞) operator set rather than a separate soft score —
+# prop:soft requires V=0 *and* finite enclosures (see project description
+# ``sec:axioms``, ``sec:soft``). Ensemble positivity follows from the joint
+# floor (A3) when L_∞ > 0.
 AXIOM_INDICES: Final[tuple[str, ...]] = (
     "mono",
     "conv",

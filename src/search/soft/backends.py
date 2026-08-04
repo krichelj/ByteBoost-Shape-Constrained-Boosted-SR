@@ -4,9 +4,9 @@ Soft search backends (``sec:software``, ``sec:soft``).
 Primary engine: ``gplearn`` with IA axiom penalties in the fitness
 (``GPLearnSoftBackend``). Penalties use DualInterval enclosures on compact
 slices ``I_x ⊂ ℍ̃`` (``I_x`` ≡ ``ℐ_x`` in the PDF) plus structural ``ord`` /
-leaf scores: A1–A4 via ``v_mono…v_decay``, leaf for scale presence, A5 folded
-into ``v_irred``, and A6 discharged by finite DualInterval enclosures under
-the ``C^∞`` operator set (not a separate ``v_a``).
+leaf scores: A1–A4 via ``v_mono…v_decay``, leaf for scale presence, and A5
+discharged by finite DualInterval enclosures under the ``C^∞`` operator set
+(not a separate ``v_a``).
 
 Optional: PySR as an unconstrained / post-hoc ablation backend.
 """
