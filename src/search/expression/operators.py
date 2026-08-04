@@ -9,8 +9,16 @@ for a finite set ``P ⊂ R ∖ {0}``, where ``pow_p(z) = |z|^p`` for ``z > 0``,
 and with bounded depth. Soft ablations may also expose unary ``inv`` / ``log`` /
 ``sqrt``.
 
-These primitives are ``C^∞`` on ``(0, ∞)`` (hence ``C²`` for A5). Trees are
-evaluated on log-features ``log φ_h(h)``; DualInterval certificates on
+These primitives are ``C^∞`` (hence ``C²`` for A5) only away from the zeros of
+their arguments: ``div`` needs a nonzero denominator, and ``pow_p`` a nonzero
+argument (``|z|^p`` is unbounded at 0 for ``p < 0`` and not ``C²`` there for the
+fractional ``p`` that dominate ``DEFAULT_POWERS``). Interval arithmetic enforces
+this on ``I_x`` by returning a non-finite enclosure when an operand straddles 0
+(``ia_eval``); beyond ``x_max`` it is a structural side condition
+(``stage_conditions``). Note gplearn's stock *protected* division returns 1.0 for
+near-zero denominators, which is discontinuous — do not rely on it for A5.
+
+Trees are evaluated on log-features ``log φ_h(h)``; DualInterval certificates on
 ``I_x ⊂ ℍ̃`` map derivatives back to raw ``N``/``D`` via the chain rule
 (``ia_eval``).
 
