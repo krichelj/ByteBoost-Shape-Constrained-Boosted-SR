@@ -17,15 +17,16 @@ Work from the repository root so package imports resolve, e.g.
 |---------|------|-------------|
 | `scaling/` | Problem setup and data (`sec:setup`, `sec:datasets`) | `setup/`, `data/` |
 | `constraints/` | Admissibility and certificates (`sec:axioms`, `sec:stage-admiss`, `sec:certificates`, `sec:guarantee`) | `axioms/`, `certificates/`, `guarantee/` |
-| `search/` | Boosted SR (`sec:boosting`, `sec:algorithm`, `sec:soft`) | `baselines/`, `residuals/`, `expression/`, `soft_path/`, `hard_path/`, `boosting/` |
+| `search/` | Boosted SR (`sec:boosting`, `sec:algorithm`, `sec:soft`) | `baselines/`, `residuals/`, `expression/`, `soft/` (sole discovery), `boosting/` |
 | `modeling/` | Pretraining track (`sec:models`, Neocortex in `sec:testbeds`) | `models/`, `training/` |
 | `systems/` | HPC profiling and deliverables (`sec:testbeds` AMA27, `sec:deliverables`) | `hpc/`, `pipeline/` |
 
 ## Description ↔ skeleton
 
-Ordered for **implementation** (soft primary before optional hard filter), not
-strict §4 narrative order. Soft appears before Algorithm 1 because Algorithm 1
-calls into the search backends.
+Ordered for **implementation**. Soft IA search (``sec:soft``) is the sole
+discovery method; Algorithm 1 calls into ``soft/`` at every stage. This
+order is close to, but not identical to, the narrative order in §4 of the PDF
+(certificates and stage-0 pieces are implemented before the full boosting loop).
 
 | Project description | Skeleton path |
 |---------------------|---------------|
@@ -36,11 +37,10 @@ calls into the search backends.
 | Huber \(\delta_j\), \(\tilde r_j\) (`sec:boosting`) | `search/residuals/` |
 | Expression trees / \(\mathrm{pow}_p\) (`sec:boosting`) | `search/expression/` |
 | Stagewise conditions (i)–(vi) (`sec:stage-admiss`, Prop. 2) | `constraints/axioms/stage_conditions.py` |
-| DualInterval certificates on \(I_x\subset\widetilde{\mathbb{H}}\) (`sec:certificates`) | `constraints/certificates/` (`interval.py`, `ia_eval.py`, `hard_certificates.py`) |
+| DualInterval certificates on \(I_x\subset\widetilde{\mathbb{H}}\) (`sec:certificates`) | `constraints/certificates/` (`interval.py`, `ia_eval.py`, `ia_certificates.py`) |
 | Optional JAX+JVP certificate (`sec:software`) | `constraints/certificates/jax_backend.py` |
-| Soft path \(v_a\), \(F_j\), gplearn (`sec:soft`, Prop. 3) | `search/soft_path/` |
-| Soft search backends (gplearn / optional PySR) | `search/soft_path/backends.py` |
-| Hard path / reject filter (`sec:stage-admiss`, workshop) | `search/hard_path/` |
+| Soft search \(v_a\), \(F_j\), gplearn (`sec:soft`, Prop. 3 / zero-penalty ⇒ certificates) | `search/soft/` |
+| Soft search backends (gplearn / optional PySR) | `search/soft/backends.py` |
 | Algorithm 1 (`sec:algorithm`, `alg:boosting-bb`) | `search/boosting/` |
 | Guarantee (`sec:guarantee`, Thm. 1) | `constraints/guarantee/` |
 | Existing HF loss / checkpoint baselines (`sec:baselines`) | `scaling/data/scaling_dataset.py` |
@@ -52,8 +52,8 @@ calls into the search backends.
 
 ## Suggested implementation order
 
-Dependency order (soft search is primary; hard filter is optional workshop
-extension). This is *not* the same as §4 section order in the PDF.
+Dependency order for the soft-only discovery stack. Modeling / systems tracks
+are independent of this list.
 
 1. `scaling/` — discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
 2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2)
@@ -62,11 +62,10 @@ extension). This is *not* the same as §4 section order in the PDF.
 5. `search/residuals/` — Huber stage targets
 6. `search/expression/` + `constraints/certificates/ia_eval.py` — trees, \(\mathrm{ord}\), log→raw
 7. `constraints/axioms/stage_conditions.py` + certificate enclosures on \(I_x\subset\widetilde{\mathbb{H}}\)
-8. `search/soft_path/` — primary gplearn + IA penalties (A5 via `v_irred`; A6 via finiteness)
-9. `search/hard_path/` — optional reject filter (workshop extension)
-10. `search/boosting/` — Algorithm 1 (`sec:algorithm`)
-11. `constraints/guarantee/` — floor / exponent checks on \(\widetilde{\mathbb{H}}\)
-12. Modeling / systems tracks as assigned: `modeling/`, `systems/hpc/`
+8. `search/soft/` — gplearn + IA penalties (A5 via `v_irred`; A6 via finiteness)
+9. `search/boosting/` — Algorithm 1 (`sec:algorithm`)
+10. `constraints/guarantee/` — floor / exponent checks on \(\widetilde{\mathbb{H}}\)
+11. Modeling / systems tracks as assigned: `modeling/`, `systems/hpc/`
 
 ## Notation
 

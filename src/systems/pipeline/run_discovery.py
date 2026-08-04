@@ -5,22 +5,19 @@ Deliverables
 ------------
 (1) An admissible boosted scaling law on ``ℍ̃`` (``sec:axioms``, ``sec:guarantee``)
     fit on the collected training grid ``ℍ`` (``sec:datasets``).
-(2) Public release of the shape-constrained SR library with IA-certified
-    admissibility checking on ``I_x ⊂ ℍ̃`` (``sec:certificates``).
+(2) Public release of the shape-constrained SR library with DualInterval
+    soft scores / certification on ``I_x ⊂ ℍ̃`` (``sec:certificates``, ``sec:soft``).
 (3) A short paper / methods report on ``sec:method``.
 
 This module wires student implementations into a single runnable entry point.
-Default ``DiscoveryConfig.path`` is ``\"soft\"`` (primary gplearn + IA penalties);
-set ``path=\"hard\"`` for the workshop reject-filter extension.
+Discovery uses soft shape-constrained search only (gplearn + IA penalties;
+``sec:soft``, Algorithm 1).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Literal
-
-
-SearchPath = Literal["soft", "hard"]
+from typing import Any
 
 
 @dataclass
@@ -28,7 +25,6 @@ class DiscoveryConfig:
     """Top-level knobs for a discovery run (concrete fields are student-defined)."""
 
     num_stages: int  # K
-    path: SearchPath = "soft"
     # baseline_name: str = "chinchilla"
     # data_uri: str = ...
     # lambdas: dict[str, float] | None = None
@@ -48,14 +44,14 @@ class DiscoveryResult:
 def run_discovery(config: DiscoveryConfig, *args: Any, **kwargs: Any) -> DiscoveryResult:
     """Load ``D``, run Algorithm 1 (``sec:algorithm``), verify guarantee, return artifacts.
 
-    Typical soft-path wiring
-    ------------------------
+    Typical wiring
+    --------------
     setup (``ℍ`` / ``ℍ̃`` / ``I_x``) → stage-0 NLS baseline → for each stage:
     Huber residuals → soft ``F_j`` search (IA penalties on ``I_x ⊂ ℍ̃``) →
     ensemble update → guarantee / soft ``V`` report.
     """
     raise NotImplementedError(
-        "TODO: wire setup → baseline → soft (or hard) boosting → guarantee.check"
+        "TODO: wire setup → baseline → soft boosting (eq. penalized-bb) → guarantee.check"
     )
 
 

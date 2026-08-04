@@ -8,9 +8,7 @@ leaf scores: A1–A4 via ``v_mono…v_decay``, leaf for scale presence, A5 folde
 into ``v_irred``, and A6 discharged by finite DualInterval enclosures under
 the ``C^∞`` operator set (not a separate ``v_a``).
 
-Optional: PySR as an unconstrained / post-hoc ablation backend. A hard reject
-filter is a separate workshop extension (``src.search.hard_path``), not a
-second soft engine.
+Optional: PySR as an unconstrained / post-hoc ablation backend.
 """
 
 from __future__ import annotations
@@ -41,7 +39,7 @@ class SoftSearchBackend(ABC):
 
 
 class GPLearnSoftBackend(SoftSearchBackend):
-    """Primary soft path: patch gplearn fitness with MSE + Σ λ_a v_a²."""
+    """gplearn fitness with MSE + Σ λ_a v_a² (sole discovery engine of ``sec:soft``)."""
 
     def fit_stage(
         self,

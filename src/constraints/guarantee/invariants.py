@@ -1,9 +1,9 @@
 """
 Boosting guarantee (``sec:guarantee``, Thm. 1 / ``thm:guarantee``, eq. guarantee-bb).
 
-Hard path: if ``L̂_0 ∈ S`` and every ``L̂_j`` is accepted by certificates (a)–(b)
-(IA on compact slices of ``ℍ̃``, structural ``ord`` on the ``x→∞`` tail), then for
-all ``j``:
+The sole discovery method (``sec:soft``) drives each correction toward
+``V = 0`` with finite DualInterval enclosures. When that holds at every stage
+(``prop:soft``), certificates (a)–(b) are satisfied and for all ``j``:
 
 * ``L̂^{(j)} ∈ S`` on ``ℍ̃`` (A1–A6);
 * writing ``L_∞^{(j)}`` for the joint floor of ``L̂^{(j)}``, one has
@@ -15,13 +15,11 @@ all ``j``:
   where ``L^∞_x`` is the marginal floor of ``L̂^{(j)}`` along ``x``
   (depends on frozen coordinates; equal to that of ``L̂_0``).
 
-Soft path recovers the same conclusion when ``V = 0`` at every stage and
-DualInterval enclosures are finite (``prop:soft``), with ``v_irred = 0``
-covering both the joint floor and positivity (A5); A6 is discharged by
-successful finite IA under the ``C^∞`` operator set. Boosting therefore
-improves fit *without* corrupting the interpretable constants researchers
-quote. Implement empirical checks / unit tests that probe these invariants
-on fitted ensembles.
+Here ``v_irred = 0`` covers both the joint floor and positivity (A5); A6 is
+discharged by successful finite IA under the ``C^∞`` operator set. Boosting
+therefore improves fit *without* corrupting the interpretable constants
+researchers quote. Implement empirical checks / unit tests that probe these
+invariants on fitted ensembles.
 """
 
 from __future__ import annotations

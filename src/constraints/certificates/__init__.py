@@ -1,13 +1,14 @@
 """
 Interval / DualInterval certificates and tree evaluation (``sec:certificates``).
 
-Shared by soft scores and the hard reject filter. Certify continuum conditions
-on compact slices of ``ℍ̃`` (``I_x`` boxes) plus structural ``ord`` for the
-``x→∞`` tail:
+Soft search (``sec:soft``, ``src.search.soft``) uses these primitives as the
+substrate for continuum violation scores on compact slices of ``ℍ̃`` (``I_x``
+boxes) plus structural ``ord`` for the ``x→∞`` tail:
 
 * ``interval.py`` — arithmetic / DualInterval (needs ``d2`` for A2)
 * ``ia_eval.py`` — tree walk, ``ord``, log→raw chain rule
-* ``hard_certificates.py`` — eq. interval-bb accept test / enclosures
-  (A1–A3/A5/A6 on the box)
+* ``ia_certificates.py`` — eq. interval-bb enclosures (input to ``v_a``)
 * ``jax_backend.py`` — optional JAX+JVP acceleration
+
+Enclosures feed soft scores; they are not a search-time reject filter.
 """

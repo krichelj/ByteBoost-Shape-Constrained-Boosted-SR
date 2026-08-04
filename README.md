@@ -21,7 +21,7 @@ documents/description/   # LaTeX source, bibliography, committed PDF
 src/                     # student skeleton (5 packages — see src/README.md)
   scaling/               # setup + datasets
   constraints/           # axioms, certificates, guarantee
-  search/                # stage-0 / residuals / soft (+ hard) SR / Algorithm 1
+  search/                # stage-0 / residuals / soft SR (sole) / Algorithm 1
   modeling/              # LM architecture + pretraining
   systems/               # HPC profiling + deliverables pipeline
 scripts/                 # compile.sh, optional check-latex.sh
@@ -41,7 +41,7 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make 
 ## Related
 
 - Public HF loss / checkpoint baselines (`sec:baselines`): [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models) — compare *losses*, not original training hardware
-- Method: shape-constrained boosted SR with a primary soft path (IA violation penalties) and an optional hard path (IA reject certificates)
+- Method: shape-constrained boosted SR with soft IA violation penalties in the GP fitness
 
 ## License
 

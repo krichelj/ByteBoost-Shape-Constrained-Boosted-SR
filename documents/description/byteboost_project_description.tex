@@ -71,9 +71,9 @@ Training a modern AI language model can cost millions of dollars, so researchers
 
 Our project uses symbolic regression to discover the scaling-law equation directly from data. Symbolic regression searches many candidate formulas and returns an interpretable equation rather than a black-box model. Unconstrained searches, however, often produce formulas that fit existing measurements but extrapolate unrealistically, predicting negative error or worse performance with more data.
 
-We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive and approach an irreducible floor; excess loss must decay as a power law; and the formula must remain smoothly well-defined down to the smallest scales of interest. We mathematically certify these properties across the full continuum domain of interest, not only at measured points (\cref{sec:axioms,sec:stage-admiss,sec:guarantee}).
+We therefore require every candidate formula to satisfy admissibility axioms: larger models and additional data cannot increase error; improvements must diminish with scale; error must remain positive and approach an irreducible floor; excess loss must decay as a power law; and the formula must remain smoothly well-defined down to the smallest scales of interest. The discovery method is soft shape-constrained search: a genetic-programming fitness \emph{penalizes} continuum axiom violations via interval-arithmetic scores, drives them toward zero, and bounds any remaining shortfall (\cref{sec:soft,prop:soft,sec:algorithm,sec:axioms,sec:stage-admiss}).
 
-The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{prop:chinchilla-admiss,prop:stage-iff,thm:guarantee}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement (\cref{thm:guarantee}). The primary search path \emph{penalizes} axiom violations inside a genetic-programming fitness and drives them toward zero while bounding any remaining shortfall (\cref{sec:soft,prop:soft}); a second path \emph{rejects} inadmissible corrections outright and is a workshop extension of the soft engine (\cref{sec:stage-admiss,sec:algorithm}).
+The formula is built incrementally from a standard scaling law, adding one correction at a time while preserving all guarantees (\cref{prop:chinchilla-admiss,prop:stage-iff,thm:guarantee}). We also prove that the corrections improve fit without changing the irreducible error floor or the asymptotic rate of improvement whenever the soft scores vanish (\cref{thm:guarantee,prop:soft}).
 
 The project has two computational bottlenecks. Model training will use Cerebras CS-3 systems on PSC's Neocortex platform; new validation losses will be compared to already-published loss curves from an existing scaling grid on Hugging Face (\cref{sec:testbeds,sec:baselines}). Formula discovery is a large CPU-bound search dominated by interval-arithmetic certification. Because it is highly parallel and relies mainly on scalar or imperfectly vectorized Python (with optional JAX acceleration), Stony Brook's high-core-count AMA27 AmpereOne cluster is well suited to the workload (\cref{sec:testbeds,sec:certificates}).
 
@@ -103,9 +103,8 @@ New Neocortex pretraining runs should emit losses on a comparable protocol so th
 \subsection{Software and tools}\label{sec:software}
 \codeRef{\pyDir{src/modeling/training}, \pyDir{src/search}, \pyDir{src/constraints/certificates}}
 PyTorch~2.x for pretraining (distributed data-parallel training; optional mixed precision), with \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}.
-Symbolic search uses \texttt{gplearn}~\citep{stephens2015gplearn} with a custom fitness that adds soft interval-arithmetic axiom penalties (\cref{sec:soft}); an optional PySR backend provides an unconstrained alternate engine for ablation.
+Symbolic search uses \texttt{gplearn}~\citep{stephens2015gplearn} with a custom fitness that adds interval-arithmetic axiom penalties---the sole discovery method of \cref{sec:soft}; an optional PySR backend provides an unconstrained alternate engine for ablation.
 Certificates are evaluated with a pure-Python forward-mode \emph{DualInterval} interval-arithmetic layer (\cref{sec:certificates}); JAX with custom JVPs is an optional acceleration path, not required.
-A hard reject filter that discards inadmissible candidates during search (\cref{sec:stage-admiss}) is a workshop extension built on the same certificate primitives.
 
 \subsection{Models}\label{sec:models}
 \codeRef{\pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/transformer.py}}
@@ -205,7 +204,7 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     \item \textbf{Positivity.}
     $\Lhat(\mathbf{h}) > 0$ for every $\mathbf{h} \in \widetilde{\bbH}$.
     Since $L_\infty > 0$,~(A5) is implied by the joint-floor inequality in~(A3); we
-    retain it as an explicit physical prior (the soft path folds it into the floor
+    retain it as an explicit physical prior (the search of \cref{sec:soft} folds it into the floor
     score~$v_{\mathrm{irred}}$).
     \item \textbf{Graceful saturation.}
     $\Lhat$ is twice continuously differentiable ($C^2$) in~$x$ on $[x_{\min}, \infty)$
@@ -223,7 +222,7 @@ In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a si
 The ensemble is built stagewise,
 $\Lhat^{(j)} = \Lhat^{(j-1)} + \Lhat_j$, targeting an \emph{admissibility invariant}:
 $\Lhat^{(j)} \in \calS$ for every $j = 0, \ldots, K$ (\cref{sec:axioms}),
-enforced exactly by the hard filter and recovered by the soft path whenever $V=0$ (\cref{sec:soft,thm:guarantee}).
+enforced by the shape-constrained search of \cref{sec:soft} whenever $V=0$ with finite DualInterval enclosures (\cref{prop:soft,thm:guarantee}).
 Throughout, $\Lhat_j$ (subscript) is the stage-$j$ correction and
 $\Lhat^{(j)}$ (superscript) is the cumulative ensemble through stage~$j$,
 so in particular $\Lhat^{(0)} = \Lhat_0$.
@@ -279,7 +278,7 @@ Trees are evaluated on \emph{log-features} $\log\phi_h(h)$; raw-scale derivative
 needed by~(A1)--(A2) are recovered by the chain rule (\cref{sec:certificates}).
 
 \subsection{Stagewise admissibility}\label{sec:stage-admiss}\label{sec:certificates}
-\codeRef{\pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}, \pyDir{src/search/hard_path}}
+\codeRef{\pyFile{src/constraints/axioms/stage_conditions.py}, \pyFile{src/constraints/certificates/interval.py}, \pyFile{src/constraints/certificates/ia_eval.py}, \pyFile{src/constraints/certificates/ia_certificates.py}}
 Checking that the full ensemble $\Lhat^{(j)}$ obeys~(A1)--(A6) of \cref{sec:axioms} is a continuum statement on~$\widetilde{\bbH}$ and along each scale half-line.
 The next claim reduces that check to conditions on the increment alone.
 \begin{equation}\label{eq:stage-admiss-bb}
@@ -317,7 +316,7 @@ if and only if $\Lhat_j$ satisfies~\eqref{eq:stage-admiss-bb}(i)--(vi) for each 
 \end{proposition}
 (See \cref{sec:stage-iff-proof} for the proof.)
 Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\widetilde{\bbH}$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
-They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificates decide whether~$g$ preserves~\eqref{eq:stage-admiss-bb}: interval checks establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
+They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificate constructions supply the continuous checks used by the soft fitness of \cref{sec:soft}: interval enclosures establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
 
 \smallskip\noindent
 \emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on a compact slice of~$\widetilde{\bbH}$).
@@ -326,7 +325,7 @@ Forward-mode automatic differentiation composed with interval arithmetic~\citep{
 $\underline{f} \leq f \leq \overline{f}$ on~$\calI_x$ for $f \in \{F,\, \partial F/\partial x,\, \partial^2 F/\partial x^2\}$, in time linear in the tree size.
 (The second-derivative enclosure is what makes~(A2) / stage~(ii) checkable;~(A6) asks only for~$C^2$, while the operator set of \cref{sec:boosting} in fact yields~$C^\infty$ on $(0,\infty)$.)
 When~$g$ is represented on log-features, DualInterval evaluation is performed in log-coordinates and first/second derivatives are mapped to the raw axis~$x$ by the chain rule before applying~\eqref{eq:interval-bb}.
-A candidate is accepted when, for each $x \in \{N,D\}$,
+Those enclosures are exactly the inputs to the soft violation scores of \cref{sec:soft}: writing $v_{\mathrm{mono}}=\max(0,\overline{\partial F/\partial x})$ and likewise for the other gaps, the sufficient inequalities
 \begin{equation}\label{eq:interval-bb}
     \overline{\partial F / \partial x} \leq 0,
     \quad
@@ -334,15 +333,15 @@ A candidate is accepted when, for each $x \in \{N,D\}$,
     \quad
     \underline{F} > L_\infty ,
     \quad
-    \overline{F} < \infty .
+    \overline{F} < \infty
 \end{equation}
-Because the enclosures are sound, \eqref{eq:interval-bb} is a \emph{sufficient} certificate that the corresponding continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points of~$\bbH$ (\cref{lem:ia-sound,sec:cert-lemmas}):
+hold for each $x \in \{N,D\}$ precisely when the corresponding soft gaps vanish (and $\overline{F}<\infty$).
+Because the enclosures are sound, vanishing gaps are a \emph{sufficient} certificate that the continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points of~$\bbH$ (\cref{lem:ia-sound,sec:cert-lemmas}):
 $\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ on~$\calI_x$ (hence~(i) on the box), and likewise for~(ii);
 $\underline{F} > L_\infty > 0$ forces~(iv) on the continuum configurations covered by the product of boxes, and hence also~(iii) / positivity~(A5);
 $\overline{F} < \infty$ forces the finiteness half of~(vi), while~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$ follows from the operator set and discharges~(A6) on the box.
-The test is conservative: a failure of~\eqref{eq:interval-bb} does \emph{not} prove that~$g$ fails~\eqref{eq:stage-admiss-bb} (interval over-approximation can reject a truly admissible update), but every accepted~$g$ is guaranteed to preserve admissibility on~$\calI_x$.
-That one-sided decidability is exactly what a hard filter needs, and evaluating~\eqref{eq:interval-bb} on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
-In the primary soft path (\cref{sec:soft}), the same enclosures are converted to continuous violation scores rather than used as a reject gate.
+The implication is one-sided: inflated enclosures can produce positive soft scores for a truly admissible update, but every~$g$ with vanishing gaps on~\eqref{eq:interval-bb} is guaranteed to preserve admissibility on~$\calI_x$.
+Evaluating DualInterval enclosures (and the soft scores built from them) on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
 
 \smallskip\noindent
 \emph{(b) Exact structural checks} (condition~(v), and prerequisites for it).
@@ -351,54 +350,10 @@ Then~(v) holds with $c_{x,j} = \mathrm{ord}(g,x)$ precisely when $\mathrm{ord}(g
 We additionally require that each scale variable $x \in \{N,D\}$ appears as a leaf of~$g$ (otherwise the exponent in~$x$ is undefined or vacuously~$0$).
 Both tests are exact, finite walks over a finite tree, with no floating-point search over~$\widetilde{\bbH}$.
 
-\subsection{Algorithm}\label{sec:algorithm}
-\codeRef{\pyDir{src/search/boosting}}
-Putting the pieces together, Algorithm~\ref{alg:boosting-bb} builds the ensemble of \cref{sec:boosting}.
-The \emph{primary} soft path of \cref{sec:soft} selects each correction by minimizing the penalized fitness~\eqref{eq:penalized-bb}; the workshop hard-filter extension instead constrains the stage argmin by certificates~(a)--(b) of \cref{sec:stage-admiss} (written explicitly in the pseudocode below).
-\begin{algorithm}[H]
-\caption{Shape-constrained boosted symbolic regression}
-\label{alg:boosting-bb}
-\begin{algorithmic}[1]
-\Require Dataset $\calD = \{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n}$,
-         stages $K$
-\Ensure Ensemble $\Lhat^{(K)}$ (admissible under the hard filter; soft path aims for $V=0$ at every stage)
-\State Fit $\Lhat_0$ via~\eqref{eq:chinchilla-bb} on $\calD$;
-       set $\Lhat^{(0)} \gets \Lhat_0$
-\For{$j = 1, \ldots, K$}
-    \State Compute $\delta_j$ via~\eqref{eq:delta-bb}
-    \State Compute $\tilde{r}_j^{(\ell)}$ for all $\ell=1,\ldots,n$
-           via~\eqref{eq:pseudoresid-bb}
-    \State Find $\Lhat_j$ by soft search~\eqref{eq:penalized-bb}
-           \textbf{or} by
-           $\argmin_{g}
-           \dfrac{1}{n}\sum_{\ell=1}^{n}\bigl(\tilde{r}_j^{(\ell)} - g(\mathbf{h}_\ell)\bigr)^2$
-           subject to certificates~(a)--(b) for~\eqref{eq:stage-admiss-bb}
-           \Comment{soft primary; hard filter is the workshop extension}
-    \State $\Lhat^{(j)} \gets \Lhat^{(j-1)} + \Lhat_j$
-\EndFor
-\State \Return $\Lhat^{(K)}$
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Guarantee}\label{sec:guarantee}
-\codeRef{\pyFile{src/constraints/guarantee/invariants.py}}
-The hard path of Algorithm~\ref{alg:boosting-bb} preserves admissibility, the joint floor, and the stage-0 rates:
-\begin{theorem}[Hard-path boosting guarantee]\label{thm:guarantee}
-Assume $\Lhat_0$ is the admissible stage-0 law of \cref{prop:chinchilla-admiss} (so $L_\infty = E$).
-If every later correction $\Lhat_j$ ($j\geq 1$) is accepted by certificates~(a)--(b) of \cref{sec:stage-admiss}, then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
-\begin{equation}\label{eq:guarantee-bb}
-    \lim_{t \to \infty}
-    \frac{\log\bigl(\Lhat^{(j)}(\mathbf{h})\big|_{x=t}
-        - L^{\infty}_{x}\bigr)}{\log t}
-    \;=\; c_x^{(0)},
-\end{equation}
-where $L^{\infty}_{x}$ is the marginal floor of $\Lhat^{(j)}$ along~$x$ (equal to that of~$\Lhat_0$).
-\end{theorem}
-Boosting therefore improves fit \emph{without} corrupting the interpretable constants researchers actually quote (proof in \cref{sec:guarantee-proof}).
-
-\subsection{Soft-constrained variant}\label{sec:soft}
-\codeRef{\pyFile{src/search/soft_path/violations.py}, \pyFile{src/search/soft_path/fitness.py}, \pyFile{src/search/soft_path/backends.py}}
-The primary implemented path uses per-axiom violation scores on the candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$, folded into the \texttt{gplearn} fitness (\cref{sec:software}), rather than a hard reject gate.
+\subsection{Shape-constrained search}\label{sec:soft}
+\codeRef{\pyFile{src/search/soft/violations.py}, \pyFile{src/search/soft/fitness.py}, \pyFile{src/search/soft/backends.py}}
+The discovery method---and the only search used by Algorithm~\ref{alg:boosting-bb}---is soft interval-arithmetic search: per-axiom violation scores on the candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$ are folded into the \texttt{gplearn} fitness (\cref{sec:software}), steering the genetic program toward admissible corrections.
+(The student package is \pyDir{src/search/soft}; there is no separate reject-filter path.)
 Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural quantities of~(b), define the soft scores of \cref{sec:notation}:
 \begin{equation}\label{eq:violations-bb}
 \begin{aligned}
@@ -430,7 +385,7 @@ Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural q
 \end{aligned}
 \end{equation}
 Here $\varepsilon_{\mathrm{decay}} > 0$ is a fixed margin so that $v_{\mathrm{decay}}(g)=0$ forces the strict inequality $\mathrm{ord}(g,x) \leq c_x^{(0)}-\varepsilon_{\mathrm{decay}} < c_x^{(0)}$ required by~\eqref{eq:stage-admiss-bb}(v); $\mathrm{leaves}(g)$ is the set of variable leaves of the expression tree~$g$.
-Every score is nonnegative, and $v_{\mathrm{mono}}=v_{\mathrm{conv}}=v_{\mathrm{irred}}=v_{\mathrm{leaf}}=0$ iff the corresponding hard certificate passes (for $v_{\mathrm{decay}}$, zero is sufficient but slightly stronger than~(v) because of the margin).
+Every score is nonnegative, and $v_{\mathrm{mono}}=v_{\mathrm{conv}}=v_{\mathrm{irred}}=v_{\mathrm{leaf}}=0$ iff the corresponding interval or structural test of~\eqref{eq:interval-bb} /~(b) succeeds (for $v_{\mathrm{decay}}$, zero is sufficient but slightly stronger than~(v) because of the margin).
 Writing $a$ for an axiom index ranging over $\{\mathrm{mono},\mathrm{conv},\mathrm{irred},\mathrm{decay},\mathrm{leaf}\}$ and $\lambda_a > 0$ for its penalty weight, the aggregate violation is $V(g)=\sum_a v_a(g)$.
 Stage~$j$ then minimizes the penalized fitness
 \begin{equation}\label{eq:penalized-bb}
@@ -442,17 +397,57 @@ Stage~$j$ then minimizes the penalized fitness
 \end{equation}
 where $F_j$ is a scalar fitness (distinct from the ensemble map~$F$ above), the first term is mean squared error of~$g$ against the Huber pseudo-residuals~\eqref{eq:pseudoresid-bb}, and the second term penalizes axiom gaps (squared so the penalty gradient vanishes at zero violation).
 Candidates that already satisfy~\eqref{eq:stage-admiss-bb} therefore incur no penalty pressure.
-\begin{proposition}[Soft-path recovery and containment]\label{prop:soft}
+\begin{proposition}[Zero-penalty implies certificates]\label{prop:soft}
 If $V(g)=0$ at every stage \emph{and} DualInterval evaluation returns finite upper
 enclosures~$\overline{F}<\infty$ on each~$\calI_x$ (the finiteness half of~\eqref{eq:interval-bb},
-discharged in practice by the $C^\infty$ operator set of \cref{sec:boosting}), then the soft path recovers the hard-path conclusion of \cref{thm:guarantee} exactly.
+discharged in practice by the $C^\infty$ operator set of \cref{sec:boosting}), then certificates~(a)--(b) hold and the boosting guarantee of \cref{thm:guarantee} applies exactly.
 The scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-bound the corresponding true pointwise violations on~$\calI_x$ (while $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact).
-Moreover, for every finite operator set~$\calP$ there exists $\varepsilon_{\mathrm{decay}}>0$ small enough that every correction accepted by the hard certificates~(a)--(b) has $V(g)=0$ (and finite enclosures), so the soft search contains the hard one of \cref{sec:stage-admiss}.
 \end{proposition}
 (See \cref{sec:soft-proof} for the proof.)
-The soft scores therefore yield a \emph{measured} admissibility gap rather than silent failure.
+The soft scores therefore yield a \emph{measured} admissibility gap, in contrast to unconstrained search ($\lambda_a=0$), which can fit the grid while leaving axiom violations unpenalized.
 Soft scores act as IA proxies for~(A1)--(A4) (with positivity~(A5) folded into the irreducible-floor gap and~(A6) into finiteness of the DualInterval enclosure / $C^2$---in practice $C^\infty$---operator set).
-Comparing soft-penalty search ($\lambda_a>0$) against an unconstrained baseline ($\lambda_a=0$), and optionally against a true hard reject filter, is one of the empirical questions the project settles.
+Comparing soft-penalty search ($\lambda_a>0$) against that unconstrained baseline is one of the empirical questions the project settles.
+
+\subsection{Algorithm}\label{sec:algorithm}
+\codeRef{\pyFile{src/search/boosting/algorithm.py}, \pyDir{src/search/boosting}}
+Putting the pieces together, Algorithm~\ref{alg:boosting-bb} builds the ensemble of \cref{sec:boosting}.
+At every stage the correction is the minimizer of the shape-constrained fitness~\eqref{eq:penalized-bb} from \cref{sec:soft}.
+\begin{algorithm}[H]
+\caption{Shape-constrained boosted symbolic regression}
+\label{alg:boosting-bb}
+\begin{algorithmic}[1]
+\Require Dataset $\calD = \{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n}$,
+         stages $K$
+\Ensure Ensemble $\Lhat^{(K)}$ (aims for $V=0$ with finite DualInterval enclosures at every stage)
+\State Fit $\Lhat_0$ via~\eqref{eq:chinchilla-bb} on $\calD$;
+       set $\Lhat^{(0)} \gets \Lhat_0$
+\For{$j = 1, \ldots, K$}
+    \State Compute $\delta_j$ via~\eqref{eq:delta-bb}
+    \State Compute $\tilde{r}_j^{(\ell)}$ for all $\ell=1,\ldots,n$
+           via~\eqref{eq:pseudoresid-bb}
+    \State Find $\Lhat_j$ by minimizing~\eqref{eq:penalized-bb}
+    \State $\Lhat^{(j)} \gets \Lhat^{(j-1)} + \Lhat_j$
+\EndFor
+\State \Return $\Lhat^{(K)}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Guarantee}\label{sec:guarantee}
+\codeRef{\pyFile{src/constraints/guarantee/invariants.py}}
+The soft search of \cref{sec:soft} drives each correction toward vanishing violation scores.
+When $V(\Lhat_j)=0$ with finite DualInterval enclosures at every stage (\cref{prop:soft}), certificates~(a)--(b) of \cref{sec:stage-admiss} hold, and the ensemble preserves admissibility, the joint floor, and the stage-0 rates:
+\begin{theorem}[Boosting guarantee]\label{thm:guarantee}
+Assume $\Lhat_0$ is the admissible stage-0 law of \cref{prop:chinchilla-admiss} (so $L_\infty = E$).
+If every later correction $\Lhat_j$ ($j\geq 1$) has $V(\Lhat_j)=0$ with finite DualInterval enclosures---equivalently, satisfies certificates~(a)--(b) of \cref{sec:stage-admiss} (\cref{prop:soft})---then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
+\begin{equation}\label{eq:guarantee-bb}
+    \lim_{t \to \infty}
+    \frac{\log\bigl(\Lhat^{(j)}(\mathbf{h})\big|_{x=t}
+        - L^{\infty}_{x}\bigr)}{\log t}
+    \;=\; c_x^{(0)},
+\end{equation}
+where $L^{\infty}_{x}$ is the marginal floor of $\Lhat^{(j)}$ along~$x$ (equal to that of~$\Lhat_0$).
+\end{theorem}
+Boosting therefore improves fit \emph{without} corrupting the interpretable constants researchers actually quote (proofs in \cref{sec:guarantee-proof,sec:soft-proof}).
 
 \section{Additional information}\label{sec:additional}
 
@@ -460,13 +455,13 @@ Comparing soft-penalty search ($\lambda_a>0$) against an unconstrained baseline 
 \codeRef{\pyDir{src/modeling} (modeling); \pyDir{src/search}, \pyDir{src/systems/hpc} (search)}
 The project splits into two fairly independent tracks, so a teammate could own either one.
 The \emph{modeling} track ports and benchmarks transformer pretraining on Neocortex's Cerebras CS-3 systems (\cref{sec:testbeds}) and compares the resulting validation losses to the public Hugging Face loss curves of \cref{sec:baselines} (useful background: PyTorch, or curiosity about the Cerebras software stack).
-The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting,sec:algorithm,sec:soft} to AMA27 (\cref{sec:testbeds}) and profiles the DualInterval certification inner loop of \cref{sec:certificates} on AmpereOne (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking soft-penalty search against $\lambda_a=0$ and against a hard reject filter (\cref{sec:stage-admiss}).
+The \emph{search} track ports the genetic-programming symbolic-regression loop of \cref{sec:boosting,sec:algorithm,sec:soft} to AMA27 (\cref{sec:testbeds}) and profiles the DualInterval certification inner loop of \cref{sec:certificates} on AmpereOne (useful background: C/C++ or Python performance work, or an interest in Arm/HPC profiling); a self-contained slice of it is benchmarking soft-penalty search against $\lambda_a=0$ (\cref{sec:soft}).
 No prior scaling-law expertise is needed for either; the main thing is an appetite for making code run fast on unusual hardware.
 The student skeleton paths for each track are listed in \cref{sec:code-map}.
 
 \subsection{Deliverables}\label{sec:deliverables}
 \codeRef{\pyFile{src/systems/pipeline/run_discovery.py}}
-(1) An admissible boosted scaling law (\cref{sec:axioms,sec:guarantee}) fit on the collected training grid (\cref{sec:datasets}); (2) a public release of the shape-constrained symbolic-regression library with the interval-arithmetic-certified admissibility checking of \cref{sec:certificates}; and (3) a short paper on the method of \cref{sec:method}.
+(1) An admissible boosted scaling law (\cref{sec:axioms,sec:guarantee}) fit on the collected training grid (\cref{sec:datasets}); (2) a public release of the shape-constrained symbolic-regression library with the DualInterval soft-score / certification stack of \cref{sec:certificates,sec:soft}; and (3) a short paper on the method of \cref{sec:method}.
 Notation, the description$\leftrightarrow$skeleton map, and the formal proofs appear in \cref{sec:notation,sec:code-map,sec:proofs}.
 
 \clearpage
@@ -481,6 +476,7 @@ Notation, the description$\leftrightarrow$skeleton map, and the formal proofs ap
 \section{Notation}\label{sec:notation}
 Symbols used in \cref{sec:method} (and pointed to from the student stubs of \cref{sec:code-map}).
 Formal claims from \cref{sec:method} are proved in \cref{sec:proofs}.
+Violation scores~$v_a$, aggregate~$V$, and fitness~$F_j$ belong to the sole discovery method of \cref{sec:soft}.
 \begin{longtable}{@{}>{$}l<{$}p{0.72\textwidth}@{}}
 \toprule
 \textbf{Symbol} & \textbf{Meaning} \\
@@ -531,7 +527,7 @@ x_{\min},\; x_{\max}
   & Set of admissible scaling laws (\cref{sec:axioms}). \\
 L_\infty,\; L_\infty^{(j)}
   & Joint irreducible-loss floor; joint floor of~$\Lhat^{(j)}$
-    ($L_\infty^{(j)}=E$ under the hard path). \\
+    ($L_\infty^{(j)}=E$ when $V=0$ with finite enclosures). \\
 L^{\infty}_{x}
   & Marginal floor along axis~$x$~\eqref{eq:margfloor-bb}
     (depends on the frozen coordinates). \\
@@ -577,7 +573,7 @@ c_{x,j},\; \mathrm{ord}(g,x)
     $\underline{F}>L_\infty$ certifies~(A3)/(A5) on the box;
     $\overline{F}<\infty$ with the smooth operator set certifies~(A6). \\
 a,\; v_a(g),\; V(g)
-  & Soft-path axiom index $a\in\{\mathrm{mono},\mathrm{conv},\mathrm{irred},
+  & Soft-search axiom index $a\in\{\mathrm{mono},\mathrm{conv},\mathrm{irred},
     \mathrm{decay},\mathrm{leaf}\}$; per-axiom violation score;
     aggregate $V=\sum_a v_a$~\eqref{eq:violations-bb}. \\
 \varepsilon_{\mathrm{decay}}
@@ -588,7 +584,7 @@ a,\; v_a(g),\; V(g)
 \lambda_a
   & Positive penalty weight for axiom~$a$. \\
 F_j(g)
-  & Soft-path penalized fitness at stage~$j$~\eqref{eq:penalized-bb}
+  & Shape-constrained penalized fitness at stage~$j$~\eqref{eq:penalized-bb}
     (distinct from~$F$). \\
 \end{longtable}
 
@@ -597,6 +593,7 @@ The repository ships a student implementation skeleton under \pyDir{src}, groupe
 Blue links open the corresponding paths on GitHub (\texttt{main}).
 Each technical subsection in the main text also points to those files via the \textit{Code skeleton} lines; symbols used there are listed in \cref{sec:notation}.
 The stage-0 baseline used by the boosting stubs is \cref{prop:chinchilla-admiss}; proofs of all formal claims are in \cref{sec:proofs}.
+The table follows the soft-only method order of \cref{sec:method}: DualInterval enclosures feed the sole discovery package \pyDir{src/search/soft} (\cref{sec:soft}), which Algorithm~\ref{alg:boosting-bb} calls at every stage; there is no hard reject-filter package.
 
 {\small
 \setlength{\tabcolsep}{4pt}
@@ -617,10 +614,10 @@ The stage-0 baseline used by the boosting stubs is \cref{prop:chinchilla-admiss}
 \cref{sec:datasets} & \pyDir{src/scaling} & \pyFile{src/scaling/data/scaling_dataset.py}, \pyFile{src/scaling/data/corpora.py} \\
 \cref{sec:axioms} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/admissibility.py} \\
 \cref{sec:boosting} & \pyDir{src/search} & \pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression} \\
-\cref{sec:stage-admiss,sec:certificates} & \pyDir{src/constraints}, \pyDir{src/search} & \pyFile{src/constraints/axioms/stage_conditions.py}, \pyDir{src/constraints/certificates}, \pyDir{src/search/hard_path} \\
-\cref{sec:algorithm}, Alg.~\ref{alg:boosting-bb} & \pyDir{src/search} & \pyDir{src/search/boosting} \\
+\cref{sec:stage-admiss,sec:certificates} & \pyDir{src/constraints} & \pyFile{src/constraints/axioms/stage_conditions.py}, \pyFile{src/constraints/certificates/interval.py}, \pyFile{src/constraints/certificates/ia_eval.py}, \pyFile{src/constraints/certificates/ia_certificates.py} \\
+\cref{sec:soft} & \pyDir{src/search} & \pyFile{src/search/soft/violations.py}, \pyFile{src/search/soft/fitness.py}, \pyFile{src/search/soft/backends.py} \\
+\cref{sec:algorithm}, Alg.~\ref{alg:boosting-bb} & \pyDir{src/search} & \pyFile{src/search/boosting/algorithm.py}, \pyDir{src/search/boosting} \\
 \cref{sec:guarantee} & \pyDir{src/constraints} & \pyFile{src/constraints/guarantee/invariants.py} \\
-\cref{sec:soft} & \pyDir{src/search} & \pyDir{src/search/soft_path} \\
 \cref{sec:software} (optional JAX) & \pyDir{src/constraints} & \pyFile{src/constraints/certificates/jax_backend.py} \\
 \cref{sec:baselines} & \pyDir{src/scaling} & \pyFile{src/scaling/data/scaling_dataset.py} \\
 \cref{sec:models} & \pyDir{src/modeling} & \pyFile{src/modeling/models/config.py}, \pyFile{src/modeling/models/transformer.py} \\
@@ -632,7 +629,7 @@ The stage-0 baseline used by the boosting stubs is \cref{prop:chinchilla-admiss}
 
 
 \section{Proofs}\label{sec:proofs}
-Proofs follow the dependency order of \cref{sec:method}: stagewise equivalence, then the certificate lemmas used by the hard filter, then the hard-path theorem, then the soft-path proposition.
+Proofs follow the dependency order of \cref{sec:method}: stagewise equivalence, then the certificate lemmas, then zero-penalty implies certificates, then the boosting guarantee.
 Stage-0 admissibility (\cref{prop:chinchilla-admiss}) is independent of the boosting loop and is proved last.
 
 \subsection{Stagewise equivalence}\label{sec:stage-iff-proof}
@@ -714,25 +711,13 @@ Thus $g|_{x=t}=O\bigl(t^{\mathrm{ord}(g,x)}\bigr)$, and whenever there is no exa
 Condition~(v) asks for some $c_{x,j}<c_x^{(0)}$ with $g=O(t^{c_{x,j}})$, which holds with $c_{x,j}=\mathrm{ord}(g,x)$ precisely when $\mathrm{ord}(g,x)<c_x^{(0)}$.
 \end{proof}
 
-\subsection{Hard-path boosting guarantee}\label{sec:guarantee-proof}
-\begin{proof}[Proof of \cref{thm:guarantee}]
-Induct on the stage index~$j$.
-For $j=0$, the claim is \cref{prop:chinchilla-admiss}: $\Lhat_0\in\calS$ with $L_\infty^{(0)}=E$ and the stated $c_x^{(0)}$.
-
-Fix $j\geq 1$ and assume the claim holds through stage~$j-1$.
-Certificates~(a)--(b) accept $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A3),~(A5)--(A6) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
-The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A6) extends by the operator set.
-\Cref{prop:stage-iff} therefore yields $\Lhat^{(j)}\in\calS$ with the same joint floor $L_\infty^{(j)}=L_\infty^{(j-1)}=E$.
-The marginal-floor / rate calculation in the proof of \cref{prop:stage-iff} gives~\eqref{eq:guarantee-bb}.
-\end{proof}
-
-\subsection{Soft-path guarantees}\label{sec:soft-proof}
+\subsection{Zero-penalty implies certificates}\label{sec:soft-proof}
 \begin{proof}[Proof of \cref{prop:soft}]
 By definition each $v_a(g)\geq 0$, and $V(g)=\sum_a v_a(g)$.
 Hence $V(g)=0$ if and only if every score vanishes.
 
-\paragraph{Recovery.}
-$v_{\mathrm{mono}}(g)=0$ iff $\overline{\partial F/\partial x}\leq 0$ for all $x\in\{N,D\}$, which is the monotonicity half of~\eqref{eq:interval-bb}; likewise $v_{\mathrm{conv}}=0$ recovers the convexity test and $v_{\mathrm{irred}}=0$ recovers the floor test of \cref{lem:ia-sound} (hence also positivity~(A5) when $L_\infty>0$).
+\paragraph{Implication.}
+$v_{\mathrm{mono}}(g)=0$ iff $\overline{\partial F/\partial x}\leq 0$ for all $x\in\{N,D\}$, which is the monotonicity half of~\eqref{eq:interval-bb}; likewise $v_{\mathrm{conv}}=0$ is equivalent to the convexity test and $v_{\mathrm{irred}}=0$ is equivalent to the floor test of \cref{lem:ia-sound} (hence also positivity~(A5) when $L_\infty>0$).
 The remaining interval test~$\overline{F}<\infty$ is not encoded as a soft score~$v_a$: under the smooth operator set of \cref{sec:boosting}, a completed DualInterval evaluation already yields finite enclosures, so~(A6) /~(vi) holds whenever the IA layer succeeds.
 $v_{\mathrm{leaf}}(g)=0$ iff both scale variables appear as leaves.
 $v_{\mathrm{decay}}(g)=0$ iff $\mathrm{ord}(g,x)\leq c_x^{(0)}-\varepsilon_{\mathrm{decay}}<c_x^{(0)}$, which is a strict strengthening of~(v).
@@ -751,11 +736,18 @@ pointwise on the box (and likewise for the convexity and floor / positivity gaps
 Taking maxima over $x\in\{N,D\}$ shows that $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ upper-bound the corresponding true violations on the compact slice of~$\widetilde{\bbH}$.
 The quantities $\mathrm{ord}(g,x)$ and $\mathrm{leaves}(g)$ are exact combinatorial reads of the tree, so $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ are exact.
 
-\paragraph{Containment.}
-The attainable values of $\mathrm{ord}(g,x)$ for trees over a finite power set~$\calP$ form a finite subset of~$\bbR$.
-Let $\Delta$ be the minimal positive gap between $c_x^{(0)}$ and any attainable exponent strictly below it (or $\Delta=1$ if no such exponent exists).
-Choosing $0<\varepsilon_{\mathrm{decay}}<\Delta$ forces: every $g$ with $\mathrm{ord}(g,x)<c_x^{(0)}$ automatically satisfies $\mathrm{ord}(g,x)\leq c_x^{(0)}-\varepsilon_{\mathrm{decay}}$.
-Therefore every hard-accepted correction has $v_{\mathrm{decay}}=0$ as well as vanishing mono/conv/irred/leaf scores, i.e.\ $V(g)=0$, and already satisfies~$\overline{F}<\infty$ by~\eqref{eq:interval-bb}, so it is a zero-penalty feasible point of~\eqref{eq:penalized-bb}.
+\end{proof}
+
+\subsection{Boosting guarantee}\label{sec:guarantee-proof}
+\begin{proof}[Proof of \cref{thm:guarantee}]
+Induct on the stage index~$j$.
+For $j=0$, the claim is \cref{prop:chinchilla-admiss}: $\Lhat_0\in\calS$ with $L_\infty^{(0)}=E$ and the stated $c_x^{(0)}$.
+
+Fix $j\geq 1$ and assume the claim holds through stage~$j-1$.
+Certificates~(a)--(b) hold for $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A3),~(A5)--(A6) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
+The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A6) extends by the operator set.
+\Cref{prop:stage-iff} therefore yields $\Lhat^{(j)}\in\calS$ with the same joint floor $L_\infty^{(j)}=L_\infty^{(j-1)}=E$.
+The marginal-floor / rate calculation in the proof of \cref{prop:stage-iff} gives~\eqref{eq:guarantee-bb}.
 \end{proof}
 
 \subsection{Stage-0 Chinchilla admissibility}\label{sec:chinchilla-proof}

@@ -15,9 +15,8 @@ handles that tail (certificate (b)). Composition with forward-mode AD yields
 enclosures of ``F``, ``∂F/∂x``, and ``∂²F/∂x²`` in time linear in the
 expression-tree size.
 
-Both search paths use these primitives:
-* soft path (``sec:soft``) — convert enclosures into continuous ``v_a`` scores;
-* hard path (workshop extension) — accept/reject via certificate (a).
+Soft search (``sec:soft``) converts these enclosures into continuous ``v_a``
+scores that enter the fitness.
 """
 
 from __future__ import annotations

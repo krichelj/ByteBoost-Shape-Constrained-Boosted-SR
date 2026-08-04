@@ -1,5 +1,6 @@
 """
-Soft-path penalized fitness (``sec:soft``, Prop. 3 / ``prop:soft``, eq. penalized-bb).
+Soft-search penalized fitness (``sec:soft``, Prop. 3 / ``prop:soft``:
+zero-penalty ⇒ certificates; eq. penalized-bb).
 
 Stage ``j`` minimizes
 
@@ -12,11 +13,10 @@ penalty gradient vanishes at zero violation.
 Candidates that already satisfy stage admissibility incur no penalty pressure.
 
 Guarantee sketch (see description): ``V = 0`` plus finite DualInterval
-enclosures recovers the hard result on ``ℍ̃``; ``v_irred`` covers joint floor
-(A3) and positivity (A5); A6 is discharged by successful finite IA under the
-``C^∞`` operator set (not a separate ``v_a``); interval-based scores
-upper-bound true pointwise violations on ``I_x``; for small enough
-``ε_decay`` the soft search contains the hard one.
+enclosures implies certificates (a)–(b) and the boosting guarantee on ``ℍ̃``;
+``v_irred`` covers joint floor (A3) and positivity (A5); A6 is discharged by
+successful finite IA under the ``C^∞`` operator set (not a separate ``v_a``);
+interval-based scores upper-bound true pointwise violations on ``I_x``.
 """
 
 from __future__ import annotations
