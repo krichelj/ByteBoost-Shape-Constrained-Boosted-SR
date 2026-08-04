@@ -34,12 +34,27 @@ A scaling-law approximant ``L̂`` is *admissible* (``L̂ ∈ S``) when it satisf
     ``∂²L̂/∂x² ≥ 0`` for all ``x ≥ x_min``, i.e. ``L̂`` is **convex** in ``x``.
     Together with (A1): further increases in ``x`` yield weakly smaller loss
     reductions.
-    Mind the direction. Diminishing returns is classically drawn *concave*, but
-    that picture is of a gain; ``L̂`` is a loss, and a gain like
-    ``L̂(x_min, ·) − L̂`` is concave exactly when ``L̂`` is convex. The certified
-    quantity is the convex one throughout: (A2), stage condition (ii)
-    (``∂²F/∂x² ≥ 0``), the interval test ``∂²F/∂x²̲ ≥ 0``, and
-    ``v_conv = max(0, −∂²F/∂x²̲)`` all carry the same sign.
+    Mind the direction. The textbook form of diminishing returns is *concavity*,
+    but that convention is for an increasing production/utility function whose
+    marginal gain falls. ``L̂`` is a decreasing *loss*, so the same shape carries
+    the opposite sign, and the two agree: a gain like ``L̂(x_min, ·) − L̂`` is
+    concave exactly when ``L̂`` is convex.
+
+    Concretely, for ``L̂ = A·N^(-1/2)`` each 4x in ``N`` buys half of what the
+    previous one did:
+
+        N                 1      4      16     64
+        L̂                 1.0    0.5    0.25   0.125
+        gain over prev.          0.50   0.25   0.125
+
+    The loss row flattens onto its floor, which is convex; the cumulative gain
+    (0, 0.5, 0.75, 0.875) is concave. Same curve, mirrored.
+
+    The certified quantity is the convex one throughout: (A2), stage condition
+    (ii) (``∂²F/∂x² ≥ 0``), the interval test ``∂²F/∂x²̲ ≥ 0``, and
+    ``v_conv = max(0, −∂²F/∂x²̲)`` all carry the same sign. Flipping it would
+    contradict the stage-0 law, whose ``∂²L̂_0/∂N² = α(α+1)A·N^(-α-2)`` is
+    strictly positive (``prop:chinchilla-admiss``).
 
 (A3) **Irreducible loss.**
     Joint floor ``L_∞ > 0`` with ``L̂(h) > L_∞`` for every ``h ∈ ℍ̃``;
