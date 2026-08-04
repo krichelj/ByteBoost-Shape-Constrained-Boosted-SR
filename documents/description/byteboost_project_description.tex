@@ -107,7 +107,7 @@ New Neocortex pretraining runs should emit losses on a comparable protocol so th
 \subsection{Software and tools}\label{sec:software}
 \codeRef{\pyDir{src/modeling/training}, \pyDir{src/search}, \pyDir{src/constraints/certificates}}
 PyTorch~2.x for pretraining (distributed data-parallel training; optional mixed precision), with \texttt{uv} for environment management and Weights \& Biases for experiment logging~\citep{biewald2020wandb}.
-Symbolic search uses \texttt{gplearn}~\citep{stephens2015gplearn} with a custom fitness that adds interval-arithmetic axiom penalties---the sole discovery method of \cref{sec:soft}; an optional PySR backend provides an unconstrained alternate engine for ablation.
+Symbolic search uses \texttt{gplearn}~\citep{stephens2015gplearn} with a custom fitness that adds interval-arithmetic axiom penalties, the sole discovery method of \cref{sec:soft}; an optional PySR backend provides an unconstrained alternate engine for ablation.
 Certificates are evaluated with a pure-Python forward-mode \emph{DualInterval} interval-arithmetic layer (\cref{sec:certificates}); JAX with custom JVPs is an optional acceleration path, not required.
 
 \subsection{Models}\label{sec:models}
@@ -208,8 +208,8 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     logarithm is defined) whenever the limit in~(A3)(ii) is approached from above,
     which follows from~(A1) when the floor is not attained at finite~$t$.
     \item \textbf{Graceful saturation}~\citep{kronberger2022shape}.
-    $\Lhat$ is twice continuously differentiable ($C^2$) in~$x$ on $[x_{\min}, \infty)$
-    ---so that the second derivative in~(A2) exists and is continuous---and
+    $\Lhat$ is twice continuously differentiable ($C^2$) in~$x$ on $[x_{\min}, \infty)$,
+    so that the second derivative in~(A2) exists and is continuous, and
     $\Lhat(x_{\min}, \cdot)$ is finite.
     (Expression-tree corrections used later are in fact $C^\infty$ on $(0,\infty)$.
     The inequality $\Lhat(x_{\min},\cdot)>L_\infty$ is already required by~(A3)(i).)
@@ -221,15 +221,15 @@ In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a si
 \paragraph{Where the axioms come from.}
 (A1)--(A4) are not new modeling choices; each is the formal statement of an empirical regularity already reported in the neural scaling-law literature, and we adopt them from that literature rather than positing them.
 Power-law scaling of generalization error in model and data size is the central finding of \citet{hestness2017scaling} and \citet{kaplan2020scaling}, and is what~(A4) asserts; the monotone decrease~(A1) and the diminishing returns~(A2) are the shape that a decaying power law has.
-\citet{hestness2017scaling} further decompose measured learning curves into a small-data region, a power-law region, and an \emph{irreducible-error region} bounded below by Bayes error---which is the floor~$L_\infty$ of~(A3).
+\citet{hestness2017scaling} further decompose measured learning curves into a small-data region, a power-law region, and an \emph{irreducible-error region} bounded below by Bayes error, which is the floor~$L_\infty$ of~(A3).
 \citet{hoffmann2022chinchilla} make that floor explicit in the parametric form $\Lhat(N,D) = E + A N^{-\alpha} + B D^{-\beta}$, in which~$E$ is read as the loss of an ideal generative process on the data distribution, i.e.\ the entropy of natural text.
-Our stage-0 law~\eqref{eq:chinchilla-bb} is exactly that form generalized to additional hyperparameter axes, so the constants $L_\infty = E$ and $c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ of \cref{prop:chinchilla-admiss} inherit their published meaning directly---which is what makes preserving them across boosting stages (\cref{thm:guarantee}) worth proving.
+Our stage-0 law~\eqref{eq:chinchilla-bb} is exactly that form generalized to additional hyperparameter axes, so the constants $L_\infty = E$ and $c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ of \cref{prop:chinchilla-admiss} inherit their published meaning directly, which is what makes preserving them across boosting stages (\cref{thm:guarantee}) worth proving.
 Related joint $(N,D)$ functional forms fitted for extrapolation appear in \citet{rosenfeld2020constructive} and \citet{alabdulmohsin2022revisiting}.
 By contrast,~(A5) is a regularity condition rather than an empirical claim: it is the smoothness that derivative-based shape constraints need in order to be stated at all~\citep{kronberger2022shape}.
 
 \paragraph{Scope of~(A1)--(A2).}
 Monotonicity and convexity are a modeling restriction, not a universal law.
-\citet{caballero2023broken} document \emph{non-monotonic} scaling behavior---double descent, sharp inflections---that no monotone form can express.
+\citet{caballero2023broken} document \emph{non-monotonic} scaling behavior (double descent, sharp inflections) that no monotone form can express.
 We impose~(A1)--(A2) because this project targets the smooth, monotonically decreasing regime of LLM pretraining validation loss on the grids of \cref{sec:datasets}.
 A testbed that exhibited breaks or double descent would require the axiom set to be relaxed; detecting such a failure is itself a legitimate outcome here, since the soft scores of \cref{sec:soft} \emph{measure} the admissibility gap rather than assume it away.
 
@@ -247,8 +247,8 @@ Stage~$0$ is a generalized Chinchilla law~\citep{hoffmann2022chinchilla}, fit by
 positive parameter constraints.
 Concrete instances include a 2D law in $(N,D)$ and a 4D law that adds two
 hyperparameter axes (e.g.\ weight decay and learning rate). The 4D hyperparameter
-terms may be power laws of the same form as in~\eqref{eq:chinchilla-bb}, or---matching
-U-shaped loss in $\mathrm{lr}$/$\mathrm{wd}$---quadratic penalties in
+terms may be power laws of the same form as in~\eqref{eq:chinchilla-bb}, or, matching
+U-shaped loss in $\mathrm{lr}$/$\mathrm{wd}$, quadratic penalties in
 $\log\phi_{\mathrm{lr}}(\mathrm{lr})$ and $\log\phi_{\mathrm{wd}}(\mathrm{wd})$
 (shape axioms still act only on~$N$ and~$D$):
 \begin{equation}\label{eq:chinchilla-bb}
@@ -337,7 +337,7 @@ Conversely, any update with those three properties satisfies~(i)--(iv) and~(vi)
 together with the tail bound
 $\Lhat_j(\mathbf{h})|_{x=t} = o\bigl(t^{c_x^{(0)}}\bigr)$.
 The gap between that bound and~(v) is deliberate:~(v) is the strictly stronger
-form---it excludes borderline tails such as $t^{c_x^{(0)}}/\log t$---and we adopt
+form, since it excludes borderline tails such as $t^{c_x^{(0)}}/\log t$, and we adopt
 it because it is what the structural test of~(b) decides exactly on a finite
 tree, while only the sufficient direction is needed by \cref{thm:guarantee}.
 \end{proposition}
@@ -367,7 +367,7 @@ hold for each $x \in \{N,D\}$ precisely when the corresponding soft gaps vanish 
 Because the enclosures are sound, vanishing gaps are a \emph{sufficient} certificate that the continuum conditions hold \emph{everywhere} on~$\calI_x$, not merely at sampled points of~$\bbH$ (\cref{lem:ia-sound,sec:cert-lemmas}):
 $\overline{\partial F/\partial x} \leq 0$ forces~$\partial F/\partial x \leq 0$ on~$\calI_x$ (hence~(i) on the box), and likewise for~(ii);
 $\underline{F} > L_\infty > 0$ forces~(iv) on the continuum configurations covered by the product of boxes, and hence also~(iii) (ensemble positivity);
-$\overline{F} < \infty$ forces the finiteness half of~(vi), and---because a finite enclosure also certifies that no denominator or $\mathrm{pow}_p$ argument vanished---yields~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$, discharging~(A5) on the box.
+$\overline{F} < \infty$ forces the finiteness half of~(vi), and, because a finite enclosure also certifies that no denominator or $\mathrm{pow}_p$ argument vanished, yields~$C^2$ (in fact~$C^\infty$) smoothness of~$g$ on~$\calI_x$, discharging~(A5) on the box.
 The implication is one-sided: inflated enclosures can produce positive soft scores for a truly admissible update, but every~$g$ with vanishing gaps on~\eqref{eq:interval-bb} is guaranteed to preserve admissibility on~$\calI_x$.
 Evaluating DualInterval enclosures (and the soft scores built from them) on each GP candidate is the inner-loop hot spot, the direct target of the AMA27 performance work.
 
@@ -387,7 +387,7 @@ Both tests are exact, finite walks over a finite tree, with no floating-point se
 
 \subsection{Shape-constrained search}\label{sec:soft}
 \codeRef{\pyFile{src/search/soft/violations.py}, \pyFile{src/search/soft/fitness.py}, \pyFile{src/search/soft/backends.py}}
-The discovery method---and the only search used by Algorithm~\ref{alg:boosting-bb}---is soft interval-arithmetic search: per-axiom violation scores on the candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$ are folded into the \texttt{gplearn} fitness (\cref{sec:software}), steering the genetic program toward admissible corrections.
+The discovery method, and the only search used by Algorithm~\ref{alg:boosting-bb}, is soft interval-arithmetic search: per-axiom violation scores on the candidate ensemble $F \coloneqq \Lhat^{(j-1)}+g$ are folded into the \texttt{gplearn} fitness (\cref{sec:software}), steering the genetic program toward admissible corrections.
 (The student package is \pyDir{src/search/soft}; there is no separate reject-filter path.)
 Using the interval enclosures of \cref{sec:stage-admiss}(a) and the structural quantities of~(b), define the soft scores of \cref{sec:notation}:
 \begin{equation}\label{eq:violations-bb}
@@ -436,10 +436,10 @@ Candidates with vanishing soft scores (and finite DualInterval enclosures) there
 
 \paragraph{Where the penalties come from.}
 Constraining a symbolic-regression model through bounds on its image and its partial derivatives, and computing those bounds with interval arithmetic, is the shape-constrained symbolic regression of \citet{kronberger2022shape}; \citet{bladek2019formal} attack the same problem with SMT solvers and counterexample-driven GP instead.
-Our $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ are that literature's monotonicity, convexity, and image-bound constraints, specialized to~(A1)--(A3) of \cref{sec:axioms} and evaluated on the ensemble $F = \Lhat^{(j-1)} + g$ rather than on the candidate~$g$ alone---the modification that makes them meaningful stagewise (\cref{prop:stage-iff}).
+Our $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ are that literature's monotonicity, convexity, and image-bound constraints, specialized to~(A1)--(A3) of \cref{sec:axioms} and evaluated on the ensemble $F = \Lhat^{(j-1)} + g$ rather than on the candidate~$g$ alone, the modification that makes them meaningful stagewise (\cref{prop:stage-iff}).
 Where we depart from \citet{kronberger2022shape} is the \emph{handling} of a violation: they enforce constraints as a hard feasibility filter, discarding infeasible candidates during selection or segregating them into a second population, whereas~\eqref{eq:penalized-bb} adds $\sum_a \lambda_a v_a(g)^2$ to the fitness and lets violations shrink continuously.
-That soft, penalty-based treatment follows \citet{martinek2024penalized}, who minimize shape-constraint violations inside the objective rather than applying them only as a post-hoc selection filter, and who report the clearest gains in the data-scarce regime---which is the regime a scaling grid of expensive pretraining runs puts us in.
-The one-sidedness recorded after~\eqref{eq:interval-bb}---inflated enclosures may penalize a candidate that is in fact admissible, but never certify one that is not---is the \emph{pessimistic} constraint evaluation compared against optimistic sampling-based evaluation by \citet{haider2022optimistic}; we take the pessimistic side deliberately, because \cref{thm:guarantee} needs soundness rather than tightness.
+That soft, penalty-based treatment follows \citet{martinek2024penalized}, who minimize shape-constraint violations inside the objective rather than applying them only as a post-hoc selection filter, and who report the clearest gains in the data-scarce regime, which is the regime a scaling grid of expensive pretraining runs puts us in.
+The one-sidedness recorded after~\eqref{eq:interval-bb} (inflated enclosures may penalize a candidate that is in fact admissible, but never certify one that is not) is the \emph{pessimistic} constraint evaluation compared against optimistic sampling-based evaluation by \citet{haider2022optimistic}; we take the pessimistic side deliberately, because \cref{thm:guarantee} needs soundness rather than tightness.
 The remaining two scores have no counterpart in that literature: $v_{\mathrm{decay}}$ encodes the asymptotic-rate axiom~(A4), which is specific to scaling laws, through the structural exponent $\mathrm{ord}(g,x)$ of \cref{sec:stage-admiss}(b) on the half-line $x > x_{\max}$ rather than through an interval bound on a compact box, and $v_{\mathrm{leaf}}$ is the prerequisite that makes that exponent meaningful.
 \begin{proposition}[Zero-penalty implies certificates]\label{prop:soft}
 If $V(g)=0$ at every stage \emph{and} DualInterval evaluation returns finite upper
@@ -449,7 +449,7 @@ The scores $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, $v_{\mathrm{irred}}$ upper-
 \end{proposition}
 (See \cref{sec:soft-proof} for the proof.)
 The soft scores therefore yield a \emph{measured} admissibility gap, in contrast to unconstrained search ($\lambda_a=0$), which can fit the grid while leaving axiom violations unpenalized.
-Soft scores act as IA proxies for~(A1)--(A4) (with~(A5) discharged by finiteness of the DualInterval enclosure / $C^2$---in practice $C^\infty$---operator set).
+Soft scores act as IA proxies for~(A1)--(A4) (with~(A5) discharged by finiteness of the DualInterval enclosure / $C^2$ (in practice $C^\infty$) operator set).
 Comparing soft-penalty search ($\lambda_a>0$) against that unconstrained baseline is one of the empirical questions the project settles.
 
 \subsection{Algorithm}\label{sec:algorithm}
@@ -482,7 +482,7 @@ The soft search of \cref{sec:soft} drives each correction toward vanishing viola
 When $V(\Lhat_j)=0$ with finite DualInterval enclosures at every stage (\cref{prop:soft}), certificates~(a)--(b) of \cref{sec:stage-admiss} hold, and the ensemble preserves admissibility, the joint floor, and the stage-0 rates:
 \begin{theorem}[Boosting guarantee]\label{thm:guarantee}
 Assume $\Lhat_0$ is the admissible stage-0 law of \cref{prop:chinchilla-admiss} (so $L_\infty = E$).
-If every later correction $\Lhat_j$ ($j\geq 1$) has $V(\Lhat_j)=0$ with finite DualInterval enclosures---equivalently, satisfies certificates~(a)--(b) of \cref{sec:stage-admiss} (\cref{prop:soft})---then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
+If every later correction $\Lhat_j$ ($j\geq 1$) has $V(\Lhat_j)=0$ with finite DualInterval enclosures (equivalently, satisfies certificates~(a)--(b) of \cref{sec:stage-admiss}; see \cref{prop:soft}), then for all $j$: $\Lhat^{(j)} \in \calS$; writing $L_\infty^{(j)}$ for the joint floor of~$\Lhat^{(j)}$, one has $L_\infty^{(j)} = E$; and the asymptotic exponents are preserved,
 \begin{equation}\label{eq:guarantee-bb}
     \lim_{t \to \infty}
     \frac{\log\bigl(\Lhat^{(j)}(\mathbf{h})\big|_{x=t}

@@ -8,7 +8,7 @@ doi:10.1162/evco_a_00294; SMT-based variant in Błądek & Krawiec 2019,
 doi:10.1145/3321707.3321743), with two deliberate changes:
 
 * they are evaluated on the *ensemble* ``F = L̂^{(j−1)} + g``, not on ``g``
-  alone — what makes them meaningful stagewise (``prop:stage-iff``);
+  alone, which is what makes them meaningful stagewise (``prop:stage-iff``);
 * violations are *penalized* in the fitness rather than rejected by a hard
   feasibility filter as in Kronberger et al., following the penalized-objective
   treatment of Martinek et al. 2024 (doi:10.1007/978-3-032-25305-7_16).
@@ -35,7 +35,7 @@ Every score is nonnegative. Aggregate ``V(g) = Σ_a v_a(g)``.
 Soft fitness uses ``Σ_a λ_a v_a(g)²`` (typically with positive ``λ``); ``λ = 0``
 is the unconstrained ablation. Soft scores act as IA proxies for A1–A4;
 A5 is discharged by DualInterval finiteness / the ``C²`` (in practice
-``C^∞``) operator set — not a separate ``v_a``. ``V = 0`` with finite
+``C^∞``) operator set, not a separate ``v_a``. ``V = 0`` with finite
 enclosures implies certificates (a)–(b) and the boosting guarantee
 (match ``AXIOM_INDICES`` / your λ schedule).
 """

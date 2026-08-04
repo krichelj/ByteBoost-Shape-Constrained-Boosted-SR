@@ -2,9 +2,9 @@
 Scaling-law datasets (``sec:datasets``, ``sec:setup``, ``sec:baselines``).
 
 Sources named in the project description:
-* Wikipedia, RedPajama, and related open text mixtures — pretraining corpora
+* Wikipedia, RedPajama, and related open text mixtures: pretraining corpora
   (modeling track). FineWeb-Edu is an *optional* workshop extension.
-* Public ``colinear_scaling_models`` on Hugging Face — trained checkpoints and
+* Public ``colinear_scaling_models`` on Hugging Face: trained checkpoints and
   validation-loss curves (``sec:baselines``). Compare *losses* with new
   Neocortex runs; the original training hardware is out of scope and not
   available to students.

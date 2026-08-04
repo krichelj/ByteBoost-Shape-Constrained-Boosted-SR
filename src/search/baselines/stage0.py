@@ -81,7 +81,7 @@ class BaselineFit(ABC):
 
 
 class GeneralizedChinchilla(BaselineFit):
-    """Concrete stage-0 law — implement 2D and/or 4D specializations."""
+    """Concrete stage-0 law; implement 2D and/or 4D specializations."""
 
     def fit(self, X: Any, y: Any) -> None:
         raise NotImplementedError("TODO: NLS fit of eq. chinchilla-bb with positive params")

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# compile.sh — build the ByteBoost project-description PDF.
+# compile.sh: build the ByteBoost project-description PDF.
 #
 # Usage:
 #   bash scripts/compile.sh          # project description

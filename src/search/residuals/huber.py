@@ -19,7 +19,7 @@ continuum domain ``ℍ̃`` used by A1–A5):
 Corrections ``g`` are fit to these Huber pseudo-residuals so outlier runs
 cannot dominate the stage objective. Axiom gaps of ``g`` are scored via
 DualInterval-derived ``v_a`` inside the soft fitness (``sec:soft``,
-``src.search.soft``)—the sole discovery method.
+``src.search.soft``), the sole discovery method.
 """
 
 from __future__ import annotations

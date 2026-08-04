@@ -18,7 +18,7 @@ the project description and the ``src/`` stubs only.
 ```
 documents/
   description/    # project description (.tex, .pdf) + bibliography
-src/              # student skeleton — five packages (see src/README.md)
+src/              # student skeleton, five packages (see src/README.md)
   scaling/        # sec:setup, sec:datasets
   constraints/    # sec:axioms, sec:stage-admiss, sec:guarantee
   search/         # sec:boosting, sec:algorithm, sec:soft
@@ -44,7 +44,7 @@ Requires a standard TeX Live / MacTeX install. After editing the `.tex` file, re
 
 ## Document
 
-- `documents/description/byteboost_project_description.tex` — full project description (fields of science, abstract/summary, testbed requirements, technical method with theorems/algorithms, deliverables). Uses natbib + cleveref; cites `byteboost_refs.bib` in the same directory.
+- `documents/description/byteboost_project_description.tex`: full project description (fields of science, abstract/summary, testbed requirements, technical method with theorems/algorithms, deliverables). Uses natbib + cleveref; cites `byteboost_refs.bib` in the same directory.
 
 ## Student skeleton
 
@@ -52,4 +52,4 @@ See `src/README.md` for the description ↔ package map and suggested implementa
 
 ## Domain consistency
 
-The requested testbeds are **Neocortex (PSC, Cerebras CS-3)** for pretraining and **AMA27 (Stony Brook, AmpereOne A192-32M Arm cluster)** for the CPU-bound symbolic-regression search. Existing LLM *loss* baselines are the public Hugging Face `colinear_scaling_models` inventory (`sec:baselines`) — compare losses, not original training hardware (which is not available to students). Earlier drafts referenced Ookami/A64FX and CS-2 — those systems were replaced; do not reintroduce them except in the historical note explaining AMA27 replaced the retired Ookami. Do not reintroduce GH200/DeltaAI/EPYC as workshop-available baseline hardware.
+The requested testbeds are **Neocortex (PSC, Cerebras CS-3)** for pretraining and **AMA27 (Stony Brook, AmpereOne A192-32M Arm cluster)** for the CPU-bound symbolic-regression search. Existing LLM *loss* baselines are the public Hugging Face `colinear_scaling_models` inventory (`sec:baselines`); compare losses, not original training hardware (which is not available to students). Earlier drafts referenced Ookami/A64FX and CS-2; those systems were replaced, so do not reintroduce them except in the historical note explaining AMA27 replaced the retired Ookami. Do not reintroduce GH200/DeltaAI/EPYC as workshop-available baseline hardware.

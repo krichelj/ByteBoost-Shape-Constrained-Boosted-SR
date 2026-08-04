@@ -55,20 +55,20 @@ order is close to, but not identical to, the narrative order in §4 of the PDF
 Dependency order for the soft-only discovery stack. Modeling / systems tracks
 are independent of this list.
 
-1. `scaling/` — discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
-2. `constraints/certificates/interval.py` — `Interval`, `DualInterval` (incl. `d2` for A2).
+1. `scaling/`: discrete \(\mathbb{H}\), continuum \(\widetilde{\mathbb{H}}\), \(\mathcal{D}\), `I_x` domains
+2. `constraints/certificates/interval.py`: `Interval`, `DualInterval` (incl. `d2` for A2).
    Make division and `pow_p` return a **non-finite** enclosure when the operand
    straddles 0: the whole A5 discharge rests on "finite enclosure ⇒ nothing
    vanished". gplearn's stock protected division (returns 1.0 near zero) is
    discontinuous and will silently break that argument.
-3. `constraints/axioms/admissibility.py` — A1–A5 on \(\widetilde{\mathbb{H}}\)
-4. `search/baselines/` — NLS admissible \(\widehat L_0\)
-5. `search/residuals/` — Huber stage targets
-6. `search/expression/` + `constraints/certificates/ia_eval.py` — trees, \(\mathrm{ord}\), log→raw
+3. `constraints/axioms/admissibility.py`: A1–A5 on \(\widetilde{\mathbb{H}}\)
+4. `search/baselines/`: NLS admissible \(\widehat L_0\)
+5. `search/residuals/`: Huber stage targets
+6. `search/expression/` + `constraints/certificates/ia_eval.py`: trees, \(\mathrm{ord}\), log→raw
 7. `constraints/axioms/stage_conditions.py` + certificate enclosures on \(I_x\subset\widetilde{\mathbb{H}}\)
-8. `search/soft/` — gplearn + IA penalties (A5 via DualInterval finiteness / ``C^∞``)
-9. `search/boosting/` — Algorithm 1 (`sec:algorithm`)
-10. `constraints/guarantee/` — floor / exponent checks on \(\widetilde{\mathbb{H}}\)
+8. `search/soft/`: gplearn + IA penalties (A5 via DualInterval finiteness / ``C^∞``)
+9. `search/boosting/`: Algorithm 1 (`sec:algorithm`)
+10. `constraints/guarantee/`: floor / exponent checks on \(\widetilde{\mathbb{H}}\)
 11. Modeling / systems tracks as assigned: `modeling/`, `systems/hpc/`
 
 ## Notation

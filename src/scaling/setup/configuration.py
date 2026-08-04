@@ -3,8 +3,8 @@ Configuration space and labeled dataset (project description ``sec:setup``).
 
 Formal objects
 --------------
-* ``N``, ``D`` — scale variables (parameter count, training-token count).
-* ``H = {h_1, …, h_m}`` — remaining hyperparameters.
+* ``N``, ``D``: scale variables (parameter count, training-token count).
+* ``H = {h_1, …, h_m}``: remaining hyperparameters.
 * For each coordinate ``h ∈ {N, D} ∪ H``, a finite admissible set ``H_h`` and a
   strictly monotone preprocessing map ``φ_h : H_h → R_{>0}``.
 * Configuration space ``ℍ = ∏_h H_h`` with typical element ``h ∈ ℍ``.
@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 
-# Type aliases — refine as needed (arrays, tensors, …).
+# Type aliases; refine as needed (arrays, tensors, …).
 ConfigPoint = Any  # element h ∈ ℍ (or continuum point in ℍ̃ for axiom checks)
 LossValue = float
 PreprocessMap = Callable[[Any], float]  # φ_h

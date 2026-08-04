@@ -4,7 +4,7 @@ Expression-tree abstraction for a candidate correction ``g`` (``sec:boosting``).
 The project description treats ``g`` as a finite expression tree over
 ``{+, −, ×, ÷} ∪ {pow_p}`` (and optional unary ablations). Those primitives are
 ``C^∞`` away from the zeros of their arguments, so a finite ``F̄ < ∞`` enclosure
-— which also certifies that no denominator or ``pow_p`` argument vanished —
+(which also certifies that no denominator or ``pow_p`` argument vanished)
 discharges graceful saturation (A5) on certification boxes; see ``operators.py``
 for the domain caveat. Concrete encodings (gplearn prefix lists,
 sympy, PySR expressions, …) are left to students; this protocol captures the
