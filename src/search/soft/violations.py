@@ -1,6 +1,27 @@
 """
 Soft-search per-axiom violation scores (``sec:soft``, eq. violations-bb).
 
+Provenance ("Where the penalties come from", ``sec:soft``). ``v_mono``,
+``v_conv``, ``v_irred`` are the monotonicity / convexity / image-bound
+constraints of shape-constrained symbolic regression (Kronberger et al. 2022,
+doi:10.1162/evco_a_00294; SMT-based variant in Błądek & Krawiec 2019,
+doi:10.1145/3321707.3321743), with two deliberate changes:
+
+* they are evaluated on the *ensemble* ``F = L̂^{(j−1)} + g``, not on ``g``
+  alone — what makes them meaningful stagewise (``prop:stage-iff``);
+* violations are *penalized* in the fitness rather than rejected by a hard
+  feasibility filter as in Kronberger et al., following the penalized-objective
+  treatment of Martinek et al. 2024 (doi:10.1007/978-3-032-25305-7_16).
+
+The one-sidedness of IA enclosures (they may penalize an admissible candidate,
+never certify an inadmissible one) is *pessimistic* constraint evaluation in
+the sense of Haider et al. 2022 (doi:10.1145/3512290.3528714); soundness is
+what ``thm:guarantee`` needs, so the pessimistic side is chosen on purpose.
+
+``v_decay`` and ``v_leaf`` have no counterpart in that literature: they encode
+the scaling-law-specific rate axiom A4 via the structural exponent
+``ord(g, x)`` on the half-line ``x > x_max``, not via an interval bound.
+
 Using IA enclosures of ``F = L̂^{(j−1)} + g`` on compact slices ``I_x ⊂ ℍ̃``
 and structural quantities for the ``x → ∞`` tail:
 

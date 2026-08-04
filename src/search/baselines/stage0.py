@@ -2,6 +2,13 @@
 Stage-0 generalized Chinchilla law (``sec:boosting``, Prop. 1 / ``prop:chinchilla-admiss``,
 eq. chinchilla-bb).
 
+The 2D core ``E + A·N^-α + B·D^-β`` is the Chinchilla parametric form of
+Hoffmann et al. 2022 (arXiv:2203.15556, eq. 2), generalized here to extra
+hyperparameter axes; ``E`` is their irreducible loss (entropy of natural text).
+The stagewise-additive ensemble around it is gradient boosting in the sense of
+Friedman 2001 (doi:10.1214/aos/1013203451), with shape-constrained search
+(``sec:soft``) in place of an unconstrained base learner.
+
 Stage 0 fits by nonlinear least squares (positive parameter constraints) an
 admissible baseline on the labeled grid ``ℍ``. The closed-form law extends to
 the continuum domain ``ℍ̃`` and lies in ``S`` (A1)–(A5). The canonical power-law

@@ -1,6 +1,26 @@
 """
 Admissibility axioms (A1)–(A5) (project description ``sec:axioms``).
 
+Provenance ("Where the axioms come from", ``sec:axioms``). A1–A4 are adopted
+from the neural scaling-law literature, not posited here:
+
+* A1/A2/A4 — power-law scaling of generalization error in model and data size
+  (Hestness et al. 2017, arXiv:1712.00409; Kaplan et al. 2020, arXiv:2001.08361).
+* A3 — the "irreducible-error region" of measured learning curves
+  (Hestness et al. 2017), made explicit as ``E`` in the Chinchilla form
+  ``L(N,D) = E + A·N^-α + B·D^-β`` (Hoffmann et al. 2022, arXiv:2203.15556),
+  which is where ``L_∞ = E`` and ``c_N^(0) = −α``, ``c_D^(0) = −β`` get their
+  published meaning.
+* A5 — a regularity condition, not an empirical claim: the smoothness that
+  derivative-based shape constraints require (Kronberger et al. 2022,
+  doi:10.1162/evco_a_00294).
+
+Scope: A1–A2 are a modeling restriction. Non-monotonic scaling (double descent,
+sharp inflections) is documented by Caballero et al. 2023 (arXiv:2210.14891);
+these axioms target the smooth monotone regime of LLM pretraining loss. The
+soft scores of ``sec:soft`` *measure* the admissibility gap rather than assume
+it, so a testbed that violates A1–A2 shows up as a nonzero score.
+
 Although the labeled grid ``ℍ`` is finite, ``L̂`` is constrained on the continuum
 domain ``ℍ̃`` of ``sec:setup``: each scale ranges over ``[x_min, ∞)``, other
 coordinates over finite ``H_h``, with ``ℍ ⊂ ℍ̃``.

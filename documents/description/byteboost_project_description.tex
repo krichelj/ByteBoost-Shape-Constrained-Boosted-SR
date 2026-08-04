@@ -1,5 +1,9 @@
 \documentclass[11pt]{article}
 
+% Latin Modern + T1: scalable outlines (microtype expansion needs them) and
+% accented author names in the bibliography (e.g. B\l{}\k{a}dek).
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
 \usepackage[margin=0.9in]{geometry}
 \usepackage{amsmath, amssymb, mathtools}
 \usepackage{amsthm}
@@ -159,13 +163,13 @@ the continuum domain~$\widetilde{\bbH}$ of \cref{sec:setup}, so that the derivat
 in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
 
 \begin{enumerate}[nosep, leftmargin=2.2em, label=\textup{(A\arabic*)}]
-    \item \textbf{Monotone decrease.}
+    \item \textbf{Monotone decrease}~\citep{hestness2017scaling,kaplan2020scaling}.
     $\dfrac{\partial \Lhat}{\partial x} \leq 0$ for all $x \geq x_{\min}$.
-    \item \textbf{Diminishing returns.}
+    \item \textbf{Diminishing returns}~\citep{hestness2017scaling,kaplan2020scaling}.
     $\dfrac{\partial^2 \Lhat}{\partial x^2} \geq 0$ for all $x \geq x_{\min}$.
     (Together with~(A1), this is the usual diminishing-returns shape: further
     increases in~$x$ yield weakly smaller loss reductions.)
-    \item \textbf{Irreducible loss.}
+    \item \textbf{Irreducible loss}~\citep{hestness2017scaling,hoffmann2022chinchilla}.
     There is a positive \emph{joint floor} $L_\infty$ and, along each axis, a
     \emph{marginal floor} $L^{\infty}_{x}$:
     \begin{enumerate}[nosep, leftmargin=1.4em, label=\textup{(\roman*)}]
@@ -191,7 +195,7 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     larger.
     Joint-floor positivity~$L_\infty>0$ already forces~$\Lhat>0$ on~$\widetilde{\bbH}$, so a
     separate positivity axiom is unnecessary.
-    \item \textbf{Asymptotic power-law decay.}
+    \item \textbf{Asymptotic power-law decay}~\citep{hestness2017scaling,kaplan2020scaling,hoffmann2022chinchilla}.
     Relative to the marginal floor~\eqref{eq:margfloor-bb},
     \begin{equation}\label{eq:powerlaw-bb}
         \lim_{t\to\infty}
@@ -203,7 +207,7 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
     The excess $\Lhat(\mathbf{h})|_{x=t}-L^{\infty}_{x}$ is eventually positive (so the
     logarithm is defined) whenever the limit in~(A3)(ii) is approached from above,
     which follows from~(A1) when the floor is not attained at finite~$t$.
-    \item \textbf{Graceful saturation.}
+    \item \textbf{Graceful saturation}~\citep{kronberger2022shape}.
     $\Lhat$ is twice continuously differentiable ($C^2$) in~$x$ on $[x_{\min}, \infty)$
     ---so that the second derivative in~(A2) exists and is continuous---and
     $\Lhat(x_{\min}, \cdot)$ is finite.
@@ -214,6 +218,21 @@ in~(A1)--(A2) and the limits in~(A3)--(A4) are well-defined.
 These encode physical priors on loss surfaces that unconstrained symbolic regression routinely violates.
 In particular,~(A4) must use $L^{\infty}_{x}$ rather than $L_\infty$: along a single axis the excess over the joint floor need not vanish, so a power-law rate would not be identifiable against $L_\infty$.
 
+\paragraph{Where the axioms come from.}
+(A1)--(A4) are not new modeling choices; each is the formal statement of an empirical regularity already reported in the neural scaling-law literature, and we adopt them from that literature rather than positing them.
+Power-law scaling of generalization error in model and data size is the central finding of \citet{hestness2017scaling} and \citet{kaplan2020scaling}, and is what~(A4) asserts; the monotone decrease~(A1) and the diminishing returns~(A2) are the shape that a decaying power law has.
+\citet{hestness2017scaling} further decompose measured learning curves into a small-data region, a power-law region, and an \emph{irreducible-error region} bounded below by Bayes error---which is the floor~$L_\infty$ of~(A3).
+\citet{hoffmann2022chinchilla} make that floor explicit in the parametric form $\Lhat(N,D) = E + A N^{-\alpha} + B D^{-\beta}$, in which~$E$ is read as the loss of an ideal generative process on the data distribution, i.e.\ the entropy of natural text.
+Our stage-0 law~\eqref{eq:chinchilla-bb} is exactly that form generalized to additional hyperparameter axes, so the constants $L_\infty = E$ and $c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ of \cref{prop:chinchilla-admiss} inherit their published meaning directly---which is what makes preserving them across boosting stages (\cref{thm:guarantee}) worth proving.
+Related joint $(N,D)$ functional forms fitted for extrapolation appear in \citet{rosenfeld2020constructive} and \citet{alabdulmohsin2022revisiting}.
+By contrast,~(A5) is a regularity condition rather than an empirical claim: it is the smoothness that derivative-based shape constraints need in order to be stated at all~\citep{kronberger2022shape}.
+
+\paragraph{Scope of~(A1)--(A2).}
+Monotonicity and convexity are a modeling restriction, not a universal law.
+\citet{caballero2023broken} document \emph{non-monotonic} scaling behavior---double descent, sharp inflections---that no monotone form can express.
+We impose~(A1)--(A2) because this project targets the smooth, monotonically decreasing regime of LLM pretraining validation loss on the grids of \cref{sec:datasets}.
+A testbed that exhibited breaks or double descent would require the axiom set to be relaxed; detecting such a failure is itself a legitimate outcome here, since the soft scores of \cref{sec:soft} \emph{measure} the admissibility gap rather than assume it away.
+
 \subsection{Boosted construction}\label{sec:boosting}
 \codeRef{\pyDir{src/search/baselines}, \pyDir{src/search/residuals}, \pyDir{src/search/expression}}
 The ensemble is built stagewise,
@@ -223,7 +242,8 @@ enforced by the shape-constrained search of \cref{sec:soft} whenever $V=0$ with 
 Throughout, $\Lhat_j$ (subscript) is the stage-$j$ correction and
 $\Lhat^{(j)}$ (superscript) is the cumulative ensemble through stage~$j$,
 so in particular $\Lhat^{(0)} = \Lhat_0$.
-Stage~$0$ is a generalized Chinchilla law, fit by nonlinear least squares with
+The stagewise-additive construction is gradient boosting in the sense of \citet{friedman2001greedy}, with the shape-constrained search of \cref{sec:soft} in place of an unconstrained base learner.
+Stage~$0$ is a generalized Chinchilla law~\citep{hoffmann2022chinchilla}, fit by nonlinear least squares with
 positive parameter constraints.
 Concrete instances include a 2D law in $(N,D)$ and a 4D law that adds two
 hyperparameter axes (e.g.\ weight decay and learning rate). The 4D hyperparameter
@@ -243,7 +263,7 @@ lies in~$\calS$, with joint floor $L_\infty = E$ and asymptotic exponents
 $c_N^{(0)} = -\alpha$, $c_D^{(0)} = -\beta$ (the rates $c_x$ in~(A4) of \cref{sec:axioms} along $N$ and~$D$).
 \end{proposition}
 (See \cref{sec:chinchilla-proof} for the proof.)
-Each later stage $j \geq 1$ fits Huber pseudo-residuals of the current ensemble,
+Each later stage $j \geq 1$ fits Huber pseudo-residuals~\citep{huber1964robust,friedman2001greedy} of the current ensemble,
 with clipping threshold
 \begin{equation}\label{eq:delta-bb}
     \delta_j
@@ -395,6 +415,14 @@ Stage~$j$ then minimizes the penalized fitness
 \end{equation}
 where $F_j$ is a scalar fitness (distinct from the ensemble map~$F$ above), the first term is mean squared error of~$g$ against the Huber pseudo-residuals~\eqref{eq:pseudoresid-bb}, and the second term penalizes axiom gaps (squared so the penalty gradient vanishes at zero violation).
 Candidates with vanishing soft scores (and finite DualInterval enclosures) therefore incur no penalty pressure; note that $v_{\mathrm{decay}}=0$ is slightly stronger than~\eqref{eq:stage-admiss-bb}(v) because of the margin~$\varepsilon_{\mathrm{decay}}$.
+
+\paragraph{Where the penalties come from.}
+Constraining a symbolic-regression model through bounds on its image and its partial derivatives, and computing those bounds with interval arithmetic, is the shape-constrained symbolic regression of \citet{kronberger2022shape}; \citet{bladek2019formal} attack the same problem with SMT solvers and counterexample-driven GP instead.
+Our $v_{\mathrm{mono}}$, $v_{\mathrm{conv}}$, and $v_{\mathrm{irred}}$ are that literature's monotonicity, convexity, and image-bound constraints, specialized to~(A1)--(A3) of \cref{sec:axioms} and evaluated on the ensemble $F = \Lhat^{(j-1)} + g$ rather than on the candidate~$g$ alone---the modification that makes them meaningful stagewise (\cref{prop:stage-iff}).
+Where we depart from \citet{kronberger2022shape} is the \emph{handling} of a violation: they enforce constraints as a hard feasibility filter, discarding infeasible candidates during selection or segregating them into a second population, whereas~\eqref{eq:penalized-bb} adds $\sum_a \lambda_a v_a(g)^2$ to the fitness and lets violations shrink continuously.
+That soft, penalty-based treatment follows \citet{martinek2024penalized}, who minimize shape-constraint violations inside the objective rather than applying them only as a post-hoc selection filter, and who report the clearest gains in the data-scarce regime---which is the regime a scaling grid of expensive pretraining runs puts us in.
+The one-sidedness recorded after~\eqref{eq:interval-bb}---inflated enclosures may penalize a candidate that is in fact admissible, but never certify one that is not---is the \emph{pessimistic} constraint evaluation compared against optimistic sampling-based evaluation by \citet{haider2022optimistic}; we take the pessimistic side deliberately, because \cref{thm:guarantee} needs soundness rather than tightness.
+The remaining two scores have no counterpart in that literature: $v_{\mathrm{decay}}$ and $v_{\mathrm{leaf}}$ encode the asymptotic-rate axiom~(A4), which is specific to scaling laws, and they do so through the structural exponent $\mathrm{ord}(g,x)$ of \cref{sec:stage-admiss}(b) on the half-line $x > x_{\max}$ rather than through an interval bound on a compact box.
 \begin{proposition}[Zero-penalty implies certificates]\label{prop:soft}
 If $V(g)=0$ at every stage \emph{and} DualInterval evaluation returns finite upper
 enclosures~$\overline{F}<\infty$ on each~$\calI_x$ (the finiteness half of~\eqref{eq:interval-bb},
