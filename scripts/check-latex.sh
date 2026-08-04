@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# check-latex.sh — recompile documents/description/byteboost_project_description
+# check-latex.sh: recompile documents/description/byteboost_project_description
 # from source and reject the build if it produces ANY LaTeX error,
 # LaTeX/package/class/font warning, over/underfull box, or BibTeX warning/error.
 #
@@ -19,14 +19,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 if ! command -v latexmk >/dev/null 2>&1; then
-  echo "check-latex: latexmk not found — a TeX Live install is required." >&2
+  echo "check-latex: latexmk not found; a TeX Live install is required." >&2
   exit 2
 fi
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 
-# Copy ONLY source inputs — never the PDF, never stale aux files. Building
+# Copy ONLY source inputs: never the PDF, never stale aux files. Building
 # from a clean slate is the whole point: the verdict must not depend on any
 # previously compiled artifact.
 shopt -s nullglob
@@ -64,7 +64,7 @@ fi
 if [ -f "$log" ] && \
    grep -nE '^!|Emergency stop|Fatal error occurred|LaTeX Error|pdfTeX error' \
         "$log" > errors.txt; then
-  echo "REJECTED: LaTeX errors —"
+  echo "REJECTED: LaTeX errors:"
   sed 's/^/    /' errors.txt
   status=1
 fi
@@ -75,7 +75,7 @@ fi
 if [ -f "$log" ] && \
    grep -nE 'LaTeX Warning:|LaTeX Font Warning:|Package [A-Za-z0-9@]+ Warning:|Class [A-Za-z0-9@]+ Warning:|^(Overfull|Underfull) \\[hv]box' \
         "$log" > warnings.txt; then
-  echo "REJECTED: LaTeX warnings —"
+  echo "REJECTED: LaTeX warnings:"
   sed 's/^/    /' warnings.txt
   status=1
 fi
@@ -86,12 +86,12 @@ fi
 if [ -f "$blg" ] && \
    grep -nE 'Warning--|\(There (was|were) [0-9]+ (warning|error)' \
         "$blg" > bibtex.txt; then
-  echo "REJECTED: BibTeX warnings/errors —"
+  echo "REJECTED: BibTeX warnings/errors:"
   sed 's/^/    /' bibtex.txt
   status=1
 fi
 
 if [ "$status" -eq 0 ]; then
-  echo "OK: $DOC compiled cleanly from scratch — no errors, no warnings."
+  echo "OK: $DOC compiled cleanly from scratch with no errors and no warnings."
 fi
 exit "$status"

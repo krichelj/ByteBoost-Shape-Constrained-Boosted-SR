@@ -4,7 +4,7 @@ Pretraining loop stubs (modeling track; ``sec:testbeds``, ``sec:software``).
 Neocortex (PSC) Cerebras CS-3 systems are requested for the pretraining grid.
 Emit validation losses ``L(h)`` on a protocol comparable to the public Hugging
 Face scaling inventory (``sec:baselines``) so new curves can be compared at the
-loss level — not by re-running models on student GPUs.
+loss level, not by re-running models on student GPUs.
 Environment: ``uv``, Weights & Biases logging.
 """
 
@@ -40,7 +40,7 @@ class PretrainTrainer(ABC):
 class TorchPretrainTrainer(PretrainTrainer):
     """Portable PyTorch DDP prototype (local / available GPUs if any).
 
-    FlashAttention / μP / LLaMA-style blocks are optional ports — not required
+    FlashAttention / μP / LLaMA-style blocks are optional ports, not required
     for a consistent ``(N, D, L)`` measurement grid. Not a workshop hardware
     baseline; public loss baselines live on Hugging Face (``sec:baselines``).
     """

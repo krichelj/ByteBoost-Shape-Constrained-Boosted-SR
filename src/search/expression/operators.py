@@ -16,7 +16,7 @@ fractional ``p`` that dominate ``DEFAULT_POWERS``). Interval arithmetic enforces
 this on ``I_x`` by returning a non-finite enclosure when an operand straddles 0
 (``ia_eval``); beyond ``x_max`` it is a structural side condition
 (``stage_conditions``). Note gplearn's stock *protected* division returns 1.0 for
-near-zero denominators, which is discontinuous — do not rely on it for A5.
+near-zero denominators, which is discontinuous; do not rely on it for A5.
 
 Trees are evaluated on log-features ``log φ_h(h)``; DualInterval certificates on
 ``I_x ⊂ ℍ̃`` map derivatives back to raw ``N``/``D`` via the chain rule

@@ -9,7 +9,7 @@ continuum *slice of* ``ℍ̃`` covering the observed scale range (the half-line
 ``x > x_max`` is handled by structural ``ord``, not by this test).
 
 These enclosures are the substrate for soft violation scores ``v_a`` in
-``src.search.soft`` (``sec:soft``)—not a search-time reject filter. The
+``src.search.soft`` (``sec:soft``), not a search-time reject filter. The
 sufficient inequalities of eq. interval-bb hold precisely when the corresponding
 gaps vanish (and ``F̄ < ∞``):
 

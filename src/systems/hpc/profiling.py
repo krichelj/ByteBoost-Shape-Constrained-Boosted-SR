@@ -2,7 +2,7 @@
 HPC profiling hooks (``sec:testbeds``, ``sec:collaborators``).
 
 Search track: port the GP + IA certification inner loop to AMA27
-(AmpereOne A192-32M). The workload is population-parallel and largely scalar —
+(AmpereOne A192-32M). The workload is population-parallel and largely scalar, so the
 useful AMA27 properties are Arm ISA diversity, high core counts, and dense
 node count for concurrent candidate evaluation.
 

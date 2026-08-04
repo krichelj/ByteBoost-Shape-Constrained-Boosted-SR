@@ -2,7 +2,7 @@
 Shape-constrained boosted symbolic regression (``sec:algorithm``, ``alg:boosting-bb``).
 
 Builds on the stage-0 baseline and search operators of ``sec:boosting``.
-Target invariant: ``L̂^{(j)} ∈ S`` on ``ℍ̃`` for every ``j = 0, …, K`` —
+Target invariant: ``L̂^{(j)} ∈ S`` on ``ℍ̃`` for every ``j = 0, …, K``,
 enforced by soft search when ``V = 0`` and DualInterval enclosures are finite
 (``sec:soft``, ``sec:guarantee``).
 Notation: ``L̂_j`` (subscript) = stage-``j`` correction;
@@ -47,7 +47,7 @@ class BoostingAlgorithm(ABC):
         Parameters
         ----------
         num_stages:
-            ``K`` — number of correction stages after stage 0.
+            ``K``: number of correction stages after stage 0.
         baseline:
             Stage-0 ``BaselineFit`` (``src.search.baselines``).
         search_backend:

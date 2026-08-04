@@ -1,7 +1,7 @@
 """
 Pretraining corpora named in ``sec:datasets``.
 
-Primary mixtures: Wikipedia, RedPajama, and related open text — used when
+Primary mixtures: Wikipedia, RedPajama, and related open text, used when
 generating new ``(N, D, L)`` points on Neocortex (and any portable PyTorch
 prototype). FineWeb-Edu is an optional workshop extension (not required for
 the core grid).

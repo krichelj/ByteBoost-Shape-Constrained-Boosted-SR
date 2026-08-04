@@ -10,7 +10,7 @@ Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoos
 
 ## Student skeleton
 
-Implement the method in [`src/`](src/), organized into five packages (`scaling`, `constraints`, `search`, `modeling`, `systems`). Stubs use the description’s notation and raise `NotImplementedError` — see [`src/README.md`](src/README.md) for the full map and suggested order.
+Implement the method in [`src/`](src/), organized into five packages (`scaling`, `constraints`, `search`, `modeling`, `systems`). Stubs use the description’s notation and raise `NotImplementedError`; see [`src/README.md`](src/README.md) for the full map and suggested order.
 
 Run Python from the repository root so imports like `from src.scaling.setup…` resolve.
 
@@ -18,7 +18,7 @@ Run Python from the repository root so imports like `from src.scaling.setup…` 
 
 ```
 documents/description/   # LaTeX source, bibliography, committed PDF
-src/                     # student skeleton (5 packages — see src/README.md)
+src/                     # student skeleton (5 packages, see src/README.md)
   scaling/               # setup + datasets
   constraints/           # axioms, certificates, guarantee
   search/                # stage-0 / residuals / soft SR (sole) / Algorithm 1
@@ -40,7 +40,7 @@ Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make 
 
 ## Related
 
-- Public HF loss / checkpoint baselines (`sec:baselines`): [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models) — compare *losses*, not original training hardware
+- Public HF loss / checkpoint baselines (`sec:baselines`): [`leibnitz-lab/colinear_scaling_models`](https://huggingface.co/datasets/leibnitz-lab/colinear_scaling_models); compare *losses*, not original training hardware
 - Method: shape-constrained boosted SR with soft IA violation penalties in the GP fitness
 
 ## License

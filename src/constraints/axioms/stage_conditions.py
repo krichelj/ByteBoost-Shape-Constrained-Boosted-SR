@@ -17,9 +17,9 @@ the same rates **if** the increment ``g = L̂_j`` satisfies, for each scale
 
 These are sufficient, not necessary: the converse gives (i)–(iv), (vi) plus only
 the weaker tail bound ``g|_{x=t} = o(t^{c_x^{(0)}})``. Condition (v) is the
-strictly stronger form — it rules out borderline tails like ``t^{c_x^{(0)}}/log t``
-— and is used because it is what ``ord`` decides exactly on a finite tree. Only
-the sufficient direction is needed by ``thm:guarantee``.
+strictly stronger form, since it rules out borderline tails like
+``t^{c_x^{(0)}}/log t``, and is used because it is what ``ord`` decides exactly
+on a finite tree. Only the sufficient direction is needed by ``thm:guarantee``.
 
 When ``L_∞ > 0``, (iv) already implies (iii); both are kept so ensemble
 positivity and floor preservation stay explicit. ``ℍ̃`` is the continuum domain
@@ -30,7 +30,7 @@ half of prop:stage-iff needs ``L̂^{(j−1)} + g`` to stay ``C²`` wherever (A1)
 are asserted. For a finite tree that means no division denominator and no
 ``pow_p`` argument vanishes on ``[x_min, ∞)``. IA discharges this on ``I_x``
 (a finite enclosure implies no such subtree vanished there); past ``x_max`` it is
-a structural side condition — restrict divisors to subtrees of certified sign, or
+a structural side condition: restrict divisors to subtrees of certified sign, or
 widen ``I_x`` past the range you actually report extrapolations over.
 
 Conditions (i)–(iv), (vi) on the compact box ``I_x ⊂ ℍ̃`` are handled by sound
@@ -38,7 +38,7 @@ interval enclosures (A1–A3/A5 on the observed scale range); (v) by the
 structural exponent ``ord(g, x)`` for the ``x → ∞`` tail
 (see ``src.constraints.certificates``). Soft search (``sec:soft`` /
 ``src.search.soft``) turns those quantities into continuous ``v_a`` that enter
-the fitness—the sole discovery method. This module scores increments; it is
+the fitness, the sole discovery method. This module scores increments; it is
 not a search-time accept/reject filter.
 """
 

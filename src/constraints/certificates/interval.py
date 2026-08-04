@@ -11,7 +11,7 @@ for continuum certificates on a slice of ``ℍ̃`` (``sec:setup``, ``sec:axioms`
 * (A5)/(vi) via ``F̄ < ∞``: division and ``pow_p`` are smooth only away from a
   zero argument, so ``__truediv__`` / ``power`` must return a non-finite
   enclosure when the operand straddles 0. A completed finite evaluation then
-  certifies no such subtree vanished on ``I_x`` — which is what makes the
+  certifies no such subtree vanished on ``I_x``, which is what makes the
   operator set ``C²`` (in practice ``C^∞``) there.
 
 The half-line ``x > x_max`` is *not* covered by ``I_x``; structural ``ord``
