@@ -35,8 +35,8 @@ clean_aux() {
 target="${1:-all}"
 
 case "$target" in
-  all|description) compile_description ;;
-  clean)           clean_aux ;;
+  all | description) compile_description ;;
+  clean) clean_aux ;;
   *)
     echo "Usage: $0 [all|description|clean]" >&2
     exit 1

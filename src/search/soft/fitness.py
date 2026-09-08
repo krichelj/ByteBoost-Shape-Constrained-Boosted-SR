@@ -22,9 +22,8 @@ pointwise violations on ``I_x``.
 
 from __future__ import annotations
 
-from typing import Any, Mapping
-
-from src.scaling.setup.constants import DEFAULT_LAMBDAS
+from collections.abc import Mapping
+from typing import Any
 
 
 def penalized_fitness(

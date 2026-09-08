@@ -53,6 +53,4 @@ def verify_guarantee(
     stage0:
         Baseline providing ``E`` and ``c_x^{(0)}``.
     """
-    raise NotImplementedError(
-        "TODO: compare L_∞^{(j)} to E and measured/structural c_x to c_x^{(0)}"
-    )
+    raise NotImplementedError("TODO: compare L_∞^{(j)} to E and measured/structural c_x to c_x^{(0)}")

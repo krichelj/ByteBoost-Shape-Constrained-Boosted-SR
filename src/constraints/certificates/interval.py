@@ -26,9 +26,8 @@ scores that enter the fitness.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Union
 
-Scalar = Union[int, float]
+Scalar = int | float
 
 
 @dataclass

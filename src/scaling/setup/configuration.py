@@ -26,9 +26,9 @@ maps). Keep the mathematical roles intact.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, Callable, Iterable, Mapping, Sequence
-
+from typing import Any
 
 # Type aliases; refine as needed (arrays, tensors, …).
 ConfigPoint = Any  # element h ∈ ℍ (or continuum point in ℍ̃ for axiom checks)
