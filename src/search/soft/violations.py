@@ -42,7 +42,8 @@ enclosures implies certificates (a)–(b) and the boosting guarantee
 
 from __future__ import annotations
 
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from src.scaling.setup.constants import AXIOM_INDICES, EPSILON_DECAY
 

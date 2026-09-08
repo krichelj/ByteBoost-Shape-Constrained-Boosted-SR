@@ -47,7 +47,8 @@ enabled for ablations; they carry the same domain caveat.
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from src.constraints.certificates.interval import DualInterval, Interval
 

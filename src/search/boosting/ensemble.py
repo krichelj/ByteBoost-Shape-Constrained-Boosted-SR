@@ -11,7 +11,8 @@ compose callables for prediction and for DualInterval evaluation of
 
 from __future__ import annotations
 
-from typing import Any, Callable, Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 
 
 def add_correction(

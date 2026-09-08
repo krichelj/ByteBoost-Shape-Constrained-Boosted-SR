@@ -1,0 +1,15 @@
+# Ruff config for ByteBoost 2026, per the `linting` and `code-best-practices` skills.
+# Pinned version and explicit rule set so linter bumps cannot silently move the gate.
+target-version = "py310"
+line-length = 110
+
+[lint]
+# Explicit, not inherited.
+select = ["E", "F", "I", "UP", "B", "SIM", "PLE", "PTH", "RET"]
+ignore = [
+    "E501",     # line length is enforced by ruff format, not checked twice
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"

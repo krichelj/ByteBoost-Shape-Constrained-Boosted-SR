@@ -24,8 +24,50 @@ src/                     # student skeleton (5 packages, see src/README.md)
   search/                # stage-0 / residuals / soft SR (sole) / Algorithm 1
   modeling/              # LM architecture + pretraining
   systems/               # HPC profiling + deliverables pipeline
-scripts/                 # compile.sh, optional check-latex.sh
-Makefile                 # make / make clean / make check
+tests/                   # falsifiable tests mirroring component structure
+  constraints/           # interval arithmetic and certificate tests
+  scaling/               # constants and domain configuration tests
+  scripts/               # build script and deliverable integrity tests
+  search/                # operator set and tree tests
+scripts/                 # compile.sh, check-latex.sh
+.github/workflows/       # GitHub Actions CI quality gates
+.agents/rules/           # Antigravity IDE workspace rules
+Makefile                 # make (pdf) / make check (LaTeX + Python suite)
+pyproject.toml           # uv project definitions and dependency groups
+ruff.toml                # pinned Ruff lint and format configurations
+AGENTS.md                # operational rules for AI coding assistants
+```
+
+## Setup and environment
+
+Python dependencies and virtual environments are managed strictly with [`uv`](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --all-groups
+```
+
+## Quality gates and testing
+
+Run the full unified quality gate (LaTeX checks, Ruff lint/format, Mypy type-checking, and Pytest suite):
+
+```bash
+make check
+```
+
+Individual component gates:
+
+```bash
+make test         # or: uv run pytest -v
+make lint         # or: uv run ruff check . && uv run ruff format --check .
+make types        # or: uv run mypy src/ tests/
+make check-latex  # or: bash scripts/check-latex.sh
+```
+
+Pre-commit hooks are wired with `pre-commit`:
+
+```bash
+uv run pre-commit install
+uv run pre-commit run --all-files
 ```
 
 ## Build (LaTeX)
@@ -36,7 +78,7 @@ bash scripts/compile.sh
 make
 ```
 
-Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`). Use `make clean` to remove aux files. Optionally run `make check` for a from-scratch rebuild that also fails on LaTeX/BibTeX warnings.
+Requires a standard TeX Live / MacTeX install (`pdflatex`, `bibtex`, `latexmk`). Use `make clean` to remove aux files.
 
 ## Related
 

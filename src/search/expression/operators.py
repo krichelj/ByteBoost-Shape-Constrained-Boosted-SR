@@ -28,12 +28,25 @@ uses its own operator table.
 
 from __future__ import annotations
 
-from typing import Final, Sequence
+from collections.abc import Sequence
+from typing import Final
 
 # Finite admissible power set P. Replace / extend for your search.
 DEFAULT_POWERS: Final[Sequence[float]] = (
-    -2.0, -1.0, -0.7, -0.5, -0.3, -0.2, -0.1,
-    0.1, 0.2, 0.3, 0.5, 0.7, 2.0, 3.0,
+    -2.0,
+    -1.0,
+    -0.7,
+    -0.5,
+    -0.3,
+    -0.2,
+    -0.1,
+    0.1,
+    0.2,
+    0.3,
+    0.5,
+    0.7,
+    2.0,
+    3.0,
 )
 
 

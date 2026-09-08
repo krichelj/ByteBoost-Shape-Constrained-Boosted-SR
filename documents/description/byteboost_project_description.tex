@@ -142,12 +142,12 @@ coordinates of~$\mathbf{h}$).
 Let $L \colon \bbH \to \bbR$ be validation loss; we seek $\Lhat \approx L$.
 We are given a labeled dataset
 $\calD = \{(\mathbf{h}_\ell, L(\mathbf{h}_\ell))\}_{\ell=1}^{n} \subset \bbH \times \bbR$.
-For each scale variable $x \in \{N, D\}$ set
+For each scale variable $x \in \{N, D\}$ let
 $x_{\min} \coloneqq \min H_x > 0$ and
 $x_{\max} \coloneqq \max H_x$,
 treat $x$ as continuous on
 $[x_{\min}, \infty)$, and take all derivatives with the other coordinates held fixed.
-Write $\widetilde{\bbH}$ for the corresponding continuum domain: each scale ranges over
+Let $\widetilde{\bbH}$ denote the corresponding continuum domain: each scale ranges over
 $[x_{\min},\infty)$ while non-scale coordinates still range over their finite~$H_h$,
 so $\bbH \subset \widetilde{\bbH}$.
 The labeled loss~$L$ is observed only on~$\bbH$; the approximant~$\Lhat$ is evaluated
@@ -353,7 +353,7 @@ tree, while only the sufficient direction is needed by \cref{thm:guarantee}.
 \end{proposition}
 (See \cref{sec:stage-iff-proof} for the proof.)
 Conditions~(i)--(iv) and~(vi) are still quantified over continua ((i)--(ii) on the half-line $x\geq x_{\min}$; (iii)--(iv) on~$\widetilde{\bbH}$), and~(v) is an asymptotic statement: none of these can be decided by sampling finitely many points of~$\bbH$.
-They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Write $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificate constructions supply the continuous checks used by the soft fitness of \cref{sec:soft}: interval enclosures establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
+They become machine-checkable because every GP proposal~$g$ is a concrete finite expression tree built from~$\{+,-,\times,\div\}\cup\{\mathrm{pow}_p:p\in\calP\}$. Define $F \coloneqq \Lhat^{(j-1)} + g$. Two complementary certificate constructions supply the continuous checks used by the soft fitness of \cref{sec:soft}: interval enclosures establish~(i)--(iv) and~(vi) on the compact box~$\calI_x$ covering the observed grid, while the structural check decides~(v) exactly (and thereby controls the $x\to\infty$ tail that the box does not cover).
 
 \smallskip\noindent
 \emph{(a) Sound interval-arithmetic checks} (conditions~(i)--(iv),~(vi) on a compact slice of~$\widetilde{\bbH}$).
@@ -690,7 +690,7 @@ Stage-0 admissibility (\cref{prop:chinchilla-admiss}) is independent of the boos
 
 \subsection{Stagewise conditions}\label{sec:stage-iff-proof}
 \begin{proof}[Proof of \cref{prop:stage-iff}]
-Write $G\coloneqq\Lhat^{(j-1)}$ and $g\coloneqq\Lhat_j$, so $\Lhat^{(j)}=G+g$.
+Define $G\coloneqq\Lhat^{(j-1)}$ and $g\coloneqq\Lhat_j$, so $\Lhat^{(j)}=G+g$.
 Throughout, derivatives along $x\in\{N,D\}$ hold the other coordinates fixed.
 
 \paragraph{(A1)--(A2).}
@@ -806,7 +806,7 @@ The quantities $\mathrm{ord}(g,x)$ and $\mathrm{leaves}(g)$ are exact combinator
 Induct on the stage index~$j$.
 For $j=0$, the claim is \cref{prop:chinchilla-admiss}: $\Lhat_0\in\calS$ with $L_\infty^{(0)}=E$ and the stated $c_x^{(0)}$.
 
-Fix $j\geq 1$ and assume the claim holds through stage~$j-1$.
+Let $j\geq 1$ and assume the claim holds through stage~$j-1$.
 Certificates~(a)--(b) hold for $g=\Lhat_j$, so by \cref{lem:ia-sound} conditions~(i)--(iv) and the box half of~(vi) hold on each certification box~$\calI_x$ (hence~(A1)--(A5) on that compact slice of~$\widetilde{\bbH}$), and by \cref{lem:ord} condition~(v) holds on the half-line.
 The box covers the observed grid; on $x>x_{\max}$,~(v) together with $G=\Lhat^{(j-1)}\in\calS$ implies that the correction is negligible relative to the leading excess of~$G$, so~(A1)--(A2) of~$G$ persist for large~$x$ (the derivatives of an $O(t^{c})$ term with $c<c_x^{(0)}<0$ are $o$ of those of the leading $t^{c_x^{(0)}}$ excess), and~$C^2$ regularity~(A5) extends by the operator set under the nonvanishing side condition of~(vi) (\cref{sec:stage-admiss}(a)).
 \Cref{prop:stage-iff} therefore yields $\Lhat^{(j)}\in\calS$ with the same joint floor $L_\infty^{(j)}=L_\infty^{(j-1)}=E$.
@@ -815,7 +815,7 @@ The marginal-floor / rate calculation in the proof of \cref{prop:stage-iff} give
 
 \subsection{Stage-0 Chinchilla admissibility}\label{sec:chinchilla-proof}
 \begin{proof}[Proof of \cref{prop:chinchilla-admiss}]
-Write the hyperparameter remainder
+Define the hyperparameter remainder
 \[
     R(\mathbf{h})
     \;\coloneqq\;
@@ -826,7 +826,7 @@ Every summand of~$R$ is strictly positive on~$\widetilde{\bbH}$, hence $R(\mathb
 Shape axioms~(A1),~(A2),~(A4), and~(A5) are imposed only along $x \in \{N,D\}$ with the other coordinates held fixed; under that restriction $R$ is constant in~$x$.
 
 \paragraph{(A1)--(A2).}
-Fix $x = N$ and freeze $(D,h_1,\ldots,h_m)$. Then
+Let $x = N$ and freeze $(D,h_1,\ldots,h_m)$. Then
 \[
     \frac{\partial \Lhat_0}{\partial N}
     \;=\;
@@ -841,7 +841,7 @@ Fix $x = N$ and freeze $(D,h_1,\ldots,h_m)$. Then
 for all $N \geq N_{\min} > 0$. The same identities with $(A,\alpha,N)$ replaced by $(B,\beta,D)$ give~(A1)--(A2) along~$D$.
 
 \paragraph{(A3).}
-Set $L_\infty \coloneqq E > 0$. For every continuum configuration with $N,D \geq$ their minima
+Define $L_\infty \coloneqq E > 0$. For every continuum configuration with $N,D \geq$ their minima
 (and hyperparameters in their~$H_h$),
 \[
     \Lhat_0(\mathbf{h}) - E

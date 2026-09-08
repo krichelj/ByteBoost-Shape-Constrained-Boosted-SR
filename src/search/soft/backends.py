@@ -49,9 +49,7 @@ class GPLearnSoftBackend(SoftSearchBackend):
         *args: Any,
         **kwargs: Any,
     ) -> Any:
-        raise NotImplementedError(
-            "TODO: install IA-penalized raw_fitness during SymbolicRegressor.fit"
-        )
+        raise NotImplementedError("TODO: install IA-penalized raw_fitness during SymbolicRegressor.fit")
 
 
 class PySRSoftBackend(SoftSearchBackend):
