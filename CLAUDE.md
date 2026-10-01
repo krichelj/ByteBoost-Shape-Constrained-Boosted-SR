@@ -17,7 +17,8 @@ the project description and the ``src/`` stubs only.
 
 ```
 documents/
-  description/    # project description (.tex, .pdf) + bibliography
+  description/    # project description (.tex, .pdf) + bibliography; history/ = older copies
+  abstract/       # one-page HPC allocation abstract (.tex, .pdf), self-contained
 src/              # student skeleton, five packages (see src/README.md)
   scaling/        # sec:setup, sec:datasets
   constraints/    # sec:axioms, sec:stage-admiss, sec:guarantee
