@@ -7,6 +7,7 @@ Workshop project for [ByteBoost 2026](https://www.stonybrook.edu/ookami/ByteBoos
 ## Documents
 
 - [Project description](documents/description/byteboost_project_description.pdf)
+- [HPC allocation abstract](documents/abstract/byteboost_abstract.pdf)
 
 ## Student skeleton
 
@@ -17,7 +18,8 @@ Run Python from the repository root so imports like `from src.scaling.setup…` 
 ## Repository layout
 
 ```
-documents/description/   # LaTeX source, bibliography, committed PDF
+documents/description/   # LaTeX source, bibliography, committed PDF (history/: older copies)
+documents/abstract/      # one-page HPC allocation abstract
 src/                     # student skeleton (5 packages, see src/README.md)
   scaling/               # setup + datasets
   constraints/           # axioms, certificates, guarantee
