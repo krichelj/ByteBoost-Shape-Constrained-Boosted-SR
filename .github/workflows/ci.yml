@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@v4
 
@@ -42,8 +42,9 @@ jobs:
         run: uv run pytest -v
 
   latex:
-    runs-on: ubuntu-latest
-    container: texlive/texlive:latest
+    runs-on: [self-hosted, linux]
+    # TeX Live comes from the host (Sanders and Godel carry TeX Live 2023): the
+    # own runners cannot run docker, and the gate passed natively (own-ci-runners).
     steps:
       - uses: actions/checkout@v4
 
