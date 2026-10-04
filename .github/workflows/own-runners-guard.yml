@@ -37,6 +37,9 @@ jobs:
       - name: Prove where this repo's Actions run
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        # guard.py needs Python 3.12 (PEP 695 type aliases). Unpinned, uv took an
-        # older interpreter on self-hosted runner and the guard died on a SyntaxError.
-        run: uv run --no-project --python 3.12 --with pyyaml==6.0.2 python .github/own-runners/guard.py
+        # The guard is the host's own tested copy (claude-code-skills, own-ci-runners),
+        # not a file vendored here: one source of truth for every repo, and a
+        # machine that is not self-hosted runners has no such file and fails.
+        # Python 3.12 because the guard uses PEP 695 aliases (unpinned, uv once
+        # took an older interpreter and the guard died on a SyntaxError).
+        run: uv run --no-project --python 3.12 --with pyyaml==6.0.2 python "$HOME/.claude/skills/own-ci-runners/templates/guard.py"
