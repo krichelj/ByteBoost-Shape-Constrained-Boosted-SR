@@ -43,7 +43,7 @@ jobs:
 
   latex:
     runs-on: [self-hosted, linux]
-    # TeX Live comes from the host (self-hosted runners carry TeX Live 2023): the
+    # TeX Live comes from the host (XXXXXXX and XXXXX carry TeX Live 2023): the
     # own runners cannot run docker, and the gate passed natively (own-ci-runners).
     steps:
       - uses: actions/checkout@v4

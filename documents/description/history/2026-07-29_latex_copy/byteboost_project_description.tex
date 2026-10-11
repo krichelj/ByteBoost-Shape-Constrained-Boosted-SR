@@ -77,7 +77,7 @@ Deliverables will include a certified scaling-law formula fitted to our training
 \end{itemize}
 
 \subsection{Baseline hardware (already available to us)}\label{sec:baselines}
-\textbf{GPU baselines (pretraining comparisons):} 200 NVIDIA GH200 superchips on DeltaAI at NCSA, plus a local four-GH200 cluster.
+\textbf{GPU baselines (pretraining comparisons):} 200 NVIDIA GH200 superchips on XXXXXXX at NCSA, plus a local four-GH200 cluster.
 \textbf{CPU baselines (search/certification comparisons):} three 256-core AMD EPYC (x86) machines, against which we will profile the AMA27 AmpereOne port.
 
 \subsection{Software and tools}\label{sec:software}
@@ -87,7 +87,7 @@ PyTorch 2.x with FlashAttention for pretraining; \texttt{uv} for environment man
 Decoder-only transformer language models in the LLaMA architecture~\citep{touvron2023llama}, spanning roughly 10M--1.4B parameters, across several tokens-per-parameter ratios ($M = D/N$), following the Step Law protocol~\citep{li2025steplaw} and the overtraining regime of Gadre et al.~\citep{gadre2024overtraining}, with $\mu$P~/~$\mu$Transfer~\citep{yang2022mup} to decouple optimization from scale.
 
 \subsection{Datasets}\label{sec:datasets}
-Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and FineWeb-Edu~\citep{penedo2024finewebedu} pretraining corpora; an already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} (trained checkpoints and loss curves from an initial DeltaAI grid).
+Wikipedia~\citep{wikimedia2023wikipedia}, RedPajama~\citep{together2023redpajama}, and FineWeb-Edu~\citep{penedo2024finewebedu} pretraining corpora; an already-public \texttt{colinear\_\allowbreak scaling\_\allowbreak models} collection on Hugging Face~\citep{kricheli2025colinear} (trained checkpoints and loss curves from an initial XXXXXXX grid).
 
 \section{Method summary (technical)}\label{sec:method}
 
